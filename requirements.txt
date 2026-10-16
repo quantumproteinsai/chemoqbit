@@ -1,0 +1,9 @@
+numpy>=2.0
+scipy>=1.12
+pyscf>=2.6
+geometric>=1.1
+rdkit>=2024.3
+fastapi>=0.110
+uvicorn>=0.29
+httpx>=0.27
+pytest>=8

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chemoqbit</title>
+<style>
+:root{--bg:#fbfaf7;--fg:#1d1d1b;--mute:#6b6a64;--line:#e3e0d8;--acc:#1f6f78;--acc2:#b4532a;--card:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#151614;--fg:#ecebe6;--mute:#9a998f;--line:#2e2f2b;--acc:#5fb7c0;--acc2:#e08a5f;--card:#1c1d1a}}
+:root[data-theme=dark]{--bg:#151614;--fg:#ecebe6;--mute:#9a998f;--line:#2e2f2b;--acc:#5fb7c0;--acc2:#e08a5f;--card:#1c1d1a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;padding:20px 16px;max-width:900px;margin-inline:auto}
+h1{font-size:1.25rem;margin:0 0 2px}
+.sub{color:var(--mute);margin:0 0 18px}
+h2{font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);margin:26px 0 8px;font-weight:600}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.kpi b{display:block;font-size:1.35rem;font-variant-numeric:tabular-nums}
+.kpi span{color:var(--mute);font-size:.8rem}
+.wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:.9rem}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--mute);font-weight:600}
+tr.hl td{color:var(--acc);font-weight:600}
+svg text{fill:var(--fg);font-size:12px}
+.note{color:var(--mute);font-size:.8rem;margin-top:24px}
+</style>
+</head>
+<body>
+<h1 id="t"></h1>
+<p class="sub" id="b"></p>
+<div class="kpis" id="k"></div>
+<h2>Energy profile (kcal/mol, relative to reactant)</h2>
+<svg id="prof" viewBox="0 0 600 230" width="100%" role="img" aria-label="Reaction energy profile"></svg>
+<h2>Barrier and rate at <span id="T"></span> K</h2>
+<div class="wrap"><table id="bars"></table></div>
+<h2>Quantum-circuit accuracy vs exact CASCI</h2>
+<div class="wrap"><table id="vqe"></table></div>
+<p class="note">Electronic energies at B3LYP/6-31G(d) geometries; CCSD(T) and active spaces in cc-pVDZ. ΔG‡ adds B3LYP thermal corrections; κ brackets tunnelling between Wigner (lower bound) and a fitted Eckart barrier (upper estimate). Active-space VQE energies alone miss dynamical correlation; the composite rows add the circuit's static-correlation correction (E<sub>VQE</sub> − E<sub>CCSD(T)</sub> in the same active space) to full CCSD(T). Educational use only.</p>
+<script>
+const D=/*__DATA__*/null;
+const $=id=>document.getElementById(id), f=(x,d=2)=>Number(x).toFixed(d);
+const e=x=>Number(x).toExponential(2);
+$('t').textContent=D.meta.title; $('b').textContent=D.meta.blurb; $('T').textContent=f(D.T,1);
+const S=D.summary, best=Object.keys(S).filter(k=>k.startsWith('ADAPT')&&!k.includes('fixed')).sort((a,b)=>parseInt(b.split(' ')[1])-parseInt(a.split(' ')[1]))[0];
+const cc=S['CCSD(T)'];
+$('k').innerHTML=[
+ [f(cc.dE_barrier,1)+' kcal/mol','Barrier, CCSD(T)'],
+ S['CCSD(T)+static 12q (ADAPT)']?[f(S['CCSD(T)+static 12q (ADAPT)'].dE_barrier,1)+' kcal/mol','Barrier, CCSD(T) + 12-qubit circuit correction']:[f(S[best].dE_barrier,1)+' kcal/mol','Barrier, '+best],
+ [f(S[best].dE_barrier,1)+' kcal/mol','Barrier, '+best+' alone'],
+ [f(D.imag_cm,0)+'i cm⁻¹','TS imaginary frequency'],
+ [e(cc.k_wigner)+' – '+e(cc.k_eckart)+' s⁻¹','Rate, CCSD(T), Wigner–Eckart']
+].map(([v,l])=>`<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join('');
+// profile
+(function(){
+ const lv=[['CCSD(T)','var(--acc)'],[best,'var(--acc2)']];
+ const ymax=Math.max(...lv.map(([k])=>S[k].dE_barrier))*1.15, ymin=Math.min(0,...lv.map(([k])=>S[k].dE_rxn))-5;
+ const Y=v=>200-(v-ymin)/(ymax-ymin)*180, xs=[70,300,530];
+ let s='';
+ lv.forEach(([k,c],i)=>{const v=[0,S[k].dE_barrier,S[k].dE_rxn];
+  s+=`<path d="M${xs[0]-40},${Y(v[0])}H${xs[0]+40}C${xs[0]+120},${Y(v[0])} ${xs[1]-90},${Y(v[1])} ${xs[1]-40},${Y(v[1])}H${xs[1]+40}C${xs[1]+90},${Y(v[1])} ${xs[2]-120},${Y(v[2])} ${xs[2]-40},${Y(v[2])}H${xs[2]+40}" fill="none" stroke="${c}" stroke-width="2.5"/>`;
+  s+=`<text x="${xs[1]+46}" y="${Y(v[1])+4+i*14}" style="fill:${c}">${f(v[1],1)}</text><text x="${xs[2]+46}" y="${Y(v[2])+4+i*14}" style="fill:${c}">${f(v[2],1)}</text>`;
+  s+=`<rect x="${12}" y="${10+i*18}" width="14" height="3" style="fill:${c}"/><text x="32" y="${15+i*18}">${k}</text>`;});
+ ['Reactant','TS','Product'].forEach((n,i)=>s+=`<text x="${xs[i]}" y="224" text-anchor="middle" style="fill:var(--mute)">${n}</text>`);
+ $('prof').innerHTML=s;})();
+// barrier table
+$('bars').innerHTML='<tr><th>Level</th><th>ΔE‡</th><th>ΔE<sub>rxn</sub></th><th>ΔG‡</th><th>k<sub>TST</sub> (s⁻¹)</th><th>κ Wigner</th><th>κ Eckart</th><th>k range (s⁻¹)</th></tr>'+
+ Object.entries(S).filter(([k])=>!k.includes('fixed')).map(([k,v])=>`<tr class="${k===best||k==='CCSD(T)'?'hl':''}"><td>${k}</td><td>${f(v.dE_barrier)}</td><td>${f(v.dE_rxn)}</td><td>${f(v.dG_barrier)}</td><td>${e(v.k_classical)}</td><td>${f(v.kappa_wigner)}</td><td>${e(v.kappa_eckart)}</td><td>${e(v.k_wigner)} – ${e(v.k_eckart)}</td></tr>`).join('');
+// vqe table
+let rows='';
+for(const g of ['reactant','ts','product']) for(const [k,v] of Object.entries(D.spaces[g]))
+ rows+=`<tr><td>${g} · ${k.replace('_',' · ')}</td><td>${v.n_qubits}</td><td>${v.n_params}</td><td>${v.gates.CNOT||0}</td><td>${e(v.err_mha)}</td><td>${e(v.fixed_err_mha)}</td></tr>`;
+$('vqe').innerHTML='<tr><th>Geometry · space · ansatz</th><th>Qubits</th><th>Params</th><th>CNOTs</th><th>Error (mHa)</th><th>Fixed-pt error (mHa)</th></tr>'+rows;
+</script>
+</body>
+</html>
