@@ -4,7 +4,7 @@ Quantum chemistry of chemotherapy-relevant reactions on qubits — end to end,
 from PySCF integrals to the 32-bit instruction stream of the **qsim-pynq**
 FPGA state-vector simulator (PYNQ-Z2).
 
-Educational and methodological. Nothing here offers a quantum advantage;
+Educational and methodological. Licence: MIT (see LICENSE); cite via CITATION.cff. Nothing here offers a quantum advantage;
 the value is a complete, checkable workflow on hardware you can build.
 
 ## Pipeline

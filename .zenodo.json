@@ -1,0 +1,14 @@
+{
+  "title": "chemoqbit: quantum chemistry of 5-fluorouracil proton transfer on an FPGA state-vector simulator",
+  "upload_type": "software",
+  "description": "Code, results and tests for an end-to-end study of the lactam-lactim proton shift of 5-fluorouracil and formamide on qubits: PySCF active spaces, UCCSD and ADAPT-VQE with adjoint gradients, a 32-bit instruction set and bit-accurate 18-bit fixed-point emulation for the qsim-pynq FPGA simulator (PYNQ-Z2), composite CCSD(T) corrections and Eckart tunnelling. Includes a FastAPI module for an oncology research platform. Educational; not for clinical use.",
+  "creators": [
+    {"name": "Mercier des Rochettes, Bertrand",
+     "affiliation": "Quantum Proteins AI, Cergy-Pontoise, France",
+     "orcid": "0000-0002-1145-1881"}
+  ],
+  "license": "MIT",
+  "keywords": ["variational quantum eigensolver", "ADAPT-VQE", "FPGA", "fixed-point arithmetic",
+               "proton transfer", "tautomerism", "5-fluorouracil", "CCSD(T)", "tunnelling"],
+  "access_right": "open"
+}

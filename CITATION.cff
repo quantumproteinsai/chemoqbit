@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "chemoqbit: quantum chemistry of 5-fluorouracil proton transfer on an FPGA state-vector simulator"
+version: 1.0.0
+date-released: 2026-10-16
+license: MIT
+repository-code: "https://github.com/bartmercier/chemoqbit"
+authors:
+  - family-names: "Mercier des Rochettes"
+    given-names: "Bertrand"
+    affiliation: "Quantum Proteins AI, Cergy-Pontoise, France"
+    orcid: "https://orcid.org/0000-0002-1145-1881"
+    email: "contact@quantum-proteins.ai"
+keywords:
+  - variational quantum eigensolver
+  - ADAPT-VQE
+  - FPGA
+  - fixed-point arithmetic
+  - proton transfer
+  - tautomerism
+  - 5-fluorouracil
+  - CCSD(T)
+  - tunnelling
