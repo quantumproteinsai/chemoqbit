@@ -101,3 +101,18 @@ re-optimise.
 * Gas-phase, unassisted proton shifts. Water-assisted paths (much lower
   barriers) are the natural next case.
 * Not for clinical use.
+
+## Protein work (beyond the small molecules)
+
+| Path | Contents |
+|---|---|
+| `chemoqbit/fold/` | lattice folding: diamond lattice, Miyazawa–Jernigan contacts, exact enumeration |
+| `chemoqbit/fold/qaoa.py` | QAOA (X and Grover mixers), Walsh/gate-model cost, fixed-point emulation |
+| `chemoqbit/enzyme/` | active-site models: `build.py` (reduced), `cluster.py` (from PDB), `xtb.py`, `frozen.py`, `tsopt.py` (P-RFO, Hessians, isotopes) |
+| `scripts/fold_case.py`, `scripts/fold_variants.py` | folding studies → `results/fold*.json` |
+| `scripts/ts_scan.py`, `scripts/ts_kie.py`, `scripts/ts_dft_sp.py` | thymidylate synthase, reduced model |
+| `scripts/ts_cluster_prep.py`, `scripts/ts_cluster_nuc.py` | 96-atom cluster from 1TLS — see `NUC.md` |
+| `data/1TLS.pdb` | ecTS·FdUMP·CH2H4folate ternary complex, 2.60 Å |
+
+The qsim-pynq instruction set gains a `DIAG` opcode (phase by a diagonal cost
+table in block RAM) for QAOA; see `chemoqbit/isa.py`.
