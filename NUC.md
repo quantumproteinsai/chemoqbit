@@ -4,15 +4,25 @@ The 96-atom active-site cluster is too heavy for a 2-core cloud container.
 Everything is checkpointed in `results/ts_cluster_run.json`, so a run that is
 interrupted resumes where it stopped.
 
-## Setup
+## Setup (LXC container, Debian/Ubuntu)
+
+One script does everything: system packages, venv, dependencies, tests, and a
+thread-timing check.
 
 ```bash
-git clone https://github.com/bartmercier/chemoqbit && cd chemoqbit
-python3 -m venv --system-site-packages .venv
-.venv/bin/pip install -U pip setuptools wheel
-.venv/bin/pip install -r requirements.txt tblite
-.venv/bin/python -m pytest -q tests          # 20 tests, ~20 s
+# from a clone
+bash setup_nuc.sh
+# or from an unzipped copy
+bash setup_nuc.sh /path/to/chemoqbit
 ```
+
+It works around two traps found the hard way:
+
+* Debian patches setuptools so geomeTRIC's build fails with
+  `AttributeError: install_layout`; a venv with fresh setuptools fixes it.
+* **tblite is slower multi-threaded** on systems this size: 0.13 s per
+  gradient at `OMP_NUM_THREADS=1` against 1.75 s at 2. The run script pins
+  the xTB stages to one thread and gives DFT all cores.
 
 `data/1TLS.pdb` is in the repository; nothing else needs downloading.
 
@@ -46,6 +56,14 @@ perpendicular to the acceptor (H···C11 2.69 Å). The crystal captures the sta
 so do not expect a low barrier from the first scan points.
 
 ## Running
+
+```bash
+tmux new -s chemoqbit     # so the run survives a disconnect
+bash run_nuc.sh           # every stage, right thread count for each
+```
+
+`run_nuc.sh` logs to `results/nuc_<date>.log` and prints the barrier and the
+isotope effects at the end. To drive the stages yourself:
 
 ```bash
 # stages 0-4: build, scan, saddle, Hessians, KIE  (GFN2-xTB; a few hours on 8 cores)
