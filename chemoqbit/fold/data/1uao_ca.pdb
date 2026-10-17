@@ -1,0 +1,11 @@
+REMARK  Chignolin, PDB 1UAO (Honda et al., Structure 12, 1507 (2004)), model 1, CA atoms only
+ATOM      2  CA  GLY A   1      -6.878  -0.708   2.896  1.00  0.00           C  
+ATOM     11  CA  TYR A   2      -4.189  -0.302   0.213  1.00  0.00           C  
+ATOM     32  CA  ASP A   3      -1.287   1.320   2.084  1.00  0.00           C  
+ATOM     44  CA  PRO A   4       0.579   3.407  -0.513  1.00  0.00           C  
+ATOM     58  CA  GLU A   5       3.531   3.694   1.893  1.00  0.00           C  
+ATOM     73  CA  THR A   6       4.684   0.239   0.748  1.00  0.00           C  
+ATOM     87  CA  GLY A   7       2.498  -0.018  -2.375  1.00  0.00           C  
+ATOM     94  CA  THR A   8       0.411  -3.025  -1.274  1.00  0.00           C  
+ATOM    108  CA  TRP A   9      -2.598  -4.011   0.868  1.00  0.00           C  
+ATOM    132  CA  GLY A  10      -1.229  -3.774   4.431  1.00  0.00           C  

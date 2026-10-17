@@ -1,11 +1,14 @@
 """A 32-bit gate instruction set for the qsim-pynq overlay.
 
 Word layout (MSB -> LSB)
-    [31:28] opcode   0=NOP 1=H 2=RX 3=RZ 4=CNOT 15=END
-    [27:23] qubit a  (target for 1q gates, control for CNOT)
+    [31:28] opcode   0=NOP 1=H 2=RX 3=RZ 4=CNOT 5=DIAG 15=END
+    [27:23] qubit a  (target for 1q gates, control for CNOT, table slot for DIAG)
     [22:18] qubit b  (CNOT target; 0 otherwise)
     [17:16] reserved
     [15:0]  angle    signed Q0.15 fraction of pi  (theta = pi * a / 2^15)
+
+DIAG multiplies every amplitude x by exp(-i angle * C[x]), with C a
+diagonal cost table preloaded in block RAM (one pass over the state).
 
 Angles are quantised to pi/32768 ~ 9.6e-5 rad. The ARM core streams the
 words over AXI-DMA; the fabric turns the angle into cos/sin(theta/2) with
@@ -21,7 +24,7 @@ from __future__ import annotations
 
 import numpy as np
 
-OP = {'NOP': 0, 'H': 1, 'RX': 2, 'RZ': 3, 'CNOT': 4, 'END': 15}
+OP = {'NOP': 0, 'H': 1, 'RX': 2, 'RZ': 3, 'CNOT': 4, 'DIAG': 5, 'END': 15}
 INV = {v: k for k, v in OP.items()}
 ANGLE_LSB = np.pi / 2 ** 15
 
@@ -40,7 +43,7 @@ def encode(gates):
         qa, qb, ang = g[1], 0, 0
         if g[0] == 'CNOT':
             qb = g[2]
-        elif g[0] in ('RX', 'RZ'):
+        elif g[0] in ('RX', 'RZ', 'DIAG'):
             ang = quantise_angle(g[2]) & 0xFFFF
         assert qa < 32 and qb < 32
         words.append((op << 28) | (qa << 23) | (qb << 18) | ang)
@@ -59,7 +62,7 @@ def decode(words):
             ang -= 2 ** 16
         if op == 'CNOT':
             gates.append(('CNOT', qa, qb))
-        elif op in ('RX', 'RZ'):
+        elif op in ('RX', 'RZ', 'DIAG'):
             gates.append((op, qa, ang * ANGLE_LSB))
         elif op == 'H':
             gates.append(('H', qa))
