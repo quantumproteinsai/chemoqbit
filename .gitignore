@@ -16,3 +16,4 @@ results/ts_pipeline_report.pdf
 results/notify_*
 dist/
 scratch/
+results/service_*.log

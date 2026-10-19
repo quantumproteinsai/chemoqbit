@@ -1,0 +1,21 @@
+[Unit]
+Description=chemoqbit: functional check of the embedded fragment (resumable; skipped once complete)
+StartLimitIntervalSec=6h
+StartLimitBurst=3
+
+[Service]
+Type=simple
+WorkingDirectory=/home/deploy/dev/chemoqbit
+Environment=OMP_NUM_THREADS=2 PYSCF_MAX_MEMORY=2500
+MemoryMax=3G
+MemorySwapMax=256M
+ExecCondition=/home/deploy/dev/chemoqbit/.venv/bin/python /home/deploy/dev/chemoqbit/scripts/nuc_todo.py xc
+ExecStartPre=/bin/sh -c 'echo "=== $(date "+%%F %%T")  start: functional check (OMP_NUM_THREADS=2, 3G cap)"'
+ExecStart=/home/deploy/dev/chemoqbit/.venv/bin/python -u /home/deploy/dev/chemoqbit/scripts/ts_functional_check.py
+StandardOutput=append:/home/deploy/dev/chemoqbit/results/service_xc.log
+StandardError=append:/home/deploy/dev/chemoqbit/results/service_xc.log
+Restart=on-failure
+RestartSec=120
+
+[Install]
+WantedBy=default.target
