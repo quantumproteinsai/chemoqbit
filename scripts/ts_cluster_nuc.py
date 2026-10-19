@@ -281,11 +281,68 @@ def stage_kie(r):
     return r
 
 
+SCRATCH = ROOT / 'scratch'      # survives reboots, unlike /tmp; one structure's files at a time
+
+
+def _dft_energy(atom, basis, xc, df, charge, tag, eps=4.0, conv_tol=1e-8, max_cycle=50):
+    """B3LYP-D3(BJ)-style single point with PCM, resumable after an interruption:
+    the density-fitting integrals go to SCRATCH under a name derived from the
+    geometry and are reused if a complete file exists (it is renamed into place
+    only once fully written), and the SCF is checkpointed every iteration and
+    restarted from the last density. Both files are removed on success.
+    Logs one line per SCF iteration."""
+    import hashlib, os
+    from pyscf import gto, dft as pdft
+    SCRATCH.mkdir(exist_ok=True)
+    key = hashlib.sha1(f'{atom}|{basis}|{xc}|{df}|{charge}|{eps}'.encode()).hexdigest()[:12]
+    stem = SCRATCH / f"{tag.replace('/', '_')}_{key}"
+    cderi, chk = Path(f'{stem}.cderi.h5'), Path(f'{stem}.chk')
+    mol = gto.M(atom=atom, basis=basis, charge=charge, verbose=0)
+    mf = pdft.RKS(mol)
+    if df:
+        mf = mf.density_fit()
+        if cderi.exists():
+            mf.with_df._cderi = str(cderi)
+            log(f'  {tag}: reusing density-fitting integrals {cderi.name}')
+        else:
+            t0 = time.time()
+            part = Path(f'{cderi}.part')
+            part.unlink(missing_ok=True)
+            mf.with_df._cderi_to_save = str(part)
+            mf.with_df.build()
+            os.replace(part, cderi)
+            mf.with_df._cderi = str(cderi)
+            log(f'  {tag}: density-fitting integrals built ({time.time() - t0:.0f}s, '
+                f'{cderi.stat().st_size / 1e9:.1f} GB)')
+    mf.xc = xc; mf.disp = 'd3bj'
+    mf = mf.PCM(); mf.with_solvent.eps = eps
+    mf.conv_tol = conv_tol; mf.max_cycle = max_cycle
+    dm0 = None
+    if chk.exists():
+        try:
+            dm0 = mf.from_chk(str(chk))
+            log(f'  {tag}: restarting the SCF from {chk.name}')
+        except Exception as ex:
+            log(f'  {tag}: checkpoint unreadable ({ex}); starting fresh')
+    mf.chkfile = str(chk)
+    t_it = [time.time()]
+
+    def progress(env):
+        now = time.time()
+        log(f"  {tag}: SCF cycle {env['cycle'] + 1} E={env['e_tot']:.8f} "
+            f"|g|={env.get('norm_gorb', float('nan')):.1e} ({now - t_it[0]:.0f}s)")
+        t_it[0] = now
+    mf.callback = progress
+    mf.kernel(dm0)
+    if mf.converged:
+        cderi.unlink(missing_ok=True); chk.unlink(missing_ok=True)
+    return mf, mol
+
+
 def stage_dft(r, basis='def2-svp', xc='b3lyp', df=None):
     """df: density fitting (RI-JK, def2-universal-jkfit); by default on for
     triple-zeta and larger, where the 4-index integrals for 96 atoms are too
     slow and too large for the NUC's memory"""
-    from pyscf import gto, dft as pdft
     if df is None:
         df = any(t in basis.lower() for t in ('tzv', 'qzv'))
     sym = r['prep']['symbols']
@@ -297,14 +354,7 @@ def stage_dft(r, basis='def2-svp', xc='b3lyp', df=None):
         t0 = time.time()
         X = np.array(r[name]['coords'])
         atom = '\n'.join(f'{s} {x:.6f} {y:.6f} {z:.6f}' for s, (x, y, z) in zip(sym, X))
-        mol = gto.M(atom=atom, basis=basis, charge=1, verbose=0)
-        mf = pdft.RKS(mol)
-        if df:
-            mf = mf.density_fit()
-        mf.xc = xc; mf.disp = 'd3bj'
-        mf = mf.PCM(); mf.with_solvent.eps = 4.0
-        mf.conv_tol = 1e-8
-        mf.kernel()
+        mf, mol = _dft_energy(atom, basis, xc, df, r['prep']['charge'], tag)
         r['dft'][tag] = dict(E=float(mf.e_tot), converged=bool(mf.converged),
                              nao=int(mol.nao), density_fit=bool(df), seconds=time.time() - t0)
         save(r); log(f'DFT {tag}: E={mf.e_tot:.6f} conv={mf.converged} ({time.time() - t0:.0f}s)')
