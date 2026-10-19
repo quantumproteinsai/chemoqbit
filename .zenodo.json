@@ -1,7 +1,8 @@
 {
-  "title": "chemoqbit: quantum chemistry of 5-fluorouracil proton transfer on an FPGA state-vector simulator",
+  "title": "chemoqbit: active-space quantum circuits for 5-fluorouracil tautomerism and thymidylate synthase hydride transfer, with FPGA fixed-point emulation",
+  "version": "1.1.0",
   "upload_type": "software",
-  "description": "Code, results and tests for an end-to-end study of the lactam-lactim proton shift of 5-fluorouracil and formamide on qubits: PySCF active spaces, UCCSD and ADAPT-VQE with adjoint gradients, a 32-bit instruction set and bit-accurate 18-bit fixed-point emulation for the qsim-pynq FPGA simulator (PYNQ-Z2), composite CCSD(T) corrections and Eckart tunnelling. Includes a FastAPI module for an oncology research platform. Educational; not for clinical use.",
+  "description": "Code, results and tests for end-to-end studies of chemical reactions on qubits. (1) The lactam-lactim proton shift of 5-fluorouracil and formamide: PySCF active spaces, UCCSD and ADAPT-VQE with adjoint gradients, a 32-bit instruction set and bit-accurate 18-bit fixed-point emulation for the qsim-pynq FPGA simulator (PYNQ-Z2), composite CCSD(T) corrections and Eckart tunnelling. (2) New in 1.1.0: hydride transfer in thymidylate synthase, using a 96-atom active-site cluster built from PDB 1TLS. The pipeline runs a GFN2-xTB reaction scan with consistency guards and a backward pass, a frozen-atom-aware P-RFO saddle search, finite-difference Hessians, and H/D/T kinetic isotope effects with Wigner and Eckart tunnelling. It adds B3LYP-D3(BJ)/PCM single points, an electrostatically embedded active space with UCCSD- and ADAPT-VQE, ONIOM(CCSD(T):B3LYP) with a DF-MP2 basis-set correction, a functional-sensitivity check, and a PDF report generator. Includes a FastAPI module for an oncology research platform. Educational; not for clinical use.",
   "creators": [
     {"name": "Mercier des Rochettes, Bertrand",
      "affiliation": "Quantum Proteins AI, Cergy-Pontoise, France",
@@ -9,6 +10,8 @@
   ],
   "license": "MIT",
   "keywords": ["variational quantum eigensolver", "ADAPT-VQE", "FPGA", "fixed-point arithmetic",
-               "proton transfer", "tautomerism", "5-fluorouracil", "CCSD(T)", "tunnelling"],
+               "proton transfer", "tautomerism", "5-fluorouracil", "CCSD(T)", "tunnelling",
+               "thymidylate synthase", "hydride transfer", "kinetic isotope effect", "cluster model",
+               "GFN2-xTB", "ONIOM", "electrostatic embedding"],
   "access_right": "open"
 }

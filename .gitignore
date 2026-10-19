@@ -3,3 +3,15 @@ __pycache__/
 *.pyc
 .pytest_cache/
 results_*.log
+# thymidylate synthase cluster runs: logs, archived checkpoints and side files
+# go to the Zenodo dataset (scripts/make_dataset.py), not to git
+results/nuc_*.log
+results/ts_*_2026*.log
+results/ts_cluster_run.*.json
+results/ts_active_*.json
+results/ts_oniom_*.json
+results/ts_focal_*.json
+results/ts_functional_check*.json
+results/ts_pipeline_report.pdf
+results/notify_*
+dist/

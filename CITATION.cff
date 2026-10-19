@@ -1,8 +1,8 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
-title: "chemoqbit: quantum chemistry of 5-fluorouracil proton transfer on an FPGA state-vector simulator"
-version: 1.0.0
-date-released: 2026-10-16
+title: "chemoqbit: active-space quantum circuits for 5-fluorouracil tautomerism and thymidylate synthase hydride transfer, with FPGA fixed-point emulation"
+version: 1.1.0
+date-released: 2026-10-19
 license: MIT
 repository-code: "https://github.com/bartmercier/chemoqbit"
 authors:
@@ -21,3 +21,10 @@ keywords:
   - 5-fluorouracil
   - CCSD(T)
   - tunnelling
+  - thymidylate synthase
+  - hydride transfer
+  - kinetic isotope effect
+  - cluster model
+  - GFN2-xTB
+  - ONIOM
+  - electrostatic embedding
