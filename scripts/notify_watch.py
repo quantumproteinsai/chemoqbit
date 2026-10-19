@@ -29,7 +29,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PENDING = ROOT / 'results' / 'notify_pending.jsonl'
 CRED = Path.home() / '.config' / 'chemoqbit' / 'smtp.ini'
 STEP = re.compile(r'^(DFT |focal |ONIOM\(|oniom |active |barrier |KIE |reactant: |product: |'
-                  r'.*(Error|Traceback|failed))')
+                  r'\S+: barrier |.*(Error|Traceback|failed))')
 
 
 def send(to, subject, body):
