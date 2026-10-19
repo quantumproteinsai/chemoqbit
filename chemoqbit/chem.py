@@ -6,7 +6,7 @@ import numpy as np
 from scipy.optimize import minimize
 import scipy.sparse.linalg as spla
 
-from pyscf import gto, scf, mcscf, ao2mo, cc
+from pyscf import gto, scf, mcscf, ao2mo, cc, qmmm
 
 from .pauli import molecular_qubit_hamiltonian, to_sparse, qubitwise_commuting_groups
 from .isa import encode, decode, peephole
@@ -34,13 +34,22 @@ class ActiveSpaceProblem:
 
 
 def build_problem(atom, basis, ncas, nelecas, label='', charge=0, spin=0,
-                  with_ccsd_t=False, mo_coeff=None, natural_orbitals=True):
-    key = (atom, basis, charge, spin)
+                  with_ccsd_t=False, mo_coeff=None, natural_orbitals=True, point_charges=None):
+    """point_charges: optional (coords in Angstrom, charges in e) embedding the
+    molecule in an electrostatic environment; it enters the one-electron
+    Hamiltonian, so HF, CCSD(T), CASCI and the qubit Hamiltonian all see it."""
+    pc_key = None
+    if point_charges is not None:
+        pc_key = hash(np.round(np.c_[point_charges[0], point_charges[1]], 6).tobytes())
+    key = (atom, basis, charge, spin, pc_key)
     if key in _CACHE:
         mf, nat_mo, e_ccsd_t_cached = _CACHE[key]
     else:
         mol = gto.M(atom=atom, basis=basis, charge=charge, spin=spin, unit='Angstrom', verbose=0)
-        mf = scf.RHF(mol).run(conv_tol=1e-11)
+        mf = scf.RHF(mol)
+        if point_charges is not None:
+            mf = qmmm.mm_charge(mf, point_charges[0], point_charges[1], unit='Angstrom')
+        mf = mf.run(conv_tol=1e-11)
         nat_mo, e_ccsd_t_cached = None, None
     e_ccsd_t = None
     mo = mf.mo_coeff if mo_coeff is None else mo_coeff

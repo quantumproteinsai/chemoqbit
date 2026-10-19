@@ -52,15 +52,21 @@ def run(sym, X, fn, transition=False, hessian=None, maxiter=300, constraints=Non
     return np.array(Xf), fn(np.array(Xf))[0]
 
 
-def fd_hessian(X, grad_fn, h=0.005):
-    """central differences of the gradient (Eh/A) -> Hessian (Eh/A^2), symmetrised"""
-    n = X.size
-    Hs = np.zeros((n, n))
+def _free_coords(n_atoms, free):
+    free = range(n_atoms) if free is None else free
+    return np.array([3 * a + c for a in free for c in range(3)])
+
+
+def fd_hessian(X, grad_fn, h=0.005, free=None):
+    """central differences of the gradient (Eh/A) -> Hessian (Eh/A^2), symmetrised.
+    With `free` (atom indices), only the block over those atoms' coordinates."""
+    idx = _free_coords(len(X), free)
+    Hs = np.zeros((idx.size, idx.size))
     x0 = X.ravel()
-    for k in range(n):
+    for r, k in enumerate(idx):
         xp, xm = x0.copy(), x0.copy()
         xp[k] += h; xm[k] -= h
-        Hs[k] = (grad_fn(xp.reshape(-1, 3)).ravel() - grad_fn(xm.reshape(-1, 3)).ravel()) / (2 * h)
+        Hs[r] = (grad_fn(xp.reshape(-1, 3)).ravel()[idx] - grad_fn(xm.reshape(-1, 3)).ravel()[idx]) / (2 * h)
     return 0.5 * (Hs + Hs.T)
 
 
@@ -84,16 +90,24 @@ def _project_tr(X, m):
     return np.eye(3 * n) - Q @ Q.T
 
 
-def frequencies(X, H, masses):
-    """harmonic wavenumbers (cm-1, imaginary as negative), sorted"""
+def frequencies(X, H, masses, free=None):
+    """harmonic wavenumbers (cm-1, imaginary as negative), sorted.
+    With `free` (atom indices), H is the free-atom block from fd_hessian; the
+    frozen atoms break translational/rotational invariance, so nothing is
+    projected out and every mode is kept."""
     m = np.asarray(masses)
-    mw = 1 / np.sqrt(np.repeat(m, 3))
-    Hm = H * mw[:, None] * mw[None, :]                    # Eh/(A^2 amu)
-    P = _project_tr(X, m)
-    w = np.linalg.eigvalsh(P @ Hm @ P)
+    if free is not None:
+        mw = 1 / np.sqrt(np.repeat(m[list(free)], 3))
+        w = np.linalg.eigvalsh(H * mw[:, None] * mw[None, :])
+    else:
+        mw = 1 / np.sqrt(np.repeat(m, 3))
+        Hm = H * mw[:, None] * mw[None, :]                # Eh/(A^2 amu)
+        P = _project_tr(X, m)
+        w = np.linalg.eigvalsh(P @ Hm @ P)
     conv = HARTREE_J / (1e-20 * AMU_KG)                   # -> s^-2
     nu = np.sign(w) * np.sqrt(np.abs(w) * conv) / (2 * np.pi * C_CM)
-    nu = nu[np.argsort(np.abs(nu))][6:]                   # drop the 6 ~zero modes
+    if free is None:
+        nu = nu[np.argsort(np.abs(nu))][6:]               # drop the 6 ~zero modes
     return np.sort(nu)
 
 
@@ -105,11 +119,12 @@ def moments(X, masses):
     return np.linalg.eigvalsh(I)                          # amu A^2
 
 
-def ln_q_vib_rot(X, nu_real, masses, T):
-    """ln(Q_rot * Q_vib) with Q_vib measured from the bottom of the well (ZPE included)"""
+def ln_q_vib_rot(X, nu_real, masses, T, rot=True):
+    """ln(Q_rot * Q_vib) with Q_vib measured from the bottom of the well (ZPE included).
+    rot=False for a cluster with frozen atoms, which has no free rotation."""
     x = H_PL * C_CM * np.asarray(nu_real) / (KB * T)
     lnqv = np.sum(-x / 2 - np.log1p(-np.exp(-x)))
-    lnqr = 0.5 * np.sum(np.log(moments(X, masses)))       # constants cancel in ratios
+    lnqr = 0.5 * np.sum(np.log(moments(X, masses))) if rot else 0.0   # constants cancel in ratios
     return lnqv + lnqr
 
 
@@ -133,18 +148,31 @@ def _cart_projector(X):
     return np.eye(3 * n) - Q @ Q.T
 
 
-def prfo_follow(X, fn, guide, grad_fn=None, trust=0.08, gtol=3e-4, maxiter=60, log=print):
+def prfo_follow(X, fn, guide, grad_fn=None, trust=0.08, gtol=3e-4, maxiter=60, max_pos=8,
+                neg=1e-3, frozen=(), log=print):
     """Partitioned-RFO saddle search following the Hessian mode that overlaps
     best with `guide` (a 3N displacement, e.g. hydride moving donor->acceptor),
-    with full finite-difference Hessians each step. Units: A, Eh."""
+    with full finite-difference Hessians each step. Units: A, Eh.
+
+    Gives up after `max_pos` consecutive steps in which the followed mode's
+    curvature is above -`neg` (Eh/A^2): the start is then not in a saddle region
+    and the search is only sliding downhill. A C-H-C hydride transfer mode is
+    about -0.2 Eh/A^2; soft collective cluster modes are ~1e-4.
+
+    Atoms in `frozen` are held fixed: the search runs in the free atoms'
+    coordinates, with no translation/rotation projection (the frozen atoms
+    already remove those motions)."""
     grad_fn = grad_fn or (lambda Y: fn(Y)[1])
     X = np.array(X, float)
-    prev = guide.ravel() / np.linalg.norm(guide)
+    free = [a for a in range(len(X)) if a not in set(frozen)] if len(frozen) else None
+    idx = _free_coords(len(X), free)
+    prev = guide.ravel()[idx] / np.linalg.norm(guide.ravel()[idx])
+    n_pos = 0
     for it in range(maxiter):
         E, G = fn(X)
-        P = _cart_projector(X)
-        g = P @ G.ravel()
-        Hs = P @ fd_hessian(X, grad_fn) @ P
+        P = _cart_projector(X) if free is None else np.eye(idx.size)
+        g = P @ G.ravel()[idx]
+        Hs = P @ fd_hessian(X, grad_fn, free=free) @ P
         b, V = np.linalg.eigh(Hs)
         keep = np.abs(b) > 1e-6
         b, V = b[keep], V[:, keep]
@@ -169,14 +197,19 @@ def prfo_follow(X, fn, guide, grad_fn=None, trust=0.08, gtol=3e-4, maxiter=60, l
             ln = 0.5 * (a_ + c_)
             break
         step[oth] = -gq[oth] / (b[oth] - ln)
-        dx = V @ step
+        dx = np.zeros(X.size)
+        dx[idx] = V @ step
         nrm = np.linalg.norm(dx)
         if nrm > trust:
             dx *= trust / nrm
         gr = np.sqrt(np.mean(g ** 2))
         log(f'  PRFO {it:2d} E={E:.6f} rmsG={gr:.2e} mode={k} eig={b[k]:+.4f} overlap={ov[k]:.2f} step={min(nrm, trust):.3f}')
         prev = V[:, k] * np.sign(V[:, k] @ prev)
-        if gr < gtol and b[k] < 0:
+        if gr < gtol and b[k] < -neg:
             return X, E, dict(iterations=it, followed_eig=float(b[k]), overlap=float(ov[k]))
+        n_pos = n_pos + 1 if b[k] > -neg else 0
+        if n_pos >= max_pos:
+            raise RuntimeError(f'PRFO: followed mode has had curvature above {-neg:g} for {n_pos} '
+                               f'steps (eig={b[k]:+.2e}); the guess is not near a saddle point')
         X = X + dx.reshape(-1, 3)
     raise RuntimeError('PRFO did not converge')

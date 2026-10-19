@@ -22,6 +22,15 @@ def energy_grad(sym, X, charge=0, solvent='chloroform'):
     return r.get('energy'), r.get('gradient') / BOHR      # Eh, Eh/Angstrom
 
 
+def charges(sym, X, charge=0, solvent='chloroform'):
+    """GFN2-xTB atomic partial charges (e), e.g. for electrostatic embedding"""
+    calc = Calculator('GFN2-xTB', np.array([Z[s] for s in sym]), X / BOHR, charge=charge)
+    calc.set('verbosity', 0)
+    if solvent:
+        calc.add('alpb-solvation', solvent)
+    return calc.singlepoint().get('charges')
+
+
 def optimise(sym, X, charge=0, constraints=(), k=5.0, gtol=2e-4, maxiter=2000):
     """constraints: [(i, j, d0)] distances or [(i, j, l, m, x0)] for d_ij - d_lm = x0;
     harmonic, k in Eh/A^2.
