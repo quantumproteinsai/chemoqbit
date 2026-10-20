@@ -213,3 +213,89 @@ def prfo_follow(X, fn, guide, grad_fn=None, trust=0.08, gtol=3e-4, maxiter=60, m
                                f'steps (eig={b[k]:+.2e}); the guess is not near a saddle point')
         X = X + dx.reshape(-1, 3)
     raise RuntimeError('PRFO did not converge')
+
+
+def _prfo_step(b, V, gq, k, trust):
+    """P-RFO step in the eigenbasis: maximise along mode k, minimise along the rest"""
+    lp = 0.5 * b[k] + 0.5 * np.sqrt(b[k] ** 2 + 4 * gq[k] ** 2)
+    step = np.zeros_like(gq)
+    step[k] = -gq[k] / (b[k] - lp)
+    oth = np.array([i for i in range(len(b)) if i != k])
+    f = lambda l: l - np.sum(gq[oth] ** 2 / (l - b[oth]))
+    hi = min(b[oth].min(), 0.0) - 1e-3
+    lo = hi - 10.0
+    for _ in range(100):                                  # f increases with l below min(b)
+        mid = 0.5 * (lo + hi)
+        if f(mid) > 0: hi = mid
+        else: lo = mid
+    step[oth] = -gq[oth] / (b[oth] - 0.5 * (lo + hi))
+    dx = V @ step
+    nrm = np.linalg.norm(dx)
+    return (dx * trust / nrm if nrm > trust else dx), nrm
+
+
+def bofill_update(H, s, y):
+    """Bofill's mix of the symmetric-rank-one and Powell-symmetric-Broyden updates"""
+    d = y - H @ s
+    ss, ds = s @ s, d @ s
+    sr1 = np.outer(d, d) / ds if abs(ds) > 1e-12 else 0.0
+    psb = (np.outer(d, s) + np.outer(s, d)) / ss - ds * np.outer(s, s) / ss ** 2
+    phi = ds ** 2 / ((d @ d) * ss) if d @ d > 0 else 0.0
+    return H + phi * sr1 + (1 - phi) * psb
+
+
+def prfo_bofill(X, fn, H0, guide, frozen, trust=0.08, gtol=3e-4, maxiter=150, neg=1e-3,
+                max_pos=8, trust_min=0.01, trust_max=0.15, state=None, save=None, log=print):
+    """P-RFO saddle search for an expensive potential: one gradient per step, the
+    Hessian (free atoms only, as from fd_hessian(..., free=)) taken from `H0` and
+    updated by Bofill's formula. Follows the mode with the largest overlap with
+    `guide`, like prfo_follow. The trust radius adapts: halved when a step raises
+    the RMS gradient, enlarged by 20 % when a full step lowers it. `save(state)`
+    is called after every step and `state` resumes from it. Units: A, Eh."""
+    X = np.array(X, float)
+    fz = set(frozen)
+    free = [a for a in range(len(X)) if a not in fz]
+    idx = _free_coords(len(X), free)
+    if state:
+        X = np.array(state['X']); H = np.array(state['H']); prev = np.array(state['mode'])
+        x_old = np.array(state['x_old']) if state.get('x_old') is not None else None
+        g_old = np.array(state['g_old']) if state.get('g_old') is not None else None
+        it0, n_pos = state['it'], state['n_pos']
+        trust, gr_old, full = state.get('trust', trust), state.get('gr_old'), state.get('full', False)
+    else:
+        H = np.array(H0, float); prev = guide.ravel()[idx] / np.linalg.norm(guide.ravel()[idx])
+        x_old = g_old = None; it0, n_pos = 0, 0
+        gr_old, full = None, False
+    for it in range(it0, maxiter):
+        E, G = fn(X)
+        x, g = X.ravel()[idx], G.ravel()[idx]
+        if x_old is not None:
+            H = bofill_update(H, x - x_old, g - g_old)
+            H = 0.5 * (H + H.T)
+        b, V = np.linalg.eigh(H)
+        ov = np.abs(V.T @ prev)
+        k = int(np.argmax(ov))
+        gq = V.T @ g
+        gr = float(np.sqrt(np.mean(g ** 2)))
+        if gr_old is not None:
+            if gr > gr_old:
+                trust = max(trust_min, 0.5 * trust)
+            elif full:
+                trust = min(trust_max, 1.2 * trust)
+        log(f'  PRFO-B {it:3d} E={E:.6f} rmsG={gr:.2e} mode={k} eig={b[k]:+.4f} overlap={ov[k]:.2f} '
+            f'n_neg={int(np.sum(b < -neg))} trust={trust:.3f}')
+        prev = V[:, k] * np.sign(V[:, k] @ prev)
+        if gr < gtol and b[k] < -neg:
+            return X, E, dict(iterations=it, followed_eig=float(b[k]), overlap=float(ov[k]), rms_grad=gr)
+        n_pos = n_pos + 1 if b[k] > -neg else 0
+        if n_pos >= max_pos:
+            raise RuntimeError(f'PRFO-B: followed mode curvature above {-neg:g} for {n_pos} steps')
+        dx, nrm = _prfo_step(b, V, gq, k, trust)
+        full, gr_old = nrm >= trust, gr
+        x_old, g_old = x, g
+        Xn = X.ravel().copy(); Xn[idx] += dx; X = Xn.reshape(-1, 3)
+        if save:
+            save(dict(X=X.tolist(), H=H.tolist(), mode=prev.tolist(), x_old=x_old.tolist(),
+                      g_old=g_old.tolist(), it=it + 1, n_pos=n_pos, E=E, rms_grad=gr,
+                      trust=trust, gr_old=gr_old, full=bool(full)))
+    raise RuntimeError('PRFO-B did not converge')

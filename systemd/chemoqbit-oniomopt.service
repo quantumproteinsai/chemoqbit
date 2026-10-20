@@ -1,0 +1,20 @@
+[Unit]
+Description=chemoqbit: ONIOM(wB97X-D3:xTB) optimisation, partial Hessians and KIEs (resumable; skipped once complete)
+StartLimitIntervalSec=6h
+StartLimitBurst=3
+
+[Service]
+Type=simple
+WorkingDirectory=/home/deploy/dev/chemoqbit
+Environment=PYSCF_MAX_MEMORY=2500
+MemoryMax=4G
+ExecCondition=/home/deploy/dev/chemoqbit/.venv/bin/python /home/deploy/dev/chemoqbit/scripts/nuc_todo.py oniomopt
+ExecStartPre=/bin/sh -c 'echo "=== $(date "+%%F %%T")  start: ONIOM optimisation"'
+ExecStart=/bin/sh -c 'if systemctl --user is-active -q chemoqbit-tzvp; then n=2; else n=4; fi; echo "OMP_NUM_THREADS=$n"; OMP_NUM_THREADS=$n exec /home/deploy/dev/chemoqbit/.venv/bin/python -u /home/deploy/dev/chemoqbit/scripts/ts_oniom_opt.py'
+StandardOutput=append:/home/deploy/dev/chemoqbit/results/service_oniomopt.log
+StandardError=append:/home/deploy/dev/chemoqbit/results/service_oniomopt.log
+Restart=on-failure
+RestartSec=120
+
+[Install]
+WantedBy=default.target

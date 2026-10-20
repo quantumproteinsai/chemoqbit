@@ -238,15 +238,17 @@ def stage_hess(r):
     return r
 
 
-def stage_kie(r):
-    sym, _, k, frozen, _, _ = _ctx(r)
-    free = _free(sym, frozen)
+def kie_analysis(sym, k, free, coords, hessians, energies, T_K=None, rot=False):
+    """Frequencies, ZPEs and H/D/T kinetic isotope effects (semiclassical TST,
+    Wigner, Eckart) from reactant/ts/product `coords`, free-atom `hessians`
+    (over the atoms in `free`) and `energies` (Eh). Returns (iso, dE, dEr, kie)."""
+    T_K = TEMP if T_K is None else T_K
     masses = {i: [T.AMU[s] for s in sym] for i in ('H', 'D', 'T')}
     for iso in ('D', 'T'):
         masses[iso][k['Hd']] = T.AMU[iso]
     out = {}
     for name in ('reactant', 'ts', 'product'):
-        X = np.array(r[name]['coords']); H = np.array(r[name]['hessian'])
+        X = np.array(coords[name]); H = np.array(hessians[name])
         out[name] = {}
         for iso in ('H', 'D', 'T'):
             nu = T.frequencies(X, H, masses[iso], free=free)
@@ -254,10 +256,10 @@ def stage_kie(r):
             out[name][iso] = dict(n_imag=int(np.sum(nu < -50)),
                                   imag=float(nu[0]) if nu[0] < 0 else None,
                                   zpe=T.zpe(real),
-                                  lnq=T.ln_q_vib_rot(X, real, masses[iso], TEMP, rot=not frozen))
+                                  lnq=T.ln_q_vib_rot(X, real, masses[iso], T_K, rot=rot))
     R, TS, P = out['reactant'], out['ts'], out['product']
-    dE = (r['ts']['E'] - r['reactant']['E']) * HARTREE_KCAL
-    dEr = (r['product']['E'] - r['reactant']['E']) * HARTREE_KCAL
+    dE = (energies['ts'] - energies['reactant']) * HARTREE_KCAL
+    dEr = (energies['product'] - energies['reactant']) * HARTREE_KCAL
     kie = {}
     for iso in ('D', 'T'):
         sc = float(np.exp((TS['H']['lnq'] - R['H']['lnq']) - (TS[iso]['lnq'] - R[iso]['lnq'])))
@@ -266,11 +268,22 @@ def stage_kie(r):
             V1 = dE + (TS[lab]['zpe'] - R[lab]['zpe']) * HARTREE_KCAL
             V2 = dEr + (P[lab]['zpe'] - R[lab]['zpe']) * HARTREE_KCAL
             nu = abs(TS[lab]['imag'])
-            kap[lab] = dict(wigner=K.wigner(nu, TEMP),
-                            eckart=eckart_kappa(nu, V1, min(V2, V1 - 0.1), TEMP)[0], nu=nu, V1=V1)
+            kap[lab] = dict(wigner=K.wigner(nu, T_K),
+                            eckart=eckart_kappa(nu, V1, min(V2, V1 - 0.1), T_K)[0], nu=nu, V1=V1)
         kie[f'H/{iso}'] = dict(semiclassical=sc,
                                wigner=sc * kap['H']['wigner'] / kap[iso]['wigner'],
                                eckart=sc * kap['H']['eckart'] / kap[iso]['eckart'], kappa=kap)
+    return out, dE, dEr, kie
+
+
+def stage_kie(r):
+    sym, _, k, frozen, _, _ = _ctx(r)
+    names = ('reactant', 'ts', 'product')
+    out, dE, dEr, kie = kie_analysis(sym, k, _free(sym, frozen),
+                                     {n: r[n]['coords'] for n in names},
+                                     {n: r[n]['hessian'] for n in names},
+                                     {n: r[n]['E'] for n in names}, rot=not frozen)
+    TS = out['ts']
     r['analysis'] = dict(T=TEMP, dE_barrier=dE, dE_rxn=dEr, iso=out, kie=kie)
     save(r)
     log(f"barrier {dE:.2f}, reaction {dEr:.2f} kcal/mol; TS imag {TS['H']['imag']:.0f} cm-1 "

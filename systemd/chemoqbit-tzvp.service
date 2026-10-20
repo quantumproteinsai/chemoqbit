@@ -14,6 +14,7 @@ StandardOutput=append:/home/deploy/dev/chemoqbit/results/service_tzvp.log
 StandardError=append:/home/deploy/dev/chemoqbit/results/service_tzvp.log
 Restart=on-failure
 RestartSec=120
+ExecStopPost=/bin/sh -c 'systemctl --user try-restart chemoqbit-oniomopt || true'
 
 [Install]
 WantedBy=default.target
