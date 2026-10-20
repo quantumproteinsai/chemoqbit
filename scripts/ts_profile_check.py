@@ -28,6 +28,13 @@ OUT = ROOT / 'results' / 'ts_profile_check.json'
 XI = [-1.4, -1.2, -1.0, -0.8] + [round(-0.6 + 0.1 * i, 1) for i in range(15)] + [1.0, 1.2, 1.4]
 
 
+def _save(res):
+    """write atomically, so a power cut mid-write cannot corrupt the results"""
+    tmp = OUT.with_suffix('.json.tmp')
+    tmp.write_text(json.dumps(res, indent=1))
+    tmp.replace(OUT)
+
+
 def points(r):
     pts = [('reactant', None, r['reactant'])]
     by_xi = {p['xi']: p for p in r['scan']}
@@ -71,7 +78,7 @@ def main():
             mf.conv_tol = 1e-9
             e[kind] = float(mf.kernel())
             e[f'{kind}_converged'] = bool(mf.converged)
-            OUT.write_text(json.dumps(res, indent=1))
+            _save(res)
         print(f"{name}: done ({time.time() - t0:.0f}s)", flush=True)
 
     # profiles relative to the relaxed reactant
@@ -86,7 +93,7 @@ def main():
             oniom_me=((e['e_xtb_cluster'] + e['frag_gas'] - e['e_xtb_frag'])
                       - (R['e_xtb_cluster'] + R['frag_gas'] - R['e_xtb_frag'])) * K)
     res['_profile'] = prof
-    OUT.write_text(json.dumps(res, indent=1))
+    _save(res)
     print(f'\n{"point":>9} {"xi":>6} {"xTB":>7} {"frag EE":>8} {"ONIOM-ME":>9}   (kcal/mol vs reactant)')
     for name, v in prof.items():
         xi = '' if v['xi'] is None else f"{v['xi']:+.1f}"
