@@ -1,13 +1,13 @@
 [Unit]
 Description=chemoqbit: mail step completions of the running NUC jobs
-Wants=chemoqbit-profile.service
-After=chemoqbit-profile.service
+Wants=chemoqbit-tzvp.service
+After=chemoqbit-tzvp.service
 
 [Service]
 Type=simple
 WorkingDirectory=/home/deploy/dev/chemoqbit
-ExecCondition=/home/deploy/dev/chemoqbit/.venv/bin/python /home/deploy/dev/chemoqbit/scripts/nuc_todo.py profile
-ExecStart=/home/deploy/dev/chemoqbit/.venv/bin/python -u /home/deploy/dev/chemoqbit/scripts/notify_watch.py --to bartmercier@gmail.com --watch profile:results/service_profile.log:chemoqbit-profile
+ExecCondition=/home/deploy/dev/chemoqbit/.venv/bin/python /home/deploy/dev/chemoqbit/scripts/nuc_todo.py tzvp
+ExecStart=/home/deploy/dev/chemoqbit/.venv/bin/python -u /home/deploy/dev/chemoqbit/scripts/notify_watch.py --to bartmercier@gmail.com --watch tzvp:results/service_tzvp.log:chemoqbit-tzvp
 StandardOutput=append:/home/deploy/dev/chemoqbit/results/notify_watch.log
 StandardError=append:/home/deploy/dev/chemoqbit/results/notify_watch.log
 
