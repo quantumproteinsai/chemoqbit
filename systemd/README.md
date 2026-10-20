@@ -9,6 +9,7 @@ themselves once their work is complete (`scripts/nuc_todo.py`).
 |---|---|---|
 | `chemoqbit-tzvp` | def2-TZVP single points (resumable within a structure) | `results/service_tzvp.log` |
 | `chemoqbit-xc` | functional check of the embedded fragment, 3 GB cap | `results/service_xc.log` |
+| `chemoqbit-profile` | wB97X-D3 barrier profile along the xTB path | `results/service_profile.log` |
 | `chemoqbit-notify` | mails step completions (needs `~/.config/chemoqbit/smtp.ini`) | `results/notify_watch.log` |
 
 Install: `cp systemd/*.service ~/.config/systemd/user/ && systemctl --user daemon-reload &&
