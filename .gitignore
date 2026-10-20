@@ -17,3 +17,4 @@ results/notify_*
 dist/
 scratch/
 results/service_*.log
+results/ts_profile_check*.json

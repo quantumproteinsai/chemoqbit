@@ -30,6 +30,7 @@ ROLES = [  # (glob, description) -- first match wins
     ('ts_oniom_*.json', 'ONIOM / electrostatic-embedding stage (and focal-point data if merged), side file'),
     ('ts_focal_*.json', 'ONIOM stage plus DF-MP2 cc-pVDZ/cc-pVTZ basis-set correction, side file'),
     ('ts_functional_check.json', 'embedded-fragment barrier with five functionals at def2-TZVP'),
+    ('ts_profile_check.json', 'wB97X-D3(BJ)/def2-TZVP barrier profile along the xTB path (fragment and ONIOM(DFT:xTB))'),
     ('ts_pipeline_report.pdf', 'report: what failed, why, how it was fixed, and the results'),
     ('nuc_*_tzvp.log', 'run log, def2-TZVP DFT single points (several attempts; see README)'),
     ('nuc_*.log', 'run log, xTB stages and def2-SVP DFT'),
@@ -60,7 +61,9 @@ def status(r):
             ('5 dft def2-TZVP', full('def2-tzvp')),
             ('6 active', len(r.get('active', {})) == 3),
             ('7 oniom', len(r.get('oniom', {})) == 3),
-            ('8 focal', all('mp2' in v for v in r.get('oniom', {}).values()) and len(r.get('oniom', {})) == 3)]
+            ('8 focal', all('mp2' in v for v in r.get('oniom', {}).values()) and len(r.get('oniom', {})) == 3),
+            ('profile check', (RES / 'ts_profile_check.json').exists()
+             and '_profile' in json.loads((RES / 'ts_profile_check.json').read_text()))]
     return rows
 
 
