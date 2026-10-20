@@ -37,10 +37,12 @@ def send(to, subject, body):
         return False
     c = configparser.ConfigParser(); c.read(CRED)
     m = EmailMessage()
-    m['From'], m['To'], m['Subject'] = c['smtp']['user'], to, subject
+    m['From'], m['To'], m['Subject'] = c['smtp']['user'].strip().strip('"\''), to, subject
     m.set_content(body)
     with smtplib.SMTP('smtp.gmail.com', 587, timeout=30) as s:
-        s.starttls(); s.login(c['smtp']['user'], c['smtp']['password']); s.send_message(m)
+        # tolerate a quoted value: configparser keeps quotes as part of it
+        pw = c['smtp']['password'].strip().strip('"\'')
+        s.starttls(); s.login(c['smtp']['user'].strip().strip('"\''), pw); s.send_message(m)
     return True
 
 
