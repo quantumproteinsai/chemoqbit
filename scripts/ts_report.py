@@ -332,7 +332,7 @@ story += [table(drows, [28 * mm, 34 * mm, 34 * mm, 36 * mm, 30 * mm]),
             'the def2-SVP barrier is about 23.2 kcal/mol.', 'cap'),
           P('DFT gives roughly twice the xTB barrier. As a rough guide, the enzyme\'s turnover of about 7 s<super>−1</super> '
             'corresponds to a free-energy barrier near 16 kcal/mol, so xTB is low and single-point DFT at xTB geometries '
-            'is high. Optimising the TS at the DFT level is the natural way to close that gap.')]
+            'is high. Sections 3.5 to 3.7 test whether the functional or the geometry is responsible.')]
 
 story += [P('3.4 Active-space circuits', 'h2')]
 if act and all(f'{n}/4e4o' in act for n in ('reactant', 'ts', 'product')):
@@ -357,6 +357,86 @@ else:
     story += [P('The corrected stage (section 2.7) had not finished when this report was generated. The earlier '
                 'results are not reported because the fragments were not chemically valid.')]
 
+
+# ---- 3.5-3.8: after the debugging (each shown once its results exist)
+fx_path, pr_path = RES / 'ts_functional_check.json', RES / 'ts_profile_check.json'
+op_path, hp_path = RES / 'ts_oniom_opt.json', RES / 'ts_oniom_opt.his147p.json'
+NM = ('reactant', 'ts', 'product')
+if fx_path.exists():
+    fx = json.loads(fx_path.read_text())
+    rows = [['Method (embedded fragment, def2-TZVP)', 'Barrier (kcal/mol)', 'Reaction (kcal/mol)']]
+    for tag, v in fx.items():
+        if all('E' in v.get(n, {}) for n in NM):
+            nice = {'b3lyp-d3bj': 'B3LYP-D3(BJ)', 'pbe0-d3bj': 'PBE0-D3(BJ)', 'm062x-d3zero': 'M06-2X-D3(0)',
+                    'wb97x-d3bj': '\u03c9B97X-D3(BJ)', 'bhandhlyp': 'BHandHLYP'}
+            rows.append([nice.get(tag.split('/')[0], tag.split('/')[0]), f"{(v['ts']['E'] - v['reactant']['E']) * K:.1f}",
+                         f"{(v['product']['E'] - v['reactant']['E']) * K:+.1f}"])
+    foc = r.get('oniom', {})
+    if all('mp2' in foc.get(n, {}) for n in NM):
+        e = {n: foc[n]['mp2']['cc-pvtz']['e_hf'] + foc[n]['mp2']['cc-pvtz']['e_corr'] for n in NM}
+        rows.append(['MP2/cc-pVTZ', f"{(e['ts'] - e['reactant']) * K:.1f}", f"{(e['product'] - e['reactant']) * K:+.1f}"])
+        e = {n: foc[n]['e_ccsd_t_focal']['cbs'] for n in NM}
+        rows.append(['CCSD(T), extrapolated basis', f"{(e['ts'] - e['reactant']) * K:.1f}",
+                     f"{(e['product'] - e['reactant']) * K:+.1f}"])
+    story += [P('3.5 Which functional?', 'h2'),
+              P('B3LYP and PBE0 put the embedded-fragment barrier about 10 kcal/mol below CCSD(T), MP2 and the three '
+                'functionals suited to barrier heights. B3LYP is the outlier, so its cluster barriers in section 3.3 are '
+                'too low, and the later steps use \u03c9B97X-D3(BJ), the functional closest to CCSD(T) here.'),
+              table(rows, [80 * mm, 45 * mm, 45 * mm]),
+              P('Table 6. Single points at the GFN2-xTB geometries, fragment in the xTB point charges.', 'cap')]
+if pr_path.exists() and '_profile' in json.loads(pr_path.read_text()):
+    prof = json.loads(pr_path.read_text())['_profile']
+    pts = [v for v in prof.values() if v['xi'] is not None]
+    fig, ax = plt.subplots(figsize=(6.4, 2.9), dpi=200)
+    ax.plot([v['xi'] for v in pts], [v['xtb'] for v in pts], color='#8a8980', lw=1.6, marker='o', ms=3, label='GFN2-xTB')
+    ax.plot([v['xi'] for v in pts], [v['frag_ee'] for v in pts], color='#8a8980', lw=1.6, ls='--', marker='o', ms=3,
+            label='embedded fragment, \u03c9B97X-D3')
+    ax.plot([v['xi'] for v in pts], [v['oniom_me'] for v in pts], color=BLUE, lw=2.2, marker='o', ms=4, mec='white',
+            label='ONIOM(\u03c9B97X-D3:xTB)')
+    ax.axvline(0.1, color='#8a8980', lw=0.8, ls=(0, (3, 3)))
+    ax.text(0.08, 1.5, 'xTB saddle point', ha='right', fontsize=7.5, color='#55554f')
+    top_ = max(pts, key=lambda v: v['oniom_me'])
+    ax.annotate(f"maximum {top_['oniom_me']:.1f} at \u03be = +{top_['xi']:.1f}", (top_['xi'], top_['oniom_me']),
+                xytext=(0.55, 39.5), textcoords='data', fontsize=7.8, color='#1f1f1e',
+                arrowprops=dict(arrowstyle='-', color='#8a8980', lw=0.6))
+    style(ax); ax.set_ylim(-1, 42)
+    ax.set_xlabel('\u03be = d(C6\u2013H) \u2212 d(H\u2013C11)  (\u00c5)'); ax.set_ylabel('\u0394E vs reactant  (kcal/mol)')
+    ax.legend(frameon=False, loc='upper left', fontsize=7.5)
+    fig.tight_layout(); f3 = FIGDIR / 'fig3.png'; fig.savefig(f3); plt.close(fig)
+    story += [KeepTogether([P('3.6 Is the xTB geometry the problem?', 'h2'),
+              P(f"Along the xTB path, the ONIOM(\u03c9B97X-D3:xTB) profile peaks at {top_['oniom_me']:.1f} kcal/mol, only "
+                f"{top_['oniom_me'] - prof['ts']['oniom_me']:.1f} kcal/mol above its value at the xTB saddle point. "
+                'Single points at the xTB transition state therefore do not distort the barrier much.'),
+              Image(str(f3), width=160 * mm, height=72 * mm),
+              P('Figure 3. Energy along the GFN2-xTB scan with \u03c9B97X-D3(BJ)/def2-TZVP for the fragment.', 'cap')])]
+if op_path.exists() and 'summary' in json.loads(op_path.read_text()):
+    op = json.loads(op_path.read_text()); a_ = op['analysis']; su = op['summary']; kk = a_['kie']
+    story += [P('3.7 Structures optimised at ONIOM(\u03c9B97X-D3:xTB)', 'h2'),
+              P(f"Re-optimising reactant, transition state and product on the ONIOM surface gives a barrier of "
+                f"{su['barrier_tzvp']:.1f} kcal/mol ({su['barrier_tzvp_zpe']:.1f} with zero-point energy) and a reaction "
+                f"energy of {su['reaction_tzvp']:+.1f} kcal/mol, with def2-TZVP for the fragment. The transition state has "
+                f"one imaginary mode ({abs(a_['iso']['ts']['H']['imag']):.0f}i cm\u207b\u00b9) and is later than the xTB one."),
+              table([['Kinetic isotope effect (293 K)', 'Semiclassical', '+ Wigner', '+ Eckart', 'Experiment'],
+                     *[[f'{k_}, ONIOM', f"{v['semiclassical']:.2f}", f"{v['wigner']:.2f}", f"{v['eckart']:.2f}",
+                        '6.91 \u00b1 0.05' if k_ == 'H/T' else ''] for k_, v in kk.items()]],
+                    [44 * mm, 30 * mm, 28 * mm, 28 * mm, 40 * mm]),
+              P('Table 7. Frequencies from partial Hessians over the 34 free atoms within 5 \u00c5 of the hydride, which '
+                'reproduce the full GFN2-xTB Hessian KIE within 0.2 %.', 'cap'),
+              P('The isotope effects now bracket experiment from below, as GFN2-xTB did from above. The barrier stays '
+                'about twice what turnover implies, and its excess tracks the endothermicity: the enolate charge on O4 '
+                'has no positive partner nearby (His147, modelled neutral, at 3.8 \u00c5; Arg166 at 8 \u00c5).')]
+    hp = json.loads(hp_path.read_text()) if hp_path.exists() else {}
+    story += [P('3.8 His147 protonated', 'h2')]
+    if 'summary' in hp:
+        hs, hk = hp['summary'], hp['analysis']['kie']['H/T']
+        story += [P(f"With His147 protonated (cluster charge +2), the same pipeline gives a barrier of "
+                    f"{hs['barrier_tzvp']:.1f} kcal/mol ({hs['barrier_tzvp_zpe']:.1f} with zero-point energy) and a "
+                    f"reaction energy of {hs['reaction_tzvp']:+.1f} kcal/mol; H/T KIE {hk['semiclassical']:.2f} "
+                    f"(semiclassical), {hk['wigner']:.2f} (Wigner), {hk['eckart']:.2f} (Eckart).")]
+    else:
+        story += [P('The same pipeline with His147 protonated (cluster charge +2) was running when this report was '
+                    'generated; it tests whether a positive charge near O4 lowers the barrier and the reaction energy.')]
+
 # ---- 4. caveats
 story += [P('4. Assumptions and caveats', 'h1'),
           B('<b>N5–C11 restraint (2.8 Å floor).</b> Needed to stop N5 re-bonding to C11; inactive at the stationary points '
@@ -365,9 +445,12 @@ story += [P('4. Assumptions and caveats', 'h1'),
             'free atoms only.'),
           B('<b>Solvent.</b> xTB uses ALPB chloroform (ε 4.8) as the closest named solvent to the ε = 4 used for '
             'protein interiors; DFT uses PCM ε = 4.'),
-          B('<b>DFT at xTB geometries.</b> The DFT numbers are single points, not DFT-optimised stationary points.'),
-          B('<b>Tunnelling.</b> The Wigner and Eckart corrections use the xTB imaginary frequency (732i cm⁻¹), at the low '
-            'end for a C–H–C hydride transfer; a higher DFT frequency would change both.'),
+          B('<b>Geometries.</b> Sections 3.3 to 3.6 are single points at GFN2-xTB geometries; section 3.7 re-optimises at '
+            'ONIOM(\u03c9B97X-D3/def2-SVP:xTB), not at full DFT.'),
+          B('<b>Embedding.</b> The ONIOM optimisation uses mechanical embedding: the fragment interacts with its '
+            'surroundings at the xTB level, with fixed link-atom distances.'),
+          B('<b>Frequencies.</b> The ONIOM KIEs use partial Hessians over 34 atoms, validated on the xTB Hessians; '
+            'tunnelling corrections use the imaginary frequency of the same level.'),
           B('<b>Scan steps.</b> The backward pass removes the steps the folate shift left in the profile; the barrier and '
             'KIE use the relaxed stationary points, not scan energies.')]
 
@@ -384,7 +467,16 @@ story += [P('5. Code changes', 'h1'),
                  ['<font name="DVM">scripts/ts_cluster_nuc.py</font>',
                   'N5 hold in prep and all later stages; scan guards and backward pass; TS from the hydride coordinate '
                   'with fixed atoms; end points from the lowest scan points; skip-if-done for prep and TS; free-atom '
-                  'Hessians and KIE; density fitting for triple-zeta DFT; capped, consistent active-space region']],
+                  'Hessians and KIE; density fitting for triple-zeta DFT, resumable; capped, consistent active-space '
+                  'region; ONIOM and focal-point stages; model variants (--variant)'],
+                 ['<font name="DVM">chemoqbit/enzyme/oniom.py</font>',
+                  'two-layer ONIOM energy and gradient with link atoms (mechanical embedding)'],
+                 ['<font name="DVM">tsopt.prfo_bofill</font>',
+                  'P-RFO with a Bofill-updated Hessian, adaptive trust radius, resumable state'],
+                 ['<font name="DVM">scripts/ts_functional_check.py</font>, <font name="DVM">ts_profile_check.py</font>, '
+                  '<font name="DVM">ts_oniom_opt.py</font>',
+                  'functional benchmark, barrier profile along the path, ONIOM optimisation with partial Hessians '
+                  'and KIEs']],
                 [52 * mm, 118 * mm])]
 
 # ---- 6. status / next
@@ -394,8 +486,12 @@ story += [B('xTB stages 0–4: <b>done</b>.'),
           B('DFT def2-TZVP: ' + ('<b>done</b>.' if tz else '<b>not finished</b> when this report was generated.')),
           B('Active-space stage: ' + ('<b>done</b>.' if act and len(act) == 3 else
                                       '<b>not finished</b> when this report was generated.')),
-          B('Worth doing next: a DFT-level TS optimisation; the N5-floor sensitivity check; and, if the corrected '
-            'active-space results still show VQE errors above 1.6 mHa, a look at the ADAPT stopping criterion.')]
+          B('ONIOM(\u03c9B97X-D3:xTB) optimisation and KIEs: ' + ('<b>done</b>.' if op_path.exists() and 'summary' in
+                json.loads(op_path.read_text()) else '<b>not finished</b> when this report was generated.')),
+          B('His147-protonated model: ' + ('<b>done</b>.' if hp_path.exists() and 'summary' in
+                json.loads(hp_path.read_text()) else '<b>running</b> when this report was generated.')),
+          B('Worth doing next: the N5-floor sensitivity check, and other ways of stabilising the O4 enolate '
+            '(coupling to C6\u2013S cleavage, a larger cluster).')]
 
 story += [P('7. Files and how to reproduce', 'h1'),
           P('Checkpoints kept in <font name="DVM">results/</font>, with the stage at which each was set aside:'),
@@ -405,6 +501,10 @@ story += [P('7. Files and how to reproduce', 'h1'),
                  ['<font name="DVM">ts_cluster_run.badscan_20261018.json</font>', 'first rerun, N5 re-bonded (2.2)'],
                  ['<font name="DVM">ts_cluster_run.prebackfill_20261018.json</font>', 'forward scan before the backward pass (2.3)'],
                  ['<font name="DVM">ts_cluster_run.capsmovedTS_20261018.json</font>', 'TS with moved fixed atoms (2.5)'],
+                 ['<font name="DVM">ts_functional_check.json</font>, <font name="DVM">ts_profile_check.json</font>',
+                  'functional benchmark (3.5) and profile along the path (3.6)'],
+                 ['<font name="DVM">ts_oniom_opt.json</font>, <font name="DVM">ts_oniom_opt.his147p.json</font>',
+                  'ONIOM-optimised structures, Hessians and KIEs (3.7, 3.8)'],
                  ['<font name="DVM">nuc_20261018_1921.log</font>'
                   + (f', <font name="DVM">{TZLOG}</font>' if TZLOG else ''),
                   'logs of the final xTB/DFT run' + (' and the latest def2-TZVP run' if TZLOG else '')]],
