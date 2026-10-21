@@ -47,11 +47,22 @@ def optimise_frozen(sym, X, charge=0, frozen=(), constraints=(), k=20.0,
     mask[list(frozen)] = False
     free = np.flatnonzero(mask)
 
+    last = {}
+
     def f(v):
         Y = X.copy(); Y[free] = v.reshape(-1, 3)
-        E, G = energy_grad(sym, Y, charge)
+        try:
+            E, G = energy_grad(sym, Y, charge)
+        except RuntimeError:
+            # the xTB SCF failed at a trial geometry, typically an overlong first
+            # line-search step against a stiff restraint: report a high energy so
+            # the line search backs off, instead of aborting the optimisation
+            if not last:
+                raise
+            return last['f'] + 1.0, last['g']
         Ep, Gp = penalty(Y, constraints, k)
-        return E + Ep, (G + Gp)[free].ravel()
+        last['f'], last['g'] = E + Ep, (G + Gp)[free].ravel()
+        return last['f'], last['g']
 
     r = minimize(f, X[free].ravel(), jac=True, method='L-BFGS-B',
                  options=dict(maxiter=maxiter, gtol=gtol))
