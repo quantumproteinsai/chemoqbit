@@ -228,10 +228,14 @@ for lev, an in (('GFN2-xTB', r['analysis']), ('ONIOM', op['analysis'] if op else
         rows.append([lev, i_, f"{an['iso']['reactant'][i_]['zpe'] * K:.2f}", f"{an['iso']['ts'][i_]['zpe'] * K:.2f}",
                      f"{kap['V1']:.2f}", f"{kap['nu']:.0f}", f"{kap['wigner']:.3f}", f"{kap['eckart']:.3f}"])
 s2 += [table(rows, [22 * mm, 16 * mm, 24 * mm, 22 * mm, 18 * mm, 16 * mm, 22 * mm, 22 * mm])]
+s2 += [P('S7 His147-protonated model', 'h')]
 if hp and 'summary' in hp:
-    s2 += [P('S7 His147-protonated model', 'h'),
-           P(f"Barrier {hp['summary']['barrier_tzvp']:.2f} kcal/mol ({hp['summary']['barrier_tzvp_zpe']:.2f} with ZPE), "
-             f"reaction {hp['summary']['reaction_tzvp']:+.2f} kcal/mol at ONIOM(ωB97X-D3/def2-TZVP:xTB).")]
+    hk = hp['analysis']['kie']['H/T']
+    s2 += [P(f"Cluster charge +2. Barrier {hp['summary']['barrier_tzvp']:.2f} kcal/mol ({hp['summary']['barrier_tzvp_zpe']:.2f} "
+             f"with ZPE), reaction {hp['summary']['reaction_tzvp']:+.2f} kcal/mol at ONIOM(ωB97X-D3/def2-TZVP:xTB); "
+             f"H/T KIE {hk['semiclassical']:.2f} (TST), {hk['wigner']:.2f} (Wigner), {hk['eckart']:.2f} (Eckart).")]
+else:
+    s2 += [P('Pending: the calculations for the His147-protonated model had not finished when this file was generated.')]
 s2 += [PageBreak()]
-coords_section(s2, 'S8' if hp and 'summary' in hp else 'S7')
+coords_section(s2, 'S8')
 build(RES / 'SI_manuscript2.pdf', 'SI – Thymidylate synthase hydride transfer, cluster model', s2)

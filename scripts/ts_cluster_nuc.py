@@ -152,6 +152,15 @@ def stage_scan(r, lo=-1.4, hi=1.4, step=0.1):
     grid = np.round(np.arange(lo, hi + 1e-9, step), 2)
     if pts:
         X = np.array(pts[-1]['coords'])
+    else:
+        # approach the first grid point in 0.2 A steps: a single jump from the
+        # relaxed reactant (xi ~ -2.7) puts a large force on the restraint, and the
+        # optimiser's first step can land where the xTB SCF does not converge
+        xi0 = float(np.linalg.norm(X[k['Cd']] - X[k['Hd']]) - np.linalg.norm(X[k['Hd']] - X[k['C11']]))
+        for t in np.arange(xi0 + 0.2, lo, 0.2):
+            X, _ = optimise_frozen(sym, X, r['prep']['charge'], frozen=frozen,
+                                   constraints=rest + [(k['Cd'], k['Hd'], k['Hd'], k['C11'], float(t))])
+            log(f'  ramp to the first scan point: xi={t:+.2f}')
     for xi in grid[len(pts):]:
         t0 = time.time()
         X, E = optimise_frozen(sym, X, r['prep']['charge'], frozen=frozen,
