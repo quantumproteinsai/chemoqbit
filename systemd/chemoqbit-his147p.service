@@ -1,0 +1,20 @@
+[Unit]
+Description=chemoqbit: His147-protonated model - xTB stages, then ONIOM(wB97X-D3:xTB) optimisation and KIEs (resumable)
+StartLimitIntervalSec=6h
+StartLimitBurst=3
+
+[Service]
+Type=simple
+WorkingDirectory=/home/deploy/dev/chemoqbit
+Environment=OMP_NUM_THREADS=4 PYSCF_MAX_MEMORY=4000
+MemoryMax=8G
+ExecCondition=/home/deploy/dev/chemoqbit/.venv/bin/python /home/deploy/dev/chemoqbit/scripts/nuc_todo.py his147p
+ExecStartPre=/bin/sh -c 'echo "=== $(date "+%%F %%T")  start: his147p variant"'
+ExecStart=/bin/sh -c '/home/deploy/dev/chemoqbit/.venv/bin/python -u /home/deploy/dev/chemoqbit/scripts/ts_cluster_nuc.py --variant his147p --stages 0,1,2,3,4 && exec /home/deploy/dev/chemoqbit/.venv/bin/python -u /home/deploy/dev/chemoqbit/scripts/ts_oniom_opt.py --variant his147p'
+StandardOutput=append:/home/deploy/dev/chemoqbit/results/service_his147p.log
+StandardError=append:/home/deploy/dev/chemoqbit/results/service_his147p.log
+Restart=on-failure
+RestartSec=120
+
+[Install]
+WantedBy=default.target

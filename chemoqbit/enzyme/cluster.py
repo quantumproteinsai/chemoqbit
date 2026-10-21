@@ -97,8 +97,10 @@ def _res_of(lab):
     return _RESOF.get(lab.split(':')[0], (None, None))
 
 
-def add_hydrogens(sym, X, label, charge=1):
-    """Infer bonds, set formal charges, add missing hydrogens with coordinates."""
+def add_hydrogens(sym, X, label, charge=1, his_protonated=False):
+    """Infer bonds, set formal charges, add missing hydrogens with coordinates.
+    his_protonated: His147 as imidazolium (ND1-H and NE2-H, +1) instead of the
+    neutral NE2-H tautomer."""
     m = Chem.RWMol()
     conf = Chem.Conformer(len(sym))
     for i, (s, x) in enumerate(zip(sym, X)):
@@ -144,7 +146,9 @@ def add_hydrogens(sym, X, label, charge=1):
             em.GetAtomWithIdx(idx[k]).SetIsAromatic(True)
         if ring == 'his147':
             # NE2-H tautomer: NE2 donates to O4 of the nucleotide (3.5 A)
-            em.GetAtomWithIdx(idx['his147:ND1']).SetNumExplicitHs(0)
+            em.GetAtomWithIdx(idx['his147:ND1']).SetNumExplicitHs(1 if his_protonated else 0)
+            if his_protonated:
+                em.GetAtomWithIdx(idx['his147:ND1']).SetFormalCharge(1)
             em.GetAtomWithIdx(idx['his147:NE2']).SetNumExplicitHs(1)
             em.GetAtomWithIdx(idx['his147:NE2']).SetNoImplicit(True)
             em.GetAtomWithIdx(idx['his147:ND1']).SetNoImplicit(True)

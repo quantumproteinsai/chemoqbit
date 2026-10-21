@@ -31,6 +31,7 @@ from scipy.optimize import minimize
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT)); sys.path.insert(0, str(ROOT / 'scripts'))
 OUT = ROOT / 'results' / 'ts_oniom_opt.json'
+SUFFIX = ''             # model variant, as ts_cluster_nuc.py --variant (e.g. '.his147p')
 XC, BASIS, BASIS_SP = 'wb97x-d3bj', 'def2-svp', 'def2-tzvp'
 START_XI = 0.3          # maximum of the ONIOM(wB97X-D3:xTB) profile along the xTB path
 REGION_R = 5.0          # A, partial-Hessian region around the hydride
@@ -52,7 +53,7 @@ def main():
     from chemoqbit.enzyme import oniom as O, tsopt as T
     from chemoqbit.enzyme.frozen import penalty
     from chemoqbit.enzyme.xtb import energy_grad
-    r = json.loads((ROOT / 'results' / 'ts_cluster_run.json').read_text())
+    r = json.loads((ROOT / 'results' / f'ts_cluster_run{SUFFIX}.json').read_text())
     p = r['prep']; sym, k, frozen = p['symbols'], p['key'], p['frozen']
     rest = [tuple(c) for c in p.get('restraints', [])]
     atoms, cuts = S.active_region(r)
@@ -181,4 +182,7 @@ def main():
 
 
 if __name__ == '__main__':
+    if len(sys.argv) > 2 and sys.argv[1] == '--variant' and sys.argv[2] != 'default':
+        SUFFIX = f'.{sys.argv[2]}'
+        OUT = OUT.with_name(f'ts_oniom_opt{SUFFIX}.json')
     main()

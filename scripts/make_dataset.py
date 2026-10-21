@@ -30,6 +30,8 @@ ROLES = [  # (glob, description) -- first match wins
     ('ts_oniom_*.json', 'ONIOM / electrostatic-embedding stage (and focal-point data if merged), side file'),
     ('ts_focal_*.json', 'ONIOM stage plus DF-MP2 cc-pVDZ/cc-pVTZ basis-set correction, side file'),
     ('ts_functional_check.json', 'embedded-fragment barrier with five functionals at def2-TZVP'),
+    ('ts_cluster_run.his147p.json', 'His147-protonated model (charge +2): xTB stages, same pipeline'),
+    ('ts_oniom_opt.his147p.json', 'His147-protonated model: ONIOM(wB97X-D3:xTB) optimisation, Hessians, KIEs'),
     ('ts_oniom_opt.json', 'ONIOM(wB97X-D3:xTB) optimised reactant/TS/product, partial Hessians, KIEs, def2-TZVP energies'),
     ('ts_profile_check.json', 'wB97X-D3(BJ)/def2-TZVP barrier profile along the xTB path (fragment and ONIOM(DFT:xTB))'),
     ('ts_pipeline_report.pdf', 'report: what failed, why, how it was fixed, and the results'),

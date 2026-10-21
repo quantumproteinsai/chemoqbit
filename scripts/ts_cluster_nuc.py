@@ -41,6 +41,10 @@ from chemoqbit.eckart import eckart_kappa
 from chemoqbit.chem import HARTREE_KCAL
 
 OUT = ROOT / 'results' / 'ts_cluster_run.json'
+# model variants (--variant): cluster charge, His147 protonation, checkpoint suffix
+VARIANTS = {'default': dict(charge=1, his_protonated=False, suffix=''),
+            'his147p': dict(charge=2, his_protonated=True, suffix='.his147p')}
+VARIANT = VARIANTS['default']
 TEMP = 293.15
 CAP_FREEZE = ('tyr94:CG', 'his147:CB', 'asn177:CB', 'arg166:CD')
 N5_C11_MIN = 2.8          # A; flat-bottom, no force beyond it
@@ -64,25 +68,26 @@ def stage_prep(r):
     if 'restraints' in r.get('prep', {}):
         log('prep: already done'); return r
     sym0, X0, label, _ = build(ROOT / 'data/1TLS.pdb')
-    mh = add_hydrogens(sym0, X0, label, charge=1)
+    mh = add_hydrogens(sym0, X0, label, charge=VARIANT['charge'], his_protonated=VARIANT['his_protonated'])
     conf = mh.GetConformer()
     sym = [a.GetSymbol() for a in mh.GetAtoms()]
     X = np.array([list(conf.GetAtomPosition(i)) for i in range(mh.GetNumAtoms())])
     lab = label + [f'H{i}' for i in range(len(sym) - len(label))]
     idx = {l: i for i, l in enumerate(label)}
     heavy = np.array([s != 'H' for s in sym])
-    X, _ = optimise_frozen(sym, X, 1, frozen=np.flatnonzero(heavy))   # H only
+    q = VARIANT['charge']
+    X, _ = optimise_frozen(sym, X, q, frozen=np.flatnonzero(heavy))   # H only
     frozen = [i for i, l in enumerate(lab) if ':cap' in l] + [lab.index(n) for n in CAP_FREEZE]
     # add_hydrogens cuts N5-C11 only in the topology; C11 still sits at the crystal
     # 1.5 A from N5, and an unrestrained xTB relaxation simply re-forms the bond
     N5, C11 = idx['folate:N5'], idx['methylene:C11']
     restraints = [('min', N5, C11, N5_C11_MIN)]
-    X, E = optimise_frozen(sym, X, 1, frozen=frozen, constraints=restraints)
+    X, E = optimise_frozen(sym, X, q, frozen=frozen, constraints=restraints)
     d = lambda a, b: float(np.linalg.norm(X[a] - X[b]))
     Cd = idx['folate:C6']
     Hd = min((i for i in range(len(sym)) if sym[i] == 'H' and d(i, Cd) < 1.25),
              key=lambda i: d(i, C11))
-    r['prep'] = dict(symbols=sym, coords=X.tolist(), labels=lab, charge=1, E=E,
+    r['prep'] = dict(symbols=sym, coords=X.tolist(), labels=lab, charge=q, E=E,
                      frozen=frozen, restraints=restraints,
                      key=dict(Cd=Cd, Hd=int(Hd), C11=C11, C5u=idx['nucleotide:C5'],
                               C6u=idx['nucleotide:C6'], S=idx['cys146:SG'],
@@ -149,7 +154,7 @@ def stage_scan(r, lo=-1.4, hi=1.4, step=0.1):
         X = np.array(pts[-1]['coords'])
     for xi in grid[len(pts):]:
         t0 = time.time()
-        X, E = optimise_frozen(sym, X, 1, frozen=frozen,
+        X, E = optimise_frozen(sym, X, r['prep']['charge'], frozen=frozen,
                                constraints=rest + [(k['Cd'], k['Hd'], k['Hd'], k['C11'], float(xi))])
         _check_step(sym, pts[-1] if pts else None, X, E, k, r['prep']['labels'],
                     np.array(r['prep']['coords']))
@@ -180,7 +185,7 @@ def backfill_scan(r, tol=0.1, start=None):
     replaced = []
     for i in range(j - 1, -1, -1):
         t0 = time.time()
-        X, Ei = optimise_frozen(sym, np.array(pts[i + 1]['coords']), 1, frozen=frozen,
+        X, Ei = optimise_frozen(sym, np.array(pts[i + 1]['coords']), r['prep']['charge'], frozen=frozen,
                                 constraints=rest + [(k['Cd'], k['Hd'], k['Hd'], k['C11'], pts[i]['xi'])])
         dE = (Ei - pts[i]['E']) * HARTREE_KCAL
         log(f"backfill xi={pts[i]['xi']:+.2f} E={Ei:.6f} ({dE:+.2f} vs forward) ({time.time() - t0:.0f}s)")
@@ -218,7 +223,7 @@ def stage_ts(r):
     # (the cluster can drop into a lower conformer part-way along the scan)
     E = [p['E'] for p in pts]
     for name, j in (('reactant', int(np.argmin(E[:i]))), ('product', i + 1 + int(np.argmin(E[i + 1:])))):
-        Xm, Em = optimise_frozen(sym, np.array(pts[j]['coords']), 1, frozen=frozen,
+        Xm, Em = optimise_frozen(sym, np.array(pts[j]['coords']), r['prep']['charge'], frozen=frozen,
                                  constraints=rest)
         r[name] = dict(coords=Xm.tolist(), E=float(Em)); save(r)
         log(f"{name}: E={Em:.6f} (from xi={pts[j]['xi']})")
@@ -586,7 +591,11 @@ if __name__ == '__main__':
     ap.add_argument('--stages', default='0,1,2,3,4',
                     help='comma list of stage numbers or names (0=prep ... 6=active)')
     ap.add_argument('--basis', default='def2-svp')
+    ap.add_argument('--variant', default='default', choices=sorted(VARIANTS),
+                    help='model variant; his147p = His147 protonated, cluster charge +2')
     args = ap.parse_args()
+    VARIANT = VARIANTS[args.variant]
+    OUT = OUT.with_name(f"ts_cluster_run{VARIANT['suffix']}.json")
     sel = [ORDER[int(s)] if s.strip().isdigit() else s.strip() for s in args.stages.split(',')]
     r = load()
     for s in sel:
