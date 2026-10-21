@@ -20,3 +20,5 @@ results/service_*.log
 results/ts_profile_check*.json
 results/ts_oniom_opt*.json
 results/ts_cluster_run.his147p.json
+results/SI_*.pdf
+results/si/
