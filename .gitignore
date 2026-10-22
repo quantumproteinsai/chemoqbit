@@ -29,3 +29,4 @@ results/ts_thermo.json
 results/figures/
 results/ts_kie_temperature.json
 results/ts_qmsize*.json
+results/ts_o4h_diagnostic.json

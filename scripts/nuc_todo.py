@@ -48,6 +48,10 @@ def cs2d():
 
 
 def o4h():
+    # complete when the ONIOM summary exists, or when the variant was diagnosed as
+    # not viable (ts_o4h_diagnostic.json) and deliberately not pursued
+    if (RES / 'ts_o4h_diagnostic.json').exists():
+        return False
     p = RES / 'ts_oniom_opt.o4h.json'
     return not (p.exists() and 'summary' in json.loads(p.read_text()))
 
