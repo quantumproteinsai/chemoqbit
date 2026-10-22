@@ -10,7 +10,7 @@ Environment=OMP_NUM_THREADS=4 PYSCF_MAX_MEMORY=4000
 MemoryMax=8G
 TimeoutStartSec=infinity
 ExecCondition=/home/deploy/dev/chemoqbit/.venv/bin/python /home/deploy/dev/chemoqbit/scripts/nuc_todo.py o4h
-ExecStartPre=/bin/sh -c 'while systemctl --user is-active -q chemoqbit-cs2d; do sleep 60; done; echo "=== $(date "+%%F %%T")  start: o4h variant"'
+ExecStartPre=/bin/sh -c '/home/deploy/dev/chemoqbit/scripts/wait_units.sh chemoqbit-cs2d; echo "=== $(date "+%%F %%T")  start: o4h variant"'
 ExecStart=/bin/sh -c '/home/deploy/dev/chemoqbit/.venv/bin/python -u /home/deploy/dev/chemoqbit/scripts/ts_cluster_nuc.py --variant o4h --stages 0,1,2,3,4 && exec /home/deploy/dev/chemoqbit/.venv/bin/python -u /home/deploy/dev/chemoqbit/scripts/ts_oniom_opt.py --variant o4h'
 StandardOutput=append:/home/deploy/dev/chemoqbit/results/service_o4h.log
 StandardError=append:/home/deploy/dev/chemoqbit/results/service_o4h.log
