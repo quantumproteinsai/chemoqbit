@@ -26,3 +26,5 @@ results/ts_cs2d*.json
 results/ts_cluster_run.o4h.json
 results/ts_oniom_opt*.json
 results/ts_thermo.json
+results/figures/
+results/ts_kie_temperature.json
