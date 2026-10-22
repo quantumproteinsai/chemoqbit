@@ -32,6 +32,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT)); sys.path.insert(0, str(ROOT / 'scripts'))
 OUT = ROOT / 'results' / 'ts_oniom_opt.json'
 SUFFIX = ''             # model variant, as ts_cluster_nuc.py --variant (e.g. '.his147p')
+FRAG_CHARGE = 0         # +1 when the variant's extra proton sits inside the fragment (o4h)
 XC, BASIS, BASIS_SP = 'wb97x-d3bj', 'def2-svp', 'def2-tzvp'
 START_XI = 0.3          # maximum of the ONIOM(wB97X-D3:xTB) profile along the xTB path
 REGION_R = 5.0          # A, partial-Hessian region around the hydride
@@ -58,8 +59,9 @@ def main():
     rest = [tuple(c) for c in p.get('restraints', [])]
     atoms, cuts = S.active_region(r)
     free = S._free(sym, frozen)
-    high = O.HighLevel(xc=XC, basis=BASIS)
-    fn = O.oniom_fn(sym, p['charge'], atoms, cuts, high, extra=lambda X: penalty(X, rest))
+    high = O.HighLevel(xc=XC, basis=BASIS, charge=FRAG_CHARGE)
+    fn = O.oniom_fn(sym, p['charge'], atoms, cuts, high, extra=lambda X: penalty(X, rest),
+                    frag_charge=FRAG_CHARGE)
     res = json.loads(OUT.read_text()) if OUT.exists() else {}
     res.setdefault('config', dict(xc=XC, basis=BASIS, basis_sp=BASIS_SP, start_xi=START_XI,
                                   region_radius=REGION_R, fragment_atoms=atoms,
@@ -160,12 +162,12 @@ def main():
         from pyscf import gto, dft
         X = np.array(res[name]['X'])
         fsym, fX = O.fragment(sym, X, atoms, cuts)
-        mol = gto.M(atom=[(s_, x_) for s_, x_ in zip(fsym, fX)], basis=BASIS_SP, charge=0,
+        mol = gto.M(atom=[(s_, x_) for s_, x_ in zip(fsym, fX)], basis=BASIS_SP, charge=FRAG_CHARGE,
                     unit='Angstrom', verbose=0)
         mf = dft.RKS(mol, xc=XC); mf.conv_tol = 1e-10
         e_hi = float(mf.kernel())
         sp[name] = dict(e_xtb_cluster=float(energy_grad(sym, X, p['charge'])[0]),
-                        e_xtb_frag=float(energy_grad(fsym, fX, 0, solvent=None)[0]),
+                        e_xtb_frag=float(energy_grad(fsym, fX, FRAG_CHARGE, solvent=None)[0]),
                         e_high=e_hi, converged=bool(mf.converged))
         sp[name]['E'] = sp[name]['e_xtb_cluster'] + e_hi - sp[name]['e_xtb_frag']
         save(res)
@@ -184,5 +186,6 @@ def main():
 if __name__ == '__main__':
     if len(sys.argv) > 2 and sys.argv[1] == '--variant' and sys.argv[2] != 'default':
         SUFFIX = f'.{sys.argv[2]}'
+        FRAG_CHARGE = 1 if sys.argv[2] == 'o4h' else 0
         OUT = OUT.with_name(f'ts_oniom_opt{SUFFIX}.json')
     main()

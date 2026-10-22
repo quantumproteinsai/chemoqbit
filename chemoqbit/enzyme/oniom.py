@@ -74,8 +74,9 @@ class HighLevel:
         return float(e), np.asarray(g)
 
 
-def oniom_fn(sym, charge, atoms, cuts, high, extra=None):
-    """fn(X) -> (E, G) for the cluster; `extra` adds a (E, G) term, e.g. restraints"""
+def oniom_fn(sym, charge, atoms, cuts, high, extra=None, frag_charge=0):
+    """fn(X) -> (E, G) for the cluster; `extra` adds a (E, G) term, e.g. restraints;
+    `frag_charge` = the fragment's charge (high.charge must match)"""
     atoms = list(atoms)
 
     def fn(X):
@@ -83,7 +84,7 @@ def oniom_fn(sym, charge, atoms, cuts, high, extra=None):
         E_lo, G_lo = energy_grad(sym, X, charge)
         fsym, fX = fragment(sym, X, atoms, cuts)
         e_hi, g_hi = high(fsym, fX)
-        e_lf, g_lf = energy_grad(fsym, fX, 0, solvent=None)
+        e_lf, g_lf = energy_grad(fsym, fX, frag_charge, solvent=None)
         E = E_lo + e_hi - e_lf
         G = G_lo + scatter_gradient(sym, X, atoms, cuts, g_hi - g_lf)
         if extra is not None:

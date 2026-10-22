@@ -43,7 +43,8 @@ from chemoqbit.chem import HARTREE_KCAL
 OUT = ROOT / 'results' / 'ts_cluster_run.json'
 # model variants (--variant): cluster charge, His147 protonation, checkpoint suffix
 VARIANTS = {'default': dict(charge=1, his_protonated=False, suffix=''),
-            'his147p': dict(charge=2, his_protonated=True, suffix='.his147p')}
+            'his147p': dict(charge=2, his_protonated=True, suffix='.his147p'),
+            'o4h': dict(charge=2, his_protonated=False, o4_protonated=True, suffix='.o4h')}
 VARIANT = VARIANTS['default']
 TEMP = 293.15
 CAP_FREEZE = ('tyr94:CG', 'his147:CB', 'asn177:CB', 'arg166:CD')
@@ -68,7 +69,8 @@ def stage_prep(r):
     if 'restraints' in r.get('prep', {}):
         log('prep: already done'); return r
     sym0, X0, label, _ = build(ROOT / 'data/1TLS.pdb')
-    mh = add_hydrogens(sym0, X0, label, charge=VARIANT['charge'], his_protonated=VARIANT['his_protonated'])
+    mh = add_hydrogens(sym0, X0, label, charge=VARIANT['charge'], his_protonated=VARIANT['his_protonated'],
+                       o4_protonated=VARIANT.get('o4_protonated', False))
     conf = mh.GetConformer()
     sym = [a.GetSymbol() for a in mh.GetAtoms()]
     X = np.array([list(conf.GetAtomPosition(i)) for i in range(mh.GetNumAtoms())])
@@ -601,7 +603,7 @@ if __name__ == '__main__':
                     help='comma list of stage numbers or names (0=prep ... 6=active)')
     ap.add_argument('--basis', default='def2-svp')
     ap.add_argument('--variant', default='default', choices=sorted(VARIANTS),
-                    help='model variant; his147p = His147 protonated, cluster charge +2')
+                    help='model variant; his147p = His147 protonated, o4h = O4 protonated; cluster charge +2')
     args = ap.parse_args()
     VARIANT = VARIANTS[args.variant]
     OUT = OUT.with_name(f"ts_cluster_run{VARIANT['suffix']}.json")

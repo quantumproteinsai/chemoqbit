@@ -97,10 +97,12 @@ def _res_of(lab):
     return _RESOF.get(lab.split(':')[0], (None, None))
 
 
-def add_hydrogens(sym, X, label, charge=1, his_protonated=False):
+def add_hydrogens(sym, X, label, charge=1, his_protonated=False, o4_protonated=False):
     """Infer bonds, set formal charges, add missing hydrogens with coordinates.
     his_protonated: His147 as imidazolium (ND1-H and NE2-H, +1) instead of the
-    neutral NE2-H tautomer."""
+    neutral NE2-H tautomer. o4_protonated: O4 of the nucleotide protonated
+    (C4=O4H+, +1), the strongest stabilisation of the enolate formed on hydride
+    transfer."""
     m = Chem.RWMol()
     conf = Chem.Conformer(len(sym))
     for i, (s, x) in enumerate(zip(sym, X)):
@@ -128,6 +130,9 @@ def add_hydrogens(sym, X, label, charge=1, his_protonated=False):
                  ('folate:C4', 'folate:O4'), ('asn177:CG', 'asn177:OD1')):
         if c in idx and o in idx:
             em.GetBondBetweenAtoms(idx[c], idx[o]).SetBondType(Chem.BondType.DOUBLE)
+    if o4_protonated:
+        # O+ with a double bond to C4: valence 3, so the fill below adds one H
+        em.GetAtomWithIdx(idx['nucleotide:O4']).SetFormalCharge(1)
     # pterin: C4A=C8A (2-amino-4-oxo-tetrahydropteridine)
     if 'folate:C4A' in idx:
         em.GetBondBetweenAtoms(idx['folate:C4A'], idx['folate:C8A']).SetBondType(Chem.BondType.DOUBLE)

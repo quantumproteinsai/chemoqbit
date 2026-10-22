@@ -1,13 +1,13 @@
 [Unit]
 Description=chemoqbit: mail step completions of the running NUC jobs
-Wants=chemoqbit-cs2d.service
+Wants=chemoqbit-cs2d.service chemoqbit-o4h.service
 After=chemoqbit-cs2d.service
 
 [Service]
 Type=simple
 WorkingDirectory=/home/deploy/dev/chemoqbit
 ExecCondition=/home/deploy/dev/chemoqbit/.venv/bin/python /home/deploy/dev/chemoqbit/scripts/nuc_todo.py any
-ExecStart=/home/deploy/dev/chemoqbit/.venv/bin/python -u /home/deploy/dev/chemoqbit/scripts/notify_watch.py --to bartmercier@gmail.com --watch cs2d:results/service_cs2d.log:chemoqbit-cs2d
+ExecStart=/home/deploy/dev/chemoqbit/.venv/bin/python -u /home/deploy/dev/chemoqbit/scripts/notify_watch.py --to bartmercier@gmail.com --watch cs2d:results/service_cs2d.log:chemoqbit-cs2d --watch o4h:results/service_o4h.log:chemoqbit-o4h
 StandardOutput=append:/home/deploy/dev/chemoqbit/results/notify_watch.log
 StandardError=append:/home/deploy/dev/chemoqbit/results/notify_watch.log
 
