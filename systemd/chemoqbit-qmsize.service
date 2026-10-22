@@ -1,0 +1,21 @@
+[Unit]
+Description=chemoqbit: convergence of the ONIOM barrier with the high-level region size (resumable; skipped once complete)
+StartLimitIntervalSec=6h
+StartLimitBurst=3
+
+[Service]
+Type=simple
+WorkingDirectory=/home/deploy/dev/chemoqbit
+Environment=OMP_NUM_THREADS=4 PYSCF_MAX_MEMORY=12000
+MemoryMax=18G
+TimeoutStartSec=infinity
+ExecCondition=/home/deploy/dev/chemoqbit/.venv/bin/python /home/deploy/dev/chemoqbit/scripts/nuc_todo.py qmsize
+ExecStartPre=/bin/sh -c 'while systemctl --user is-active -q chemoqbit-cs2d || systemctl --user is-active -q chemoqbit-o4h; do sleep 120; done; echo "=== $(date "+%%F %%T")  start: QM-region size test"'
+ExecStart=/home/deploy/dev/chemoqbit/.venv/bin/python -u /home/deploy/dev/chemoqbit/scripts/ts_qmsize.py default
+StandardOutput=append:/home/deploy/dev/chemoqbit/results/service_qmsize.log
+StandardError=append:/home/deploy/dev/chemoqbit/results/service_qmsize.log
+Restart=on-failure
+RestartSec=120
+
+[Install]
+WantedBy=default.target

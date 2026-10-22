@@ -28,3 +28,4 @@ results/ts_oniom_opt*.json
 results/ts_thermo.json
 results/figures/
 results/ts_kie_temperature.json
+results/ts_qmsize*.json
