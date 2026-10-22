@@ -236,6 +236,61 @@ if hp and 'summary' in hp:
              f"H/T KIE {hk['semiclassical']:.2f} (TST), {hk['wigner']:.2f} (Wigner), {hk['eckart']:.2f} (Eckart).")]
 else:
     s2 += [P('Pending: the calculations for the His147-protonated model had not finished when this file was generated.')]
+th = load('ts_thermo.json')
+if th:
+    s2 += [P('S8 Free-energy corrections', 'h'),
+           P('ONIOM(ωB97X-D3/def2-TZVP:xTB) electronic barrier ΔE, zero-point (ΔZPE) and entropic (−TΔS) contributions, '
+             'free-energy barrier and reaction free energy (kcal/mol), harmonic and quasi-harmonic.')]
+    rows = [['Model', 'Conditions', 'ΔE‡', 'ΔZPE‡', '−TΔS‡', 'ΔG‡', 'ΔG reaction']]
+    for model, d in th.items():
+        for cond, v in d.items():
+            rows.append([model, cond, f"{v['dE']:.2f}", f"{v['dZPE']:.2f}", f"{v['TdS']:.2f}", f"{v['dG_barrier']:.2f}",
+                         f"{v['dG_reaction']:+.2f}"])
+    s2 += [table(rows, [30 * mm, 36 * mm, 18 * mm, 18 * mm, 18 * mm, 18 * mm, 24 * mm])]
+kt = load('ts_kie_temperature.json')
+if kt:
+    s2 += [P('S9 Temperature dependence of the H/T effect', 'h'),
+           P('H/T effect from transition-state theory, Wigner and Eckart at four temperatures, and Arrhenius parameters '
+             '(ΔEₐ = Eₐ(T) − Eₐ(H), kcal/mol). Experiment (Agrawal et al., 2004): 7.62 ± 0.4, 6.91 ± 0.05, 7.40 ± 0.55, '
+             '7.12 ± 0.17; Aₕ/Aₜ = 6.8 ± 2.8, ΔEₐ = 0.02 ± 0.25 kcal/mol.')]
+    rows = [['Model / level', 'Tunnel.', '278 K', '293 K', '303 K', '313 K', 'Aₕ/Aₜ', 'ΔEₐ']]
+    for name, d in kt.items():
+        for m, lab_ in (('semiclassical', 'none'), ('wigner', 'Wigner'), ('eckart', 'Eckart')):
+            rows.append([name, lab_, *[f"{d['kie'][t][m]:.2f}" for t in d['kie']],
+                         f"{d['arrhenius'][m]['A_ratio']:.2f}", f"{d['arrhenius'][m]['dEa']:.2f}"])
+    s2 += [table(rows, [44 * mm, 18 * mm, 16 * mm, 16 * mm, 16 * mm, 16 * mm, 16 * mm, 16 * mm])]
+cs = load('ts_cs2d.json')
+if cs and 'oniom' in cs.get('summary', {}):
+    g = cs['summary']['oniom']['grid']; cfg = cs['config']
+    s2 += [P('S10 Two-dimensional surface', 'h'),
+           P('ONIOM(ωB97X-D3(BJ)/def2-SVP:GFN2-xTB) energies (kcal/mol, relative to the reactant corner) over the hydride '
+             'coordinate ξ (rows, Å) and the C6–S distance (columns, Å), at GFN2-xTB geometries; 22-atom high-level region.')]
+    rows = [['ξ', *[f'{v:.2f}' for v in cfg['rcs']]]]
+    for xi, row in zip(cfg['xi'], g):
+        rows.append([f'{xi:+.1f}', *[f'{v:.1f}' if v is not None else '–' for v in row]])
+    s2 += [table(rows, [16 * mm] + [17.5 * mm] * len(cfg['rcs']))]
+o4 = load('ts_o4h_diagnostic.json')
+if o4:
+    a, b, st = o4['default_model'], o4['o4h_prep'], o4['step_xi_-1.1']
+    s2 += [P('S11 O4-protonated model', 'h'),
+           P(f"Cluster charge +2, O4 of the nucleotide protonated. In the relaxed reactant C4–C11 is {b['C4_C11']:.2f} Å "
+             f"(default model {a['C4_C11']:.2f} Å), closing a C4–C5–C11 ring (C5–C11 {b['C5_C11']:.2f} Å), and O4–H···O(water 327) "
+             f"has H···O {b['H_Owat327']:.2f} Å and O···O {b['O4_Owat327']:.2f} Å. At ξ = −1.1 Å the proton moves to the water "
+             f"(O4–H {st['O4_H'][0]:.2f} → {st['O4_H'][1]:.2f} Å; O(water)–H {st['Owat327_H'][0]:.2f} → {st['Owat327_H'][1]:.2f} Å), "
+             f"C4–C11 opens ({st['C4_C11'][0]:.2f} → {st['C4_C11'][1]:.2f} Å) and the energy falls by {-st['dE_kcal']:.1f} kcal/mol. "
+             'The variant was not pursued.')]
+qs = load('ts_qmsize.json')
+if qs and qs.get('_done'):
+    s2 += [P('S12 Size of the high-level region', 'h'),
+           P('ONIOM(ωB97X-D3(BJ)/def2-SVP:GFN2-xTB) with mechanical embedding at the ONIOM geometries (18-atom fragment). '
+             'Total energies (Eh), barrier and reaction energy (kcal/mol); atom counts include link hydrogens. The whole-cluster '
+             'DFT is in the gas phase; solvation enters through the GFN2-xTB (ALPB) terms.')]
+    rows = [['Region', 'Atoms', 'Charge', 'Reactant', 'TS', 'Product', 'Barrier', 'Reaction']]
+    for reg in ('fragment-18', 'substrates', 'substrates+contacts', 'all'):
+        e = {n: qs[f'{reg}/{n}'] for n in NAMES}
+        rows.append([reg, str(e['ts']['atoms']), (f"{e['ts']['charge']:+d}" if e['ts']['charge'] else '0'), *[f"{e[n]['E']:.6f}" for n in NAMES],
+                     f"{(e['ts']['E'] - e['reactant']['E']) * K:.2f}", f"{(e['product']['E'] - e['reactant']['E']) * K:+.2f}"])
+    s2 += [table(rows, [32 * mm, 13 * mm, 14 * mm, 25 * mm, 25 * mm, 25 * mm, 18 * mm, 20 * mm])]
 s2 += [PageBreak()]
-coords_section(s2, 'S8')
+coords_section(s2, 'S13')
 build(RES / 'SI_manuscript2.pdf', 'SI – Thymidylate synthase hydride transfer, cluster model', s2)
