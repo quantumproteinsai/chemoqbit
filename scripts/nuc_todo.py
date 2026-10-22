@@ -4,7 +4,7 @@ Used as ExecCondition= in the chemoqbit-*.service user units, so a finished
 job is skipped at boot instead of re-running (and the notifier does not mail
 "finished" again on every boot).
 
-    python scripts/nuc_todo.py tzvp|xc|profile|oniomopt|his147p|any
+    python scripts/nuc_todo.py tzvp|xc|profile|oniomopt|his147p|cs2d|any
 """
 import json, sys
 from pathlib import Path
@@ -42,9 +42,14 @@ def his147p():
     return not (p.exists() and 'summary' in json.loads(p.read_text()))
 
 
+def cs2d():
+    p = RES / 'ts_cs2d.json'
+    return not (p.exists() and 'summary' in json.loads(p.read_text()))
+
+
 if __name__ == '__main__':
     job = sys.argv[1]
-    todo = {'tzvp': tzvp, 'xc': xc, 'profile': profile, 'oniomopt': oniomopt, 'his147p': his147p,
-            'any': lambda: tzvp() or oniomopt() or his147p()}[job]()
+    todo = {'tzvp': tzvp, 'xc': xc, 'profile': profile, 'oniomopt': oniomopt, 'his147p': his147p, 'cs2d': cs2d,
+            'any': lambda: tzvp() or oniomopt() or his147p() or cs2d()}[job]()
     print(f'{job}: {"work remaining" if todo else "complete, skipping"}')
     sys.exit(0 if todo else 1)

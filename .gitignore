@@ -22,3 +22,4 @@ results/ts_oniom_opt*.json
 results/ts_cluster_run.his147p.json
 results/SI_*.pdf
 results/si/
+results/ts_cs2d*.json
