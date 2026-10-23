@@ -25,43 +25,132 @@ CH = 1.09
 NTERM, CTERM, LYS = 1, -1, 1          # free amine, free carboxylate, lysine
 
 
-def cell_a(pdb):
+def cell(pdb):
+    """(cell vectors in the PDB Cartesian frame, space group) from CRYST1."""
     for l in open(pdb):
         if l.startswith('CRYST1'):
-            return float(l[6:15])
+            a, b, c = float(l[6:15]), float(l[15:24]), float(l[24:33])
+            al, be, ga = (np.radians(float(l[33 + 7 * i:40 + 7 * i])) for i in range(3))
+            sg = l[55:66].strip()
+            ca, cb, cg, sg_ = np.cos(al), np.cos(be), np.cos(ga), np.sin(ga)
+            v = np.sqrt(1 - ca ** 2 - cb ** 2 - cg ** 2 + 2 * ca * cb * cg)
+            return np.array([[a, 0, 0],
+                             [b * cg, b * sg_, 0],
+                             [c * cb, c * (ca - cb * cg) / sg_, c * v / sg_]]), sg
     raise ValueError('no CRYST1')
 
 
-def build(pdb, chains=('A', 'B'), neighbours=0, to_alanine=()):
+def symmetry_ops(pdb):
+    """[(3x3 rotation, translation)] from REMARK 290 SMTRY, in Cartesian coordinates."""
+    rows = [l for l in open(pdb) if l.startswith('REMARK 290   SMTRY')]
+    ops, cur = [], []
+    for l in rows:
+        cur.append([float(v) for v in l.split()[-4:]])
+        if len(cur) == 3:
+            M = np.array(cur)
+            ops.append((M[:, :3], M[:, 3]))
+            cur = []
+    return ops
+
+
+def stacking_axis(V, lo=4.4, hi=5.1):
+    """The cell vector that is the beta-strand repeat: a cell edge of 4.4-5.1 A."""
+    lens = np.linalg.norm(V, axis=1)
+    i = [k for k in range(3) if lo <= lens[k] <= hi]
+    assert len(i) == 1, f'expected one cell edge in {lo}-{hi} A, got lengths {lens.round(2)}'
+    return V[i[0]], i[0]
+
+
+def mating_sheet(pdb, chain='A', cutoff=4.5):
+    """Find the symmetry image that forms the dry zipper interface with `chain`.
+
+    A steric zipper is dry and side-chain mediated, so the partner is chosen by
+    the number of SIDE-CHAIN to SIDE-CHAIN contacts, and an image whose
+    backbones come within 4 A is rejected: that is a hydrogen-bonded extension
+    of the same sheet, not a mating sheet. Images related to the original by a
+    translation along the stacking axis alone are the in-sheet neighbours.
+    Returns (rotation, translation, side-chain contacts, interface residues).
+    """
+    at = _read(pdb, chain)
+    keys = list(at)
+    X = np.array([at[k][0] for k in keys])
+    bb = np.array([k[2] in ('N', 'CA', 'C', 'O', 'OXT') for k in keys])
+    side = ~bb
+    resid = [f'{k[0]}{k[1]}' for k in keys]
+    V, _sg = cell(pdb)
+    axis, ai = stacking_axis(V)
+    best = None
+    for R, t in symmetry_ops(pdb):
+        for na in range(-2, 3):
+            for nb in range(-2, 3):
+                for nc in range(-2, 3):
+                    n_cell = (na, nb, nc)
+                    shift = na * V[0] + nb * V[1] + nc * V[2]
+                    Y = X @ R.T + t + shift
+                    if (np.allclose(R, np.eye(3)) and np.linalg.norm(t) < 1e-6
+                            and all(v == 0 for k, v in enumerate(n_cell) if k != ai)):
+                        # a translation along the stacking axis alone (or none): that is
+                        # the hydrogen-bonded neighbour inside the same sheet, not a mate
+                        continue
+                    d = np.linalg.norm(X[:, None, :] - Y[None, :, :], axis=2)
+                    if d.min() < 2.0:                 # clash: not a real packing partner
+                        continue
+                    if d[np.ix_(bb, bb)].min() < 4.0:  # same sheet, hydrogen bonded
+                        continue
+                    n = int((d[np.ix_(side, side)] < cutoff).sum())
+                    if n and (best is None or n > best[2]):
+                        face = sorted({resid[i] for i in np.flatnonzero(side)
+                                       if d[i][side].min() < cutoff},
+                                      key=lambda r: int(''.join(c for c in r if c.isdigit())))
+                        best = (R, t + shift, n, face)
+    assert best is not None, 'no mating image found'
+    return best
+
+
+def build(pdb, chain='A', mate=None, neighbours=0, to_alanine=(), substitutions=None):
     """Heavy atoms of the two mating sheets.
 
-    neighbours: strands added either side along the stacking axis (0 = one
-    strand per sheet). to_alanine: residue numbers truncated to CB, applied in
-    the central strand of each sheet only.
-    Returns dict(symbols, X, labels, charge, sheet, n_per_strand).
+    mate:        (R, t) of the symmetry image forming the interface; found
+                 automatically when None, or given as a deposited chain id.
+    neighbours:  strands added either side along the stacking axis.
+    to_alanine:  residue numbers truncated to CB, in the central strand of both
+                 sheets. substitutions: {resnum: 'ALA'} style relabelling is NOT
+                 done here -- only truncation, which needs no new atoms.
     """
-    a = cell_a(pdb)
+    V, _sg = cell(pdb)
+    axis, _ai = stacking_axis(V)
+    at = _read(pdb, chain)
+    res = sorted({(rn, num) for rn, num, _ in at})
+    if mate is None:
+        R, t, _n, _face = mating_sheet(pdb, chain)
+        sheets = [(np.eye(3), np.zeros(3), chain), (R, t, chain)]
+    elif isinstance(mate, str):
+        sheets = [(np.eye(3), np.zeros(3), chain), (np.eye(3), np.zeros(3), mate)]
+    else:
+        R, t = mate
+        sheets = [(np.eye(3), np.zeros(3), chain), (R, t, chain)]
+
     sym, X, label, sheet = [], [], [], []
-    axis = np.array([a, 0.0, 0.0])
-    for s, ch in enumerate(chains):
-        at = _read(pdb, ch)
-        res = sorted({(rn, num) for rn, num, _ in at})
+    n_lys = 0
+    for s_, (R, t, ch) in enumerate(sheets):
+        a_ch = _read(pdb, ch)
+        rs = sorted({(rn, num) for rn, num, _ in a_ch})
         for k in range(-neighbours, neighbours + 1):
-            for rn, num in res:
-                keep = None if (num not in to_alanine or k != 0) else ['N', 'CA', 'C', 'O', 'CB', 'OXT']
-                for (r2, n2, nm), (x, el) in at.items():
-                    if (r2, n2) != (rn, num):
+            for rn, num in rs:
+                keep = None if num not in to_alanine else ['N', 'CA', 'C', 'O', 'CB', 'OXT']
+                if rn == 'LYS' and (num not in to_alanine):
+                    n_lys += 1
+                for (r2, n2, nm), (x, el) in a_ch.items():
+                    if (r2, n2) != (rn, num) or (keep is not None and nm not in keep):
                         continue
-                    if keep is not None and nm not in keep:
-                        continue
-                    sym.append(el); X.append(x + k * axis)
-                    label.append(f'{ch}{k:+d}:{rn}{num}:{nm}'); sheet.append(s)
-    n_strand = len(res)
-    charge = len(chains) * (2 * neighbours + 1) * (NTERM + CTERM + LYS)
-    charge -= sum(LYS for num in to_alanine
-                  for ch in chains if any(rn == 'LYS' and n == num for rn, n, _ in _read(pdb, ch)))
+                    sym.append(el)
+                    X.append((x + k * axis) @ R.T + t)
+                    label.append(f'{ch}{s_}{k:+d}:{rn}{num}:{nm}')
+                    sheet.append(s_)
+    n_strands = len(sheets) * (2 * neighbours + 1)
+    charge = n_strands * (NTERM + CTERM) + n_lys
     return dict(symbols=sym, X=np.array(X), labels=label, charge=charge,
-                sheet=np.array(sheet), n_residues=n_strand)
+                sheet=np.array(sheet), n_residues=len(res), n_strands=n_strands)
 
 
 def protonate(c):

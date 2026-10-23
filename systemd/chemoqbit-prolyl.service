@@ -10,7 +10,7 @@ Environment=OMP_NUM_THREADS=2 PYSCF_MAX_MEMORY=8000
 MemoryMax=10G
 TimeoutStartSec=infinity
 ExecCondition=/home/deploy/dev/chemoqbit/.venv/bin/python /home/deploy/dev/chemoqbit/scripts/nuc_todo.py prolyl
-ExecStartPre=/bin/sh -c '/home/deploy/dev/chemoqbit/scripts/wait_units.sh chemoqbit-abstraction; echo "=== $(date "+%%F %%T")  start: prolyl isomerisation"'
+ExecStartPre=/bin/sh -c 'echo "=== $(date "+%%F %%T")  start: prolyl isomerisation"'
 ExecStart=/home/deploy/dev/chemoqbit/.venv/bin/python -u /home/deploy/dev/chemoqbit/scripts/prolyl_scan.py
 StandardOutput=append:/home/deploy/dev/chemoqbit/results/service_prolyl.log
 StandardError=append:/home/deploy/dev/chemoqbit/results/service_prolyl.log
