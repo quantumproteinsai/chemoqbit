@@ -4,7 +4,7 @@ Used as ExecCondition= in the chemoqbit-*.service user units, so a finished
 job is skipped at boot instead of re-running (and the notifier does not mail
 "finished" again on every boot).
 
-    python scripts/nuc_todo.py tzvp|xc|profile|oniomopt|his147p|cs2d|o4h|qmsize|any
+    python scripts/nuc_todo.py tzvp|xc|profile|oniomopt|his147p|cs2d|o4h|qmsize|abstraction|any
 """
 import json, sys
 from pathlib import Path
@@ -61,9 +61,20 @@ def qmsize():
     return not (p.exists() and json.loads(p.read_text()).get('_done'))
 
 
+STAGES_ABSTRACTION = ('prep', 'acceptor', 'cleave', 'surface')
+
+
+def abstraction():
+    p = RES / 'ts_abstraction.json'
+    if not p.exists():
+        return True
+    done = json.loads(p.read_text()).get('_stages_done', [])
+    return not all(s in done for s in STAGES_ABSTRACTION)
+
+
 if __name__ == '__main__':
     job = sys.argv[1]
-    todo = {'tzvp': tzvp, 'xc': xc, 'profile': profile, 'oniomopt': oniomopt, 'his147p': his147p, 'cs2d': cs2d, 'o4h': o4h, 'qmsize': qmsize,
-            'any': lambda: tzvp() or oniomopt() or his147p() or cs2d() or o4h() or qmsize()}[job]()
+    todo = {'tzvp': tzvp, 'xc': xc, 'profile': profile, 'oniomopt': oniomopt, 'his147p': his147p, 'cs2d': cs2d, 'o4h': o4h, 'qmsize': qmsize, 'abstraction': abstraction,
+            'any': lambda: tzvp() or oniomopt() or his147p() or cs2d() or o4h() or qmsize() or abstraction()}[job]()
     print(f'{job}: {"work remaining" if todo else "complete, skipping"}')
     sys.exit(0 if todo else 1)
