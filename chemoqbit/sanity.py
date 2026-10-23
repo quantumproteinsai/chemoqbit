@@ -46,6 +46,19 @@ BOUNDS = {
                            'a bound complex must be downhill against its separated parts'),
     'alanine_ddE': (-20.0, 60.0, 'kcal/mol',
                     'removing one side chain cannot change a contact by more than this'),
+    # the quantities the two manuscripts rest on
+    'kie': (0.5, 30.0, '-', 'a primary H/T effect of a hydride transfer; outside this the '
+                            'partition functions or the mass assignment are wrong'),
+    'kappa_tunnelling': (1.0, 10.0, '-', 'a tunnelling correction raises a rate, never lowers it'),
+    'imag_freq_ts': (1, 1, 'count', 'a transition state has exactly one imaginary mode'),
+    'imag_freq_min': (0, 0, 'count', 'a minimum has none'),
+    'imag_wavenumber': (200.0, 2500.0, 'cm-1',
+                        'the magnitude of a hydrogen-transfer imaginary mode'),
+    'zpe_change': (-15.0, 5.0, 'kcal/mol', 'the zero-point change over one bond-forming step'),
+    'entropy_term': (-10.0, 10.0, 'kcal/mol',
+                     '-T dS for a unimolecular step inside a cluster with fixed atoms'),
+    'circuit_error_mha': (0.0, 1.6, 'mHa',
+                          'chemical accuracy against exact CASCI in the same active space'),
 }
 
 
