@@ -139,14 +139,24 @@ def stage_acceptor(res):
         good = [x for x in rows if x['rel'] is not None]
         res['acceptor'][name] = dict(
             atom=key, r_reactant=r0, scan=rows,
-            cost_to_26=next((x['rel'] for x in good if abs(x['r'] - 2.6) < 0.01), None),
+            cost_close=(min(good, key=lambda x: x['r'])['rel'] if good else None),
+            r_close=(min(good, key=lambda x: x['r'])['r'] if good else None),
             cost_min=min((x['rel'] for x in good), default=None))
         save(res)
-    ranked = {k: v['cost_to_26'] for k, v in res['acceptor'].items()}
-    best = min((k for k, v in ranked.items() if v is not None), key=lambda k: ranked[k], default=None)
+    # rank on the stored scans, not on a field that an older run may have left
+    # empty: the approach grid holds no 2.6 A point, so an exact lookup found none
+    ranked = {}
+    for k, v in res['acceptor'].items():
+        good = [x for x in v['scan'] if x.get('rel') is not None]
+        if good:
+            c = min(good, key=lambda x: x['r'])
+            ranked[k] = (c['rel'], c['r'])
+    assert ranked, 'no acceptor produced a usable approach scan'
+    best = min(ranked, key=lambda k: ranked[k][0])
     res['best_acceptor'] = best
     save(res)
-    print('approach cost to 2.6 A: ' + ', '.join(f'{k} {v}' for k, v in ranked.items())
+    print('closest approach reached and its cost: '
+          + ', '.join(f'{k} {r:.2f} A {c:+.2f}' for k, (c, r) in ranked.items())
           + f'  -> best {best}', flush=True)
 
 
