@@ -27,6 +27,15 @@ BOUNDS = {
                        'prolyl cis/trans barriers are measured at 14-24 kcal/mol'),
     'prolyl_cis_trans': (-4.0, 6.0, 'kcal/mol',
                          'trans is modestly favoured for Xaa-Pro; cis is populated at a few to 30 %'),
+    'scan_vs_free_min': (0.0, 2.0, 'kcal/mol',
+                        'the lowest point of a relaxed scan must agree with a free minimisation '
+                        'of the same molecule: if it does not, the scan is trapped in a strained '
+                        'arrangement. Forcing omega from its embedded value to 180 deg in one '
+                        'step wrenched Ac-Thr-Pro-NHMe by 175 deg and left the whole scan 41 '
+                        'kcal/mol above the true minimum'),
+    'start_wrench': (0.0, 20.0, 'deg',
+                     'the first restrained point of a scan must be near the geometry it starts '
+                     'from; a large jump strains the molecule and it never recovers'),
     'torsion_error': (0.0, 2.0, 'deg',
                       'a restrained scan must follow its coordinate, or it never samples the saddle'),
     # enzyme reaction steps in this project

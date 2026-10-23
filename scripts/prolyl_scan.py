@@ -25,6 +25,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from chemoqbit.prolyl import MODELS, build, torsion
 from chemoqbit.enzyme.frozen import optimise_frozen
+from chemoqbit.enzyme import tsopt as TS
+from chemoqbit.enzyme.xtb import energy_grad
 from chemoqbit import sanity
 
 OUT = ROOT / 'results' / 'prolyl.json'
@@ -100,38 +102,42 @@ def stage_scan(res):
         if name in res['scan']:
             continue
         sym, X0, om, q = build(name)
-        # start from the relaxed trans amide, then sweep each rotation sense
-        # monotonically away from it. Ordering by distance from 180 alternated
-        # between the two senses, so consecutive points started from geometries on
-        # opposite branches and the profile mixed conformers.
-        Xt, Et, ok = relax(sym, X0, q, [('tor', *om, 180.0)])
-        plus = list(range(180, -1, -STEP))                   # 180 -> 0 through +90
-        minus = list(range(-180, 1, STEP))                   # -180 -> 0 through -90
-        assert plus[0] == 180 and minus[0] == -180, 'both sweeps must start at the trans amide'
-        rp = sweep(sym, Xt, om, q, plus, f'{name:6s} +')
-        rm = sweep(sym, Xt, om, q, minus, f'{name:6s} -')
+        # Relax freely FIRST, then sweep away from wherever that lands. Forcing
+        # omega to 180 from the embedded geometry wrenched Ac-Thr-Pro-NHMe by 175
+        # deg in one step and left every point of its scan about 41 kcal/mol above
+        # the true minimum; Ac-Ala-Pro-NHMe happened to embed near trans and was
+        # unaffected, which is why only one model looked wrong.
+        Xf, Ef, okf = relax(sym, X0, q, [], k=0.0, maxiter=2000)
+        w0 = torsion(Xf, om)
+        start = int(round(w0 / STEP) * STEP)
+        sanity.record(res, 'start_wrench', abs(((w0 - start) + 180) % 360 - 180),
+                      label=f'{name} sweep start')
+        print(f'  {name}: free minimum E {Ef:.6f} at omega {w0:+.1f}; sweeping from {start:+d}',
+              flush=True)
+        # walk the full circle in both directions from there, so no step exceeds STEP
+        fwd = [((start - k * STEP + 180) % 360) - 180 for k in range(1, 360 // STEP + 1)]
+        bwd = [((start + k * STEP + 180) % 360) - 180 for k in range(1, 360 // STEP + 1)]
+        r0 = {start: dict(omega_target=start, omega=w0, E=Ef, X=Xf.tolist(), omega_error=0.0)}
+        rp = sweep(sym, Xf, om, q, fwd, f'{name:6s} >')
+        rm = sweep(sym, Xf, om, q, bwd, f'{name:6s} <')
         rows = {}
-        for w, v in list(rp.items()) + list(rm.items()):
-            k_ = str(((w + 180) % 360) - 180)
+        for w, v in list(r0.items()) + list(rp.items()) + list(rm.items()):
+            k_ = str(((int(w) + 180) % 360) - 180)
             if k_ not in rows or (v['E'] is not None and (rows[k_]['E'] is None or v['E'] < rows[k_]['E'])):
                 rows[k_] = v
         good = {int(k_): v for k_, v in rows.items() if v['E'] is not None}
         e0 = min(v['E'] for v in good.values())
-        res['scan'][name] = dict(charge=q, omega_atoms=list(om), symbols=sym, points=rows, e_min=e0,
+        res['scan'][name] = dict(charge=q, omega_atoms=list(om), symbols=sym, points=rows,
+                                 e_min=e0, e_free=Ef, omega_free=w0,
                                  profile={k_: (v['E'] - e0) * K for k_, v in sorted(good.items())})
-        save(res)
+        # the scan must not sit above a free minimisation of the same molecule
+        sanity.record(res, 'scan_vs_free_min', (Ef - e0) * K, label=f'{name} scan vs free minimum')
         prof = res['scan'][name]['profile']
         tr = min((k_ for k_ in prof if abs(abs(k_) - 180) <= 30), key=lambda k_: prof[k_], default=None)
         ci = min((k_ for k_ in prof if abs(k_) <= 30), key=lambda k_: prof[k_], default=None)
-        top = max(prof.values())
         print(f'  {name}: trans {tr} ({prof.get(tr, float("nan")):.2f}), cis {ci} '
-              f'({prof.get(ci, float("nan")):.2f}), highest {top:.2f} kcal/mol', flush=True)
-        # the profile must look like an amide rotation before the next model runs
-        e_tr = prof.get(tr)
-        sanity.record(res, 'prolyl_barrier', top - (e_tr or 0.0), label=f'{name} scan')
-        if e_tr is not None and ci in prof:
-            sanity.record(res, 'prolyl_cis_trans', prof[ci] - e_tr, label=f'{name} scan')
-        for lab_, rr in (('+', rp), ('-', rm)):
+              f'({prof.get(ci, float("nan")):.2f}), highest {max(prof.values()):.2f} kcal/mol', flush=True)
+        for lab_, rr in (('>', rp), ('<', rm)):
             e = [v['E'] for v in rr.values() if v['E'] is not None]
             if len(e) > 2:
                 i = int(np.argmax(e))
@@ -153,7 +159,28 @@ def _stationary(prof):
     return tr, ci, sp, sn
 
 
+def torsion_guide(X, om, h=1e-3):
+    """d(omega)/dX as a 3N displacement, for the saddle search to follow."""
+    g = np.zeros_like(X)
+    for a in om:
+        for c in range(3):
+            Xp = X.copy(); Xp[a, c] += h
+            Xm = X.copy(); Xm[a, c] -= h
+            dp = ((torsion(Xp, om) - torsion(Xm, om)) + 180) % 360 - 180
+            g[a, c] = dp / (2 * h)
+    return g
+
+
 def stage_points(res):
+    """Trans and cis as free minima, the barrier as a genuine P-RFO saddle.
+
+    A torsion-restrained point is not a stationary point, and with a rotatable
+    side chain the relaxed scan mixes conformers: for Ac-Thr-Pro-NHMe the scan
+    minimum came out at omega = -135 deg, which is meaningless for an amide,
+    and the barrier read off it was 5 kcal/mol. A saddle search gives a
+    well-defined energy and the frequencies prove what it is: exactly one
+    imaginary mode at the transition state, none at the minima.
+    """
     res.setdefault('points', {})
     for name, d in res['scan'].items():
         if name in res['points']:
@@ -161,28 +188,47 @@ def stage_points(res):
         prof = {int(k): v for k, v in d['profile'].items()}
         tr, ci, sp, sn = _stationary(prof)
         sym, q, om = d['symbols'], d['charge'], tuple(d['omega_atoms'])
+        masses = [TS.AMU[s_] for s_ in sym]
+        fn = lambda Y: (lambda r: (float(r[0]), r[1]))(energy_grad(sym, Y, q, solvent=SOLVENT))
+        gfn = lambda Y: energy_grad(sym, Y, q, solvent=SOLVENT)[1]
         out = {}
-        for tag, w in (('trans', tr), ('cis', ci), ('saddle+', sp), ('saddle-', sn)):
-            if w is None:
+        for tag, w in (('trans', tr), ('cis', ci), ('saddle', sp if sp is not None else sn)):
+            if w is None or not d['points'][str(w)].get('X'):
                 continue
             X = np.array(d['points'][str(w)]['X'])
-            if tag in ('trans', 'cis'):           # free relaxation: a true minimum
-                Xn, E, ok = relax(sym, X, q, [], k=0.0)
-            else:                                 # hold the torsion at the saddle
-                Xn, E, ok = relax(sym, X, q, [('tor', *om, float(w))], k=1.0)
-            out[tag] = dict(omega_scan=w, omega=torsion(Xn, om) if ok else None, E=E,
-                            X=Xn.tolist() if ok else None)
-            print(f'  point {name:6s} {tag:8s} omega {out[tag]["omega"]}  '
-                  + ('failed' if E is None else f'E {E:.6f}'), flush=True)
-        if 'trans' in out and out['trans']['E'] is not None:
-            e_tr = out['trans']['E']
-            for tag in ('saddle+', 'saddle-'):
-                if tag in out and out[tag]['E'] is not None:
-                    sanity.record(res, 'prolyl_barrier', (out[tag]['E'] - e_tr) * K,
-                                  label=f'{name} {tag}')
-            if 'cis' in out and out['cis']['E'] is not None:
-                sanity.record(res, 'prolyl_cis_trans', (out['cis']['E'] - e_tr) * K, label=f'{name} cis')
+            t0 = time.time()
+            try:
+                if tag in ('trans', 'cis'):
+                    Xn, E, ok = relax(sym, X, q, [], k=0.0, maxiter=1500)
+                    kind = 'minimum'
+                else:
+                    Xn, E = TS.prfo_follow(X, fn, torsion_guide(X, om), grad_fn=gfn,
+                                           trust=0.05, gtol=5e-4, maxiter=40, log=lambda m: None)
+                    E, ok, kind = float(E), True, 'saddle'
+            except Exception as e:
+                print(f'  point {name:6s} {tag:8s} failed: {type(e).__name__}: {e}', flush=True)
+                out[tag] = dict(failed=f'{type(e).__name__}: {e}'); continue
+            nu = TS.frequencies(np.array(Xn), TS.fd_hessian(np.array(Xn), gfn), masses)
+            nim = int((nu < -50).sum())
+            out[tag] = dict(omega_scan=w, omega=torsion(Xn, om), E=E, X=Xn.tolist(), kind=kind,
+                            n_imaginary=nim, nu_imag=float(nu.min()) if nim else None,
+                            seconds=time.time() - t0)
+            sanity.record(res, 'imag_freq_ts' if tag == 'saddle' else 'imag_freq_min', nim,
+                          label=f'{name} {tag}')
+            if nim:
+                sanity.record(res, 'imag_wavenumber', abs(nu.min()), label=f'{name} {tag}')
+            print(f'  point {name:6s} {tag:8s} omega {out[tag]["omega"]:+7.1f}  E {E:.6f}  '
+                  f'imaginary {nim}' + (f' ({abs(nu.min()):.0f}i cm-1)' if nim else '')
+                  + f'  ({time.time() - t0:.0f}s)', flush=True)
         res['points'][name] = out
+        if 'trans' in out and out['trans'].get('E') is not None:
+            e_tr = out['trans']['E']
+            if out.get('saddle', {}).get('E') is not None:
+                sanity.record(res, 'prolyl_barrier', (out['saddle']['E'] - e_tr) * K,
+                              label=f'{name} saddle')
+                print(f"  {name}: barrier {(out['saddle']['E'] - e_tr) * K:.2f} kcal/mol", flush=True)
+            if out.get('cis', {}).get('E') is not None:
+                sanity.record(res, 'prolyl_cis_trans', (out['cis']['E'] - e_tr) * K, label=f'{name} cis')
         save(res)
 
 
