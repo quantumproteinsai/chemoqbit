@@ -1,0 +1,21 @@
+[Unit]
+Description=chemoqbit: tau PHF6 zipper (resumable)
+StartLimitIntervalSec=6h
+StartLimitBurst=3
+
+[Service]
+Type=simple
+WorkingDirectory=/home/deploy/dev/chemoqbit
+Environment=OMP_NUM_THREADS=2 PYSCF_MAX_MEMORY=10000
+MemoryMax=14G
+TimeoutStartSec=infinity
+ExecCondition=/home/deploy/dev/chemoqbit/.venv/bin/python /home/deploy/dev/chemoqbit/scripts/nuc_todo.py zipper_tau
+ExecStartPre=/bin/sh -c '/home/deploy/dev/chemoqbit/scripts/wait_units.sh chemoqbit-abstraction chemoqbit-prolyl chemoqbit-cftr chemoqbit-ache chemoqbit-zip-asyn47; echo "=== $(date "+%%F %%T")  start: zipper tau"'
+ExecStart=/home/deploy/dev/chemoqbit/.venv/bin/python -u /home/deploy/dev/chemoqbit/scripts/zipper_scan.py tau
+StandardOutput=append:/home/deploy/dev/chemoqbit/results/service_zip_tau.log
+StandardError=append:/home/deploy/dev/chemoqbit/results/service_zip_tau.log
+Restart=on-failure
+RestartSec=120
+
+[Install]
+WantedBy=default.target

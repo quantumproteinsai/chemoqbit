@@ -107,8 +107,9 @@ def stage_scan(res):
         Xt, Et, ok = relax(sym, X0, q, [('tor', *om, 180.0)])
         plus = list(range(180, -1, -STEP))                   # 180 -> 0 through +90
         minus = list(range(-180, 1, STEP))                   # -180 -> 0 through -90
+        assert plus[0] == 180 and minus[0] == -180, 'both sweeps must start at the trans amide'
         rp = sweep(sym, Xt, om, q, plus, f'{name:6s} +')
-        rm = sweep(sym, Xt, om, q, minus[::-1], f'{name:6s} -')
+        rm = sweep(sym, Xt, om, q, minus, f'{name:6s} -')
         rows = {}
         for w, v in list(rp.items()) + list(rm.items()):
             k_ = str(((w + 180) % 360) - 180)
@@ -130,7 +131,13 @@ def stage_scan(res):
         sanity.record(res, 'prolyl_barrier', top - (e_tr or 0.0), label=f'{name} scan')
         if e_tr is not None and ci in prof:
             sanity.record(res, 'prolyl_cis_trans', prof[ci] - e_tr, label=f'{name} scan')
-        sanity.record(res, 'scan_step', sanity.profile_steps(prof), label=f'{name} profile')
+        for lab_, rr in (('+', rp), ('-', rm)):
+            e = [v['E'] for v in rr.values() if v['E'] is not None]
+            if len(e) > 2:
+                i = int(np.argmax(e))
+                sanity.record(res, 'scan_drop',
+                              sanity.largest_drop([(v - e[0]) * K for v in e[:i + 1]]),
+                              label=f'{name} sweep {lab_}, rising branch')
         worst = max((v.get('omega_error', 0.0) for v in rows.values() if v.get('omega_error')), default=0.0)
         sanity.record(res, 'torsion_error', worst, label=f'{name} worst point')
         save(res)

@@ -1,24 +1,31 @@
 """What holds an amyloid steric zipper together, residue by residue.
 
-Two beta-sheets of tau's PHF6 motif (306-VQIVYK-311) mate through a dry
-interface (PDB 2ON9, 1.51 A; Sawaya et al., Nature 2007). The two chains of the
-asymmetric unit are the two sheets, touching only through Val1, Ile3 and Tyr5 --
-one face of the strand.
+Three segments, each a microcrystal structure good enough for a side-chain
+argument -- unlike the cryo-EM fibrils of full-length Abeta or tau, which carry
+the familial mutations but sit at 3.4-4.0 A:
+
+  tau       tau PHF6, 306-VQIVYK-311 (2ON9, 1.51 A; Sawaya et al., Nature 2007)
+  asyn47    alpha-synuclein 47-56, GVVHGVTTVA (4ZNN, 1.41 A; Rodriguez et al.,
+            Nature 2015) -- the A53T FAMILIAL PARKINSON mutant as crystallised.
+            Truncating Thr53 to alanine restores the wild-type sequence, so the
+            pathogenic mutation is a difference between two models that differ
+            by one side chain, at a geometry good enough to mean something.
+  nacore    alpha-synuclein 68-78, GAVVTGVTAVA (4RIL, 1.43 A), the toxic core
+
+The mating sheet is the partner that buries the most area with the largest
+side-chain share (chemoqbit.zipper.mating_sheet), which is how Sawaya et al.
+define a zipper: facing side chains interdigitating in a dry interface.
+Counting close contacts, as a first attempt did, scores an edge-on packing
+contact just as highly and picked the wrong partner.
 
   E_int  = E(both sheets) - E(sheet A) - E(sheet B), at one geometry
   ddE    = E_int(residue truncated to alanine in both sheets) - E_int(wild type)
 
-Truncation is done in the relaxed geometry, so every other atom stays put and
-the scan is a clean difference. Hydrogens are relaxed once with the heavy atoms
-held at their crystal positions.
+Truncation happens in the relaxed geometry, so every other atom stays put.
+Hydrogens are relaxed once with the heavy atoms at their crystal positions.
 
-This segment is used instead of a full-length fibril because 1.51 A supports a
-quantum-chemical argument about side chains and 3.4-4.0 A cryo-EM does not. The
-price is that it answers what makes this sequence zip, not what a familial
-mutation does.
-
-    python scripts/zipper_scan.py [stage ...]      # wt, scan, dft
-Resumable: results/zipper.json
+    python scripts/zipper_scan.py <system> [stage ...]     # wt, scan, dft
+Resumable: results/zipper_<system>.json
 """
 import json, sys, time
 from pathlib import Path
@@ -31,14 +38,20 @@ from chemoqbit.enzyme.frozen import optimise_frozen
 from chemoqbit import sanity
 from chemoqbit.enzyme.xtb import energy_grad
 
-PDB = ROOT / 'data' / 'rcsb_2on9' / '2ON9.pdb'
-OUT = ROOT / 'results' / 'zipper.json'
 K = 627.509474
 SOLVENT = 'water'
 NEIGHBOURS = 0            # one strand per sheet; 1 adds a stacked strand either side
 XC, BASIS = 'wb97x-d3bj', 'def2-svp'
-RESIDUES = [1, 2, 3, 4, 5, 6]
-NAMES = {1: 'Val306', 2: 'Gln307', 3: 'Ile308', 4: 'Val309', 5: 'Tyr310', 6: 'Lys311'}
+SYSTEMS = {
+    'tau':    dict(pdb='rcsb_2on9/2ON9.pdb', mate='B', note='tau PHF6 306-VQIVYK-311'),
+    'asyn47': dict(pdb='rcsb_4znn/4ZNN.pdb', mate=None,
+                   note='alpha-synuclein 47-56, the A53T familial Parkinson mutant; '
+                        'truncating Thr53 to Ala restores the wild-type sequence'),
+    'nacore': dict(pdb='rcsb_4ril/4RIL.pdb', mate=None, note='alpha-synuclein NACore 68-78'),
+}
+S = {}
+PDB = None
+OUT = None
 
 
 def save(d):
@@ -50,7 +63,7 @@ def load():
 
 
 def pieces(to_alanine=()):
-    c = build(str(PDB), neighbours=NEIGHBOURS, to_alanine=to_alanine)
+    c = build(str(PDB), mate=S['mate'], neighbours=NEIGHBOURS, to_alanine=to_alanine)
     sym, X, lab, q, sheet = protonate(c)
     heavy = [i for i, s in enumerate(sym) if s != 'H']
     X, _ = optimise_frozen(sym, X, charge=q, frozen=heavy, solvent=SOLVENT,
@@ -71,14 +84,33 @@ def interaction(sym, X, q, sheet):
     return (e_all - out[0] - out[1]) * K, dict(E_both=e_all, E_sheet0=out[0], E_sheet1=out[1])
 
 
+def residues(lab):
+    """(number, label) of each residue of the first sheet, in order."""
+    out = {}
+    for l in lab:
+        strand, res, _nm = l.split(':')
+        n = int(''.join(c for c in res if c.isdigit()))
+        out[n] = res
+    return sorted(out.items())
+
+
 def stage_wt(res):
     if 'wt' in res:
         return
     t0 = time.time()
+    from chemoqbit.zipper import mating_sheet
+    if S['mate'] is None:
+        _R, _t, desc = mating_sheet(str(PDB))
+        res['interface'] = desc
+        print(f"  interface: symmetry op {desc['op']} cell {desc['cell']}, buries "
+              f"{desc['buried']:.1f} A^2, side-chain fraction {desc['side_fraction']:.2f}, "
+              f"interfacial waters {desc['interfacial_waters']}", flush=True)
     sym, X, q, sheet, lab = pieces()
     ei, parts = interaction(sym, X, q, sheet)
     res['wt'] = dict(atoms=len(sym), charge=q, neighbours=NEIGHBOURS, E_int=ei,
+                     residues=[f'{r}{n}' for n, r in residues(lab)],
                      seconds=time.time() - t0, **parts)
+    res['geometry'] = dict(labels=lab)
     save(res)
     sanity.record(res, 'interaction_energy', ei, label='zipper wild type', fatal=True)
     print(f'wild type: {len(sym)} atoms, charge {q:+d}, E_int {ei:+.2f} kcal/mol '
@@ -87,9 +119,13 @@ def stage_wt(res):
 
 def stage_scan(res):
     res.setdefault('alanine', {})
-    for n in RESIDUES:
-        key = NAMES[n]
-        if key in res['alanine']:
+    nums = [n for n, r in residues(res['geometry']['labels'])]
+    names = dict(residues(res['geometry']['labels']))
+    for n in nums:
+        key = f'{names[n]}{n}'
+        if key in res['alanine'] or names[n] in ('GLY', 'ALA'):
+            if names[n] in ('GLY', 'ALA'):
+                res['alanine'].setdefault(key, dict(skipped='no side chain beyond CB'))
             continue
         t0 = time.time()
         try:
@@ -139,7 +175,12 @@ def stage_dft(res):
 STAGES = dict(wt=stage_wt, scan=stage_scan, dft=stage_dft)
 
 
-def main(names):
+def main(system, names):
+    global S, PDB, OUT
+    S = SYSTEMS[system]
+    PDB = ROOT / 'data' / S['pdb']
+    OUT = ROOT / 'results' / f'zipper_{system}.json'
+    print(f"system {system}: {S['note']}", flush=True)
     res = load()
     for n in names:
         print(f'=== {n}', flush=True)
@@ -149,4 +190,4 @@ def main(names):
 
 
 if __name__ == '__main__':
-    main(sys.argv[1:] or ['wt', 'scan', 'dft'])
+    main(sys.argv[1], sys.argv[2:] or ['wt', 'scan', 'dft'])

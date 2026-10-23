@@ -4,7 +4,7 @@ Used as ExecCondition= in the chemoqbit-*.service user units, so a finished
 job is skipped at boot instead of re-running (and the notifier does not mail
 "finished" again on every boot).
 
-    python scripts/nuc_todo.py tzvp|xc|profile|oniomopt|his147p|cs2d|o4h|qmsize|abstraction|prolyl|pocket_cftr|pocket_ache|zipper|any
+    python scripts/nuc_todo.py tzvp|xc|profile|oniomopt|his147p|cs2d|o4h|qmsize|abstraction|prolyl|pocket_cftr|pocket_ache|zipper_tau|zipper_asyn47|zipper_nacore|any
 """
 import json, sys
 from pathlib import Path
@@ -88,8 +88,8 @@ def pocket(system):
     return not all(x in done for x in ('wt', 'scan', 'dft'))
 
 
-def zipper():
-    p = RES / 'zipper.json'
+def zipper(system):
+    p = RES / f'zipper_{system}.json'
     if not p.exists():
         return True
     done = json.loads(p.read_text()).get('_stages_done', [])
@@ -99,8 +99,9 @@ def zipper():
 if __name__ == '__main__':
     job = sys.argv[1]
     todo = {'tzvp': tzvp, 'xc': xc, 'profile': profile, 'oniomopt': oniomopt, 'his147p': his147p, 'cs2d': cs2d, 'o4h': o4h, 'qmsize': qmsize, 'abstraction': abstraction, 'prolyl': prolyl,
-            'pocket_cftr': lambda: pocket('cftr'), 'pocket_ache': lambda: pocket('ache'), 'zipper': zipper,
+            'pocket_cftr': lambda: pocket('cftr'), 'pocket_ache': lambda: pocket('ache'), 'zipper_tau': lambda: zipper('tau'), 'zipper_asyn47': lambda: zipper('asyn47'),
+            'zipper_nacore': lambda: zipper('nacore'),
             'any': lambda: tzvp() or oniomopt() or his147p() or cs2d() or o4h() or qmsize() or abstraction() or prolyl()
-                           or pocket('cftr') or pocket('ache') or zipper()}[job]()
+                           or pocket('cftr') or pocket('ache') or zipper('tau') or zipper('asyn47') or zipper('nacore')}[job]()
     print(f'{job}: {"work remaining" if todo else "complete, skipping"}')
     sys.exit(0 if todo else 1)

@@ -61,50 +61,74 @@ def stacking_axis(V, lo=4.4, hi=5.1):
     return V[i[0]], i[0]
 
 
-def mating_sheet(pdb, chain='A', cutoff=4.5):
-    """Find the symmetry image that forms the dry zipper interface with `chain`.
+BACKBONE = {'N', 'CA', 'C', 'O', 'OXT'}
 
-    A steric zipper is dry and side-chain mediated, so the partner is chosen by
-    the number of SIDE-CHAIN to SIDE-CHAIN contacts, and an image whose
-    backbones come within 4 A is rejected: that is a hydrogen-bonded extension
-    of the same sheet, not a mating sheet. Images related to the original by a
-    translation along the stacking axis alone are the in-sheet neighbours.
-    Returns (rotation, translation, side-chain contacts, interface residues).
+
+def mating_sheet(pdb, chain='A', probe_waters=4.0):
+    """Find the sheet that forms the steric zipper with `chain`.
+
+    Sawaya et al. (Nature 447, 453 (2007)) define a steric zipper as a pair of
+    sheets whose facing side chains interdigitate in a dry interface, so the
+    partner is chosen by the area it BURIES, and by how much of that area is
+    side chain -- not by counting close contacts, which scores an edge-on
+    packing contact just as highly. Images related to the original by a
+    translation along the stacking axis alone are strands of the same sheet.
+
+    Returns (rotation, translation, descriptors) with the buried area in A^2,
+    the side-chain fraction of it, and the number of waters within
+    `probe_waters` of both sheets.
     """
+    from .sasa import buried, buried_per_atom
     at = _read(pdb, chain)
     keys = list(at)
     X = np.array([at[k][0] for k in keys])
-    bb = np.array([k[2] in ('N', 'CA', 'C', 'O', 'OXT') for k in keys])
-    side = ~bb
-    resid = [f'{k[0]}{k[1]}' for k in keys]
+    el = [at[k][1] for k in keys]
+    side = np.array([k[2] not in BACKBONE for k in keys])
+    W = np.array([v[0] for k, v in _read(pdb, chain).items() if k[0] == 'HOH'] or [])
+    if W.size == 0:
+        W = np.array([[float(l[30:38]), float(l[38:46]), float(l[46:54])] for l in open(pdb)
+                      if l.startswith(('ATOM', 'HETATM')) and l[17:20].strip() == 'HOH'] or []).reshape(-1, 3)
     V, _sg = cell(pdb)
-    axis, ai = stacking_axis(V)
+    _axis, ai = stacking_axis(V)
     best = None
-    for R, t in symmetry_ops(pdb):
-        for na in range(-2, 3):
-            for nb in range(-2, 3):
-                for nc in range(-2, 3):
-                    n_cell = (na, nb, nc)
+    for ci, (R, t) in enumerate(symmetry_ops(pdb)):
+        for na in range(-1, 2):
+            for nb in range(-1, 2):
+                for nc in range(-1, 2):
+                    nn = (na, nb, nc)
+                    if ci == 0 and all(v == 0 for q, v in enumerate(nn) if q != ai):
+                        continue                      # same sheet, or itself
                     shift = na * V[0] + nb * V[1] + nc * V[2]
                     Y = X @ R.T + t + shift
-                    if (np.allclose(R, np.eye(3)) and np.linalg.norm(t) < 1e-6
-                            and all(v == 0 for k, v in enumerate(n_cell) if k != ai)):
-                        # a translation along the stacking axis alone (or none): that is
-                        # the hydrogen-bonded neighbour inside the same sheet, not a mate
-                        continue
                     d = np.linalg.norm(X[:, None, :] - Y[None, :, :], axis=2)
-                    if d.min() < 2.0:                 # clash: not a real packing partner
+                    if d.min() < 2.2 or d.min() > 5.0:
                         continue
-                    if d[np.ix_(bb, bb)].min() < 4.0:  # same sheet, hydrogen bonded
-                        continue
-                    n = int((d[np.ix_(side, side)] < cutoff).sum())
-                    if n and (best is None or n > best[2]):
-                        face = sorted({resid[i] for i in np.flatnonzero(side)
-                                       if d[i][side].min() < cutoff},
-                                      key=lambda r: int(''.join(c for c in r if c.isdigit())))
-                        best = (R, t + shift, n, face)
-    assert best is not None, 'no mating image found'
+                    tot = buried(el, X, el, Y)
+                    pa = buried_per_atom(el, X, el, Y)
+                    frac = float(pa[side].sum() / max(pa.sum(), 1e-9))
+                    wb = 0
+                    if W.size:
+                        d1 = np.linalg.norm(W[:, None, :] - X[None, :, :], axis=2).min(axis=1)
+                        d2 = np.linalg.norm(W[:, None, :] - Y[None, :, :], axis=2).min(axis=1)
+                        wb = int(((d1 < probe_waters) & (d2 < probe_waters)).sum())
+                    desc = dict(buried=float(tot), side_fraction=frac, interfacial_waters=wb,
+                                op=ci + 1, cell=nn)
+                    if best is None or tot > best[2]['buried']:
+                        best = (R, t + shift, desc)
+    assert best is not None, 'no packing partner within 5 A'
     return best
+
+
+def interface_of(pdb, chain, Y):
+    """Buried area, side-chain fraction and interfacial waters for an explicit partner."""
+    from .sasa import buried, buried_per_atom
+    at = _read(pdb, chain)
+    keys = list(at)
+    X = np.array([at[k][0] for k in keys]); el = [at[k][1] for k in keys]
+    side = np.array([k[2] not in BACKBONE for k in keys])
+    tot = buried(el, X, el, Y)
+    pa = buried_per_atom(el, X, el, Y)
+    return dict(buried=float(tot), side_fraction=float(pa[side].sum() / max(pa.sum(), 1e-9)))
 
 
 def build(pdb, chain='A', mate=None, neighbours=0, to_alanine=(), substitutions=None):
@@ -122,7 +146,7 @@ def build(pdb, chain='A', mate=None, neighbours=0, to_alanine=(), substitutions=
     at = _read(pdb, chain)
     res = sorted({(rn, num) for rn, num, _ in at})
     if mate is None:
-        R, t, _n, _face = mating_sheet(pdb, chain)
+        R, t, _desc = mating_sheet(pdb, chain)
         sheets = [(np.eye(3), np.zeros(3), chain), (R, t, chain)]
     elif isinstance(mate, str):
         sheets = [(np.eye(3), np.zeros(3), chain), (np.eye(3), np.zeros(3), mate)]
