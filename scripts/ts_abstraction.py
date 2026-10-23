@@ -7,18 +7,23 @@ FdUMP carries fluorine at C5 and so has no proton to remove; the standard accoun
 is that the complex is therefore trapped, which this script tests by computing
 both routes for both substrates.
 
+No candidate base is within reach of the proton in any crystal structure. In
+1TLS the nearest acceptors to C5 are Tyr94 OH (4.14 A) and water 387 (4.55 A),
+and in the 2021 intermediate-analog structures 7JX1/7JXF (superposed onto 1TLS
+here to 0.3 A RMSD over 26 CA) the nearest water overlays water 387, at 4.07 A.
+The base must therefore approach before the proton can move, which is the
+objection Ghosh et al. (Phys. Chem. Chem. Phys. 17, 30867 (2015)) raise against
+any single residue acting as the general base. The coordinates are accordingly
+the approach r = d(C5...A) and the transfer xi = d(C5-H) - d(H...A).
+
 Stages, each resumable from results/ts_abstraction.json:
 
   prep      build the 103-atom cluster from PDB 1TLS (unedited covalent complex,
             plus Glu58) for c5 = H and F, relax with GFN2-xTB
-  acceptor  dUMP: 1D proton-transfer scan to each candidate acceptor, C6-S free,
-            to find which acceptor the proton actually reaches
-  surface   dUMP: 2D scan over the proton coordinate and the C6-S distance, the
-            concerted route, with the minimax path across the grid
+  acceptor  dUMP: how cheaply each candidate base can approach C5
   cleave    both: C6-S cleavage alone, with C5 keeping its substituent -- the
             only route open to FdUMP
-  tsopt     P-RFO transition state and partial Hessian for the preferred route
-  oniom     ONIOM(wB97X-D3(BJ)/def2-SVP:GFN2-xTB) energies at the stationary points
+  band      dUMP: 2D band over the approach and the proton transfer
 
     python scripts/ts_abstraction.py [stage ...]      # default: all, in order
 """
@@ -30,13 +35,22 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT)); sys.path.insert(0, str(ROOT / 'scripts'))
 from chemoqbit.enzyme import abstraction as A
 from chemoqbit.enzyme.frozen import optimise_frozen
-from chemoqbit.enzyme.xtb import energy_grad
 
 OUT = ROOT / 'results' / 'ts_abstraction.json'
 K = 627.509474
-XI = np.round(np.arange(-1.4, 1.41, 0.2), 2)        # d(C5-H) - d(H-acceptor)
+APPROACH = np.round(np.arange(2.5, 4.81, 0.2), 2)   # d(C5...acceptor)
+XIR = np.round(np.arange(-2.6, 0.61, 0.2), 2)       # d(C5-H) - d(H...acceptor)
 RCS = np.round(np.arange(1.95, 3.56, 0.2), 2)       # d(C6-S)
 KRES = 20.0
+# the band keeps the proton bonded to C5 or to the acceptor: for a collinear
+# C5-H...A, D_LO <= d(C5-H) <= D_HI. Outside it a restrained xi merely tears the
+# proton off into the cavity, which is what an absolute xi range did.
+D_LO, D_HI = 0.95, 1.70
+
+
+def band(r):
+    """the xi values reachable at approach r without tearing the proton off"""
+    return [float(x) for x in XIR if 2 * D_LO - r <= x <= 2 * D_HI - r]
 
 
 def load():
@@ -70,7 +84,22 @@ def geom(X, lab, h):
         g['C5-H'] = d(i('nucleotide:C5'), h)
         for name, key in A.ACCEPTORS.items():
             g[f'H-{name}'] = d(h, i(key))
+            g[f'C5-{name}'] = d(i('nucleotide:C5'), i(key))
     return g
+
+
+def _relax(p, X, cons):
+    return optimise_frozen(p['symbols'], X, charge=0, frozen=p['frozen'], constraints=cons, k=KRES)
+
+
+def _relax_safe(p, X, cons):
+    """(X, E, ok): an xTB SCF failure marks the point instead of ending the run."""
+    try:
+        Xn, E = _relax(p, X, cons)
+        return Xn, float(E), True
+    except Exception as e:
+        print(f'    point failed: {type(e).__name__}: {e}', flush=True)
+        return np.array(X), None, False
 
 
 def stage_prep(res):
@@ -84,15 +113,13 @@ def stage_prep(res):
         res['prep'][c5] = dict(symbols=S, labels=lab, frozen=frozen, hydrogen=h, X=X.tolist(),
                                E=float(E), geometry=geom(X, lab, h), seconds=time.time() - t0)
         save(res)
-        print(f"prep {c5}: E {E:.6f}  " + '  '.join(f'{k} {v:.2f}' for k, v in res['prep'][c5]['geometry'].items()),
-              flush=True)
-
-
-def _relax(p, X, cons):
-    return optimise_frozen(p['symbols'], X, charge=0, frozen=p['frozen'], constraints=cons, k=KRES)
+        print(f"prep {c5}: E {E:.6f}  "
+              + '  '.join(f'{k} {v:.2f}' for k, v in res['prep'][c5]['geometry'].items()), flush=True)
 
 
 def stage_acceptor(res):
+    """How cheaply can each candidate base approach C5? The proton keeps its
+    natural position; only d(C5...A) is restrained."""
     p = res['prep']['H']; lab, h = p['labels'], p['hydrogen']
     i5 = lab.index('nucleotide:C5')
     res.setdefault('acceptor', {})
@@ -100,44 +127,27 @@ def stage_acceptor(res):
         if name in res['acceptor']:
             continue
         ja = lab.index(key)
-        X = np.array(p['X']); rows = []
-        for xi in XI:
-            X, E = _relax(p, X, [(i5, h, ja, h, float(xi))])
-            rows.append(dict(xi=float(xi), E=float(E), rel=float((E - p['E']) * K), X=X.tolist(),
-                             **geom(X, lab, h)))
-            print(f"  acceptor {name} xi {xi:+.1f}  {(E - p['E']) * K:+8.2f} kcal/mol  "
-                  f"C5-H {rows[-1]['C5-H']:.2f} C6-SG {rows[-1]['C6-SG']:.2f}", flush=True)
-        res['acceptor'][name] = dict(atom=key, scan=rows,
-                                     barrier=float(max(r['rel'] for r in rows)),
-                                     final=rows[-1]['rel'])
+        X = np.array(p['X']); r0 = float(np.linalg.norm(X[i5] - X[ja]))
+        rows = []
+        for r in [v for v in APPROACH if v <= r0 + 1e-9][::-1]:
+            X, E, ok = _relax_safe(p, X, [(i5, ja, float(r))])
+            rows.append(dict(r=float(r), E=E, rel=None if E is None else float((E - p['E']) * K),
+                             converged=ok, X=X.tolist() if ok else None, **geom(X, lab, h)))
+            print(f"  approach {name} r {r:.2f}  "
+                  + ('failed' if E is None else f"{(E - p['E']) * K:+8.2f} kcal/mol")
+                  + f"  C5-H {rows[-1]['C5-H']:.2f} C6-SG {rows[-1]['C6-SG']:.2f}", flush=True)
+        good = [x for x in rows if x['rel'] is not None]
+        res['acceptor'][name] = dict(
+            atom=key, r_reactant=r0, scan=rows,
+            cost_to_26=next((x['rel'] for x in good if abs(x['r'] - 2.6) < 0.01), None),
+            cost_min=min((x['rel'] for x in good), default=None))
         save(res)
-    best = min(res['acceptor'], key=lambda k: res['acceptor'][k]['barrier'])
+    ranked = {k: v['cost_to_26'] for k, v in res['acceptor'].items()}
+    best = min((k for k, v in ranked.items() if v is not None), key=lambda k: ranked[k], default=None)
     res['best_acceptor'] = best
     save(res)
-    print(f"best acceptor: {best} (barrier {res['acceptor'][best]['barrier']:.2f} kcal/mol)", flush=True)
-
-
-def stage_surface(res):
-    p = res['prep']['H']; lab, h = p['labels'], p['hydrogen']
-    i5, i6 = lab.index('nucleotide:C5'), lab.index('nucleotide:C6')
-    isg = lab.index('cys146:SG')
-    ja = lab.index(A.ACCEPTORS[res['best_acceptor']])
-    s = res.setdefault('surface', dict(xi=XI.tolist(), rcs=RCS.tolist(), acceptor=res['best_acceptor'], points={}))
-    scan1d = {r['xi']: r['X'] for r in res['acceptor'][res['best_acceptor']]['scan']}
-    for xi in XI:
-        X = np.array(scan1d[float(xi)])        # each column starts from the 1D scan
-        for rcs in RCS:
-            kk = f'{xi}_{rcs}'
-            if kk in s['points']:
-                X = np.array(s['points'][kk]['X']); continue
-            t0 = time.time()
-            X, E = _relax(p, X, [(i5, h, ja, h, float(xi)), (i6, isg, float(rcs))])
-            s['points'][kk] = dict(E=float(E), rel=float((E - p['E']) * K), X=X.tolist(),
-                                   **geom(X, lab, h))
-            save(res)
-            print(f"  surface xi {xi:+.1f} rCS {rcs:.2f}  {(E - p['E']) * K:+8.2f} kcal/mol ({time.time() - t0:.0f}s)",
-                  flush=True)
-    save(res)
+    print('approach cost to 2.6 A: ' + ', '.join(f'{k} {v}' for k, v in ranked.items())
+          + f'  -> best {best}', flush=True)
 
 
 def stage_cleave(res):
@@ -150,14 +160,47 @@ def stage_cleave(res):
         i6, isg = lab.index('nucleotide:C6'), lab.index('cys146:SG')
         X = np.array(p['X']); rows = []
         for rcs in RCS:
-            X, E = _relax(p, X, [(i6, isg, float(rcs))])
-            rows.append(dict(rcs=float(rcs), E=float(E), rel=float((E - p['E']) * K), **geom(X, lab, h)))
-            print(f"  cleave {c5} rCS {rcs:.2f}  {(E - p['E']) * K:+8.2f} kcal/mol", flush=True)
-        res['cleave'][c5] = dict(scan=rows, barrier=float(max(r['rel'] for r in rows)), final=rows[-1]['rel'])
+            X, E, ok = _relax_safe(p, X, [(i6, isg, float(rcs))])
+            rows.append(dict(rcs=float(rcs), E=E, rel=None if E is None else float((E - p['E']) * K),
+                             converged=ok, **geom(X, lab, h)))
+            print(f"  cleave {c5} rCS {rcs:.2f}  "
+                  + ('failed' if E is None else f"{(E - p['E']) * K:+8.2f} kcal/mol"), flush=True)
+        good = [x for x in rows if x['rel'] is not None]
+        res['cleave'][c5] = dict(scan=rows, barrier=max((x['rel'] for x in good), default=None),
+                                 final=good[-1]['rel'] if good else None)
         save(res)
 
 
-STAGES = dict(prep=stage_prep, acceptor=stage_acceptor, surface=stage_surface, cleave=stage_cleave)
+def stage_band(res):
+    """2D band over the approach and the proton transfer, for the best acceptor."""
+    p = res['prep']['H']; lab, h = p['labels'], p['hydrogen']
+    i5 = lab.index('nucleotide:C5')
+    name = res['best_acceptor']
+    ja = lab.index(A.ACCEPTORS[name])
+    appr = {x['r']: x['X'] for x in res['acceptor'][name]['scan'] if x['X']}
+    s = res.setdefault('band', dict(acceptor=name, xi=XIR.tolist(), points={}))
+    for r in sorted(appr, reverse=True):
+        X = np.array(appr[r])                      # each row starts from the approach scan
+        for xi in band(r):
+            kk = f'{r}_{xi}'
+            if kk in s['points']:
+                if s['points'][kk].get('X'):
+                    X = np.array(s['points'][kk]['X'])
+                continue
+            t0 = time.time()
+            X, E, ok = _relax_safe(p, X, [(i5, ja, float(r)), (i5, h, ja, h, float(xi))])
+            s['points'][kk] = dict(E=E, rel=None if E is None else float((E - p['E']) * K),
+                                   converged=ok, X=X.tolist() if ok else None, **geom(X, lab, h))
+            save(res)
+            print(f"  band r {r:.2f} xi {xi:+.1f}  "
+                  + ('failed' if E is None else f"{(E - p['E']) * K:+8.2f} kcal/mol")
+                  + f"  C5-H {s['points'][kk]['C5-H']:.2f} ({time.time() - t0:.0f}s)", flush=True)
+    good = [v['rel'] for v in s['points'].values() if v['rel'] is not None]
+    s['min_barrier_on_band'] = min(good) if good else None
+    save(res)
+
+
+STAGES = dict(prep=stage_prep, acceptor=stage_acceptor, cleave=stage_cleave, band=stage_band)
 
 
 def main(names):
@@ -165,9 +208,9 @@ def main(names):
     for n in names:
         print(f'=== {n}', flush=True)
         STAGES[n](res)
-    res['_stages_done'] = sorted(set(res.get('_stages_done', [])) | set(names))
-    save(res)
+        res['_stages_done'] = sorted(set(res.get('_stages_done', [])) | {n})
+        save(res)
 
 
 if __name__ == '__main__':
-    main(sys.argv[1:] or ['prep', 'acceptor', 'cleave', 'surface'])
+    main(sys.argv[1:] or ['prep', 'acceptor', 'cleave', 'band'])
