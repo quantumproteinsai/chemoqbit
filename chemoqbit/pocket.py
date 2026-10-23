@@ -113,7 +113,7 @@ def split(c):
     return list(range(n)), list(range(n, len(c['symbols'])))
 
 
-def protonate(c, ligand_charge=0):
+def protonate(c, ligand_charge=0, sites=None):
     """Add hydrogens to a cut pocket with RDKit, setting the formal charges the
     truncation implies: Lys NZ and Arg NH2 cationic, Asp/Glu carboxylates
     anionic. `ligand_charge` is a modelling choice the structure cannot settle --
@@ -130,11 +130,18 @@ def protonate(c, ligand_charge=0):
         conf.SetAtomPosition(i, x.tolist())
     m.AddConformer(conf)
     mol = m.GetMol()
+    sites = dict(sites or {})
+    assert sum(sites.values()) == ligand_charge, \
+        f'sites sum to {sum(sites.values())}, not ligand_charge {ligand_charge}'
     total = c['charge'] + ligand_charge
     rdDetermineBonds.DetermineConnectivity(mol, useHueckel=False, charge=total)
     em = Chem.RWMol(mol)
     idx = {l: i for i, l in enumerate(lab)}
+    for l, ch in sites.items():
+        em.GetAtomWithIdx(idx[l]).SetFormalCharge(ch)
     for l, i in idx.items():
+        if l in sites:
+            continue
         rn = l.split(':')[0]
         a = l.split(':')[1]
         if rn.startswith('LYS') and a == 'NZ':
@@ -157,3 +164,27 @@ def protonate(c, ligand_charge=0):
     XH = np.array([list(confH.GetAtomPosition(i)) for i in range(molH.GetNumAtoms())])
     symH = [a.GetSymbol() for a in molH.GetAtoms()]
     return symH, XH, lab, Chem.GetFormalCharge(molH), molH
+
+
+def mutate_to_alanine(sym, X, lab, lig, hofs, resid):
+    """Truncate one residue to alanine inside an already relaxed geometry: drop
+    its side chain beyond CB and put a hydrogen where CG was. This keeps every
+    other atom exactly where it was, which is what an alanine scan wants, and
+    costs no further optimisation."""
+    keep_lab = {f'{resid}:CB', f'{resid}:capCA'}
+    gone = [i for i, l in enumerate(lab) if l.startswith(f'{resid}:') and l not in keep_lab]
+    assert gone, f'nothing to truncate in {resid}'
+    cb = lab.index(f'{resid}:CB')
+    # the removed atom bonded to CB (CG, CG1, OG, SG...) marks the new C-H direction
+    first = min(gone, key=lambda i: np.linalg.norm(X[i] - X[cb]))
+    drop = set(gone)
+    for i in gone:
+        drop.update(hofs.get(i, []))
+    u = X[first] - X[cb]
+    h_new = X[cb] + 1.09 * u / np.linalg.norm(u)
+    keep = [i for i in range(len(sym)) if i not in drop]
+    sym2 = [sym[i] for i in keep] + ['H']
+    X2 = np.vstack([X[keep], h_new])
+    lig2 = np.append(lig[keep], False)
+    dq = FORMAL.get(resid[:3], 0)
+    return sym2, X2, lig2, dq
