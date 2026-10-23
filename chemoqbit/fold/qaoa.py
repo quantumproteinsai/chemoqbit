@@ -141,3 +141,34 @@ def qaoa_program(n, gammas, betas, slot=0):
         g.append(('DIAG', slot, gm))
         g += [('RX', q, 2 * b) for q in range(n)]
     return g
+
+
+# ------------------------------------------------------- Grover mixer
+def interp(x, p):
+    """INTERP warm start (Zhou et al., PRX 10, 021067 (2020)): 2(p+1) angles from the optimum at depth p."""
+    g, b = x[:p], x[p:]
+    up = lambda v: np.array([(i / p) * (v[i - 1] if i >= 1 else 0) + ((p - i) / p) * (v[i] if i < p else 0)
+                             for i in range(p + 1)])
+    return np.r_[up(g), up(b)]
+
+
+def grover_state(C, valid, x, p):
+    """Grover-mixer QAOA restricted to valid folds (Baertschi & Eidenbenz, IEEE QCE 2020):
+    start in the uniform superposition |s> of valid folds, mixer exp(-i b |s><s|)."""
+    s = valid / np.sqrt(valid.sum())
+    psi = s.astype(complex)
+    for g, b in zip(x[:p], x[p:]):
+        psi = psi * np.exp(-1j * g * C)
+        psi = psi - (1 - np.exp(-1j * b)) * np.vdot(s, psi) * s
+    return psi
+
+
+def optimise_grover(C, valid, p, target, x0=None):
+    """minimise <C> at depth p; returns angles and the probability of `target` (bool mask)."""
+    f = lambda x: float((np.abs(grover_state(C, valid, x, p)) ** 2) @ C)
+    starts = [x0] if x0 is not None else \
+        [np.r_[np.linspace(0.1, 1, p) * 2, np.linspace(1, 0.1, p) * 0.6] + d for d in (0, 0.2, -0.2, 0.5)]
+    best = min((minimize(f, s0, method='L-BFGS-B', options=dict(maxiter=300)) for s0 in starts),
+               key=lambda o: o.fun)
+    pr = np.abs(grover_state(C, valid, best.x, p)) ** 2
+    return dict(p=p, x=[float(v) for v in best.x], energy=float(pr @ C), p_target=float(pr[target].sum()))
