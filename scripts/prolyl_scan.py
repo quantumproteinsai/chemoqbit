@@ -31,7 +31,9 @@ K = 627.509474
 STEP = 15
 OMEGA = list(range(-180, 180, STEP))         # the full circle: both rotation senses
 SOLVENT = 'water'
-KTOR = 0.05                                  # Eh/rad^2, soft enough not to distort the rest
+KTOR = 3.0     # Eh/rad^2. At 0.05 the restraint could not hold the torsion against
+               # the rotation barrier: omega came out 13-21 deg from target near the
+               # saddle, so the scan never sampled it. At 3.0 it tracks to 0.2 deg.
 XC, BASIS = 'wb97x-d3bj', 'def2-tzvp'
 
 
@@ -59,36 +61,64 @@ def relax(sym, X, q, cons, k=KTOR, maxiter=MAXITER):
         return np.array(X), None, False
 
 
+def sweep(sym, X, om, q, targets, label):
+    """Relax along `targets` in order, each point starting from the previous, then
+    a backward pass keeping the lower energy -- the same guard the enzyme scans
+    need, since the rest of the molecule can drop into another conformer mid-scan
+    and leave a step in the profile."""
+    rows, Xc = {}, X.copy()
+    for w in targets:
+        t0 = time.time()
+        Xn, E, ok = relax(sym, Xc, q, [('tor', *om, float(w))])
+        if ok:
+            Xc = Xn
+        rows[w] = dict(omega_target=w, omega=torsion(Xc, om) if ok else None, E=E,
+                       X=Xc.tolist() if ok else None, seconds=time.time() - t0)
+        print(f'  {label} omega {w:+4d} -> {rows[w]["omega"] if ok else float("nan"):+7.1f}  '
+              + ('failed' if E is None else f'E {E:.6f}') + f'  ({time.time() - t0:.0f}s)', flush=True)
+    for w in list(reversed(targets))[1:]:
+        prev = rows[targets[targets.index(w) + 1]]
+        if not prev['X']:
+            continue
+        Xn, E, ok = relax(sym, np.array(prev['X']), q, [('tor', *om, float(w))])
+        if ok and (rows[w]['E'] is None or E < rows[w]['E'] - 1e-7):
+            print(f'  {label} omega {w:+4d} backward pass lowers '
+                  f'{rows[w]["E"] if rows[w]["E"] is not None else float("nan"):.6f} -> {E:.6f}', flush=True)
+            rows[w] = dict(omega_target=w, omega=torsion(Xn, om), E=E, X=Xn.tolist(), backward=True)
+    return rows
+
+
 def stage_scan(res):
     res.setdefault('scan', {})
     for name in MODELS:
         if name in res['scan']:
             continue
         sym, X0, om, q = build(name)
+        # start from the relaxed trans amide, then sweep each rotation sense
+        # monotonically away from it. Ordering by distance from 180 alternated
+        # between the two senses, so consecutive points started from geometries on
+        # opposite branches and the profile mixed conformers.
+        Xt, Et, ok = relax(sym, X0, q, [('tor', *om, 180.0)])
+        plus = list(range(180, -1, -STEP))                   # 180 -> 0 through +90
+        minus = list(range(-180, 1, STEP))                   # -180 -> 0 through -90
+        rp = sweep(sym, Xt, om, q, plus, f'{name:6s} +')
+        rm = sweep(sym, Xt, om, q, minus[::-1], f'{name:6s} -')
         rows = {}
-        X = X0.copy()
-        # start from trans and go round, so each point starts from its neighbour
-        order = sorted(OMEGA, key=lambda w: abs(((w - 180) + 180) % 360 - 180))
-        for w in order:
-            t0 = time.time()
-            Xn, E, ok = relax(sym, X, q, [('tor', *om, float(w))])
-            if ok:
-                X = Xn
-            rows[str(w)] = dict(omega_target=w, omega=torsion(X, om) if ok else None,
-                                E=E, X=X.tolist() if ok else None, seconds=time.time() - t0)
-            print(f'  scan {name:6s} omega {w:+4d} -> {rows[str(w)]["omega"] if ok else float("nan"):+7.1f}  '
-                  + ('failed' if E is None else f'E {E:.6f}') + f'  ({time.time() - t0:.0f}s)', flush=True)
+        for w, v in list(rp.items()) + list(rm.items()):
+            k_ = str(((w + 180) % 360) - 180)
+            if k_ not in rows or (v['E'] is not None and (rows[k_]['E'] is None or v['E'] < rows[k_]['E'])):
+                rows[k_] = v
         good = {int(k_): v for k_, v in rows.items() if v['E'] is not None}
         e0 = min(v['E'] for v in good.values())
-        res['scan'][name] = dict(charge=q, omega_atoms=list(om), symbols=sym,
-                                 points=rows, e_min=e0,
+        res['scan'][name] = dict(charge=q, omega_atoms=list(om), symbols=sym, points=rows, e_min=e0,
                                  profile={k_: (v['E'] - e0) * K for k_, v in sorted(good.items())})
         save(res)
         prof = res['scan'][name]['profile']
         tr = min((k_ for k_ in prof if abs(abs(k_) - 180) <= 30), key=lambda k_: prof[k_], default=None)
         ci = min((k_ for k_ in prof if abs(k_) <= 30), key=lambda k_: prof[k_], default=None)
+        top = max(prof.values())
         print(f'  {name}: trans {tr} ({prof.get(tr, float("nan")):.2f}), cis {ci} '
-              f'({prof.get(ci, float("nan")):.2f}) kcal/mol relative to the lowest point', flush=True)
+              f'({prof.get(ci, float("nan")):.2f}), highest {top:.2f} kcal/mol', flush=True)
 
 
 def _stationary(prof):
