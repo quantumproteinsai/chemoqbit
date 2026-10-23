@@ -41,6 +41,10 @@ BOUNDS = {
     # enzyme reaction steps in this project
     'reaction_barrier': (0.0, 80.0, 'kcal/mol',
                          'a step with a barrier above this does not turn over on any timescale'),
+    'profile_segments': (1, 4, 'count',
+                        'a full-circle amide rotation rises to a saddle, falls to cis, rises to '
+                        'the other saddle and falls back: four monotonic runs. More means a point '
+                        'is out of place'),
     'scan_drop': (0.0, 1.5, 'kcal/mol',
                   'along a scan that compresses or stretches one coordinate monotonically, the '
                   'energy should not FALL: a drop means a neighbouring point was trapped in a '
@@ -102,6 +106,36 @@ def profile_steps(profile):
     if len(ks) < 2:
         return 0.0
     return max(abs(profile[b] - profile[a]) for a, b in zip(ks, ks[1:]))
+
+
+def monotonic_segments(values, tol=0.05):
+    """Number of monotonic runs in an ordered series, ignoring wobbles below `tol`.
+    A full-circle amide rotation profile has four: up to one saddle, down to cis,
+    up to the other saddle, down to trans. More than that means a point is out of
+    place. Testing the 'rising branch up to the global maximum' instead, as a
+    first version did, counts the legitimate descent into cis as an artefact."""
+    d = [b - a for a, b in zip(values, values[1:]) if abs(b - a) > tol]
+    if not d:
+        return 0
+    return 1 + sum(1 for a, b in zip(d, d[1:]) if (a > 0) != (b > 0))
+
+
+def segment_drop(values, tol=0.05):
+    """Largest reversal inside a monotonic run: a genuine discontinuity, as
+    opposed to the turns of the profile itself."""
+    worst = 0.0
+    run = [values[0]]
+    for a, b in zip(values, values[1:]):
+        if abs(b - a) <= tol:
+            continue
+        rising = b > a
+        if len(run) > 1 and rising != (run[-1] > run[-2]):
+            run = [a]
+        run.append(b)
+        if len(run) > 2:
+            seq = run if run[-1] > run[0] else [-v for v in run]
+            worst = max(worst, max([0.0] + [x - y for x, y in zip(seq, seq[1:])]))
+    return worst
 
 
 def largest_drop(values):

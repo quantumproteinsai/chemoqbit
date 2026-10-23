@@ -83,3 +83,34 @@ def pyramidalisation(X, atoms, mol_neighbours):
     nrm /= np.linalg.norm(nrm)
     d = (a + b + c) / 3 - X[n]
     return float(np.degrees(np.arcsin(abs(np.dot(d, nrm)) / max(np.linalg.norm(d), 1e-9))))
+
+
+def rotation_guide(sym, X, om, bonded=1.75):
+    """Displacement that rotates the proline rigidly about the amide C-N bond.
+
+    The guide a saddle search should follow. d(omega)/dX does not work: its
+    components blow up with the lever arms and the search locked onto a mode of
+    curvature +27 Eh/A^2, a bond stretch.
+    """
+    ca_x, c_x, n_p, ca_p = om
+    # atoms on the proline side: reachable from N without crossing the C-N bond
+    import collections
+    adj = collections.defaultdict(set)
+    for i in range(len(sym)):
+        for j in range(i + 1, len(sym)):
+            if np.linalg.norm(X[i] - X[j]) < bonded:
+                adj[i].add(j); adj[j].add(i)
+    seen, stack = {n_p}, [n_p]
+    while stack:
+        i = stack.pop()
+        for j in adj[i]:
+            if j not in seen and not (i == n_p and j == c_x):
+                seen.add(j); stack.append(j)
+    axis = X[n_p] - X[c_x]
+    axis = axis / np.linalg.norm(axis)
+    g = np.zeros_like(X)
+    for i in seen:
+        if i in (n_p,):
+            continue
+        g[i] = np.cross(axis, X[i] - X[n_p])
+    return g

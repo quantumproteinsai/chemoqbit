@@ -23,7 +23,7 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from chemoqbit.prolyl import MODELS, build, torsion
+from chemoqbit.prolyl import MODELS, build, torsion, rotation_guide
 from chemoqbit.enzyme.frozen import optimise_frozen
 from chemoqbit.enzyme import tsopt as TS
 from chemoqbit.enzyme.xtb import energy_grad
@@ -138,12 +138,12 @@ def stage_scan(res):
         print(f'  {name}: trans {tr} ({prof.get(tr, float("nan")):.2f}), cis {ci} '
               f'({prof.get(ci, float("nan")):.2f}), highest {max(prof.values()):.2f} kcal/mol', flush=True)
         for lab_, rr in (('>', rp), ('<', rm)):
-            e = [v['E'] for v in rr.values() if v['E'] is not None]
-            if len(e) > 2:
-                i = int(np.argmax(e))
-                sanity.record(res, 'scan_drop',
-                              sanity.largest_drop([(v - e[0]) * K for v in e[:i + 1]]),
-                              label=f'{name} sweep {lab_}, rising branch')
+            e = [(v['E'] - e0) * K for v in rr.values() if v['E'] is not None]
+            if len(e) > 4:
+                sanity.record(res, 'profile_segments', sanity.monotonic_segments(e),
+                              label=f'{name} sweep {lab_}')
+                sanity.record(res, 'scan_drop', sanity.segment_drop(e),
+                              label=f'{name} sweep {lab_}, inside a monotonic run')
         worst = max((v.get('omega_error', 0.0) for v in rows.values() if v.get('omega_error')), default=0.0)
         sanity.record(res, 'torsion_error', worst, label=f'{name} worst point')
         save(res)
@@ -202,7 +202,7 @@ def stage_points(res):
                     Xn, E, ok = relax(sym, X, q, [], k=0.0, maxiter=1500)
                     kind = 'minimum'
                 else:
-                    Xn, E = TS.prfo_follow(X, fn, torsion_guide(X, om), grad_fn=gfn,
+                    Xn, E, _info = TS.prfo_follow(X, fn, rotation_guide(sym, X, om), grad_fn=gfn,
                                            trust=0.05, gtol=5e-4, maxiter=40, log=lambda m: None)
                     E, ok, kind = float(E), True, 'saddle'
             except Exception as e:
