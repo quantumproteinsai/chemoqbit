@@ -109,6 +109,23 @@ def study(label, seq, first, disease):
             resc = next((float(e) for e, v in zip(EPS, pns) if v >= pn0), None)
             entry['curves'][tag] = dict(P_native=pns, eps_rescue=resc)
         lig[str(beads)] = entry
+    # deletions
+    ens_d = M.Ensemble(len(seq) - 1)
+    dels = []
+    for p in range(len(seq)):
+        m = M.keeps_fold(ens_d, key, p)
+        row = dict(deletion=f'd{seq[p]}{p + first}', pos=p,
+                   surviving_contacts=[list(c) for c in M.surviving_contacts(key, p)])
+        if m is None:
+            row.update(realisable=False)
+        else:
+            Ed = ens_d.energies(M.delete(seq, p))
+            pn, g = M.population(Ed, m, T)
+            row.update(realisable=True, conformations=int(m.sum()), P_fold=pn, dG=g,
+                       ddG=g - g0, ground_keeps_fold=M.ground_is_native(Ed, m)[0])
+        dels.append(row)
+    out['deletions'] = dels
+
     out['ligand'] = dict(eps=EPS.tolist(), activity=1.0, by_beads=lig)
     out['seconds'] = time.time() - t0
     return out
@@ -123,6 +140,8 @@ def main():
         for m, s in r['suppressors'].items():
             print(f"  {m}: {s['rescued']}/{s['tested']} suppressors, best {s['best'][0]['second']} "
                   f"(ddG {s['best'][0]['ddG']:+.2f})")
+        nr = [d['deletion'] for d in r['deletions'] if not d['realisable']]
+        print(f"  deletions: surviving native contacts unrealisable for {len(nr)}/{len(r['deletions'])} ({', '.join(nr)})")
         for d in r['disease']:
             print(f"  disease {d['mutant']}: ddG {d['ddG']:+.2f}, rank {d['rank']}/{d['of']}")
         for size, l in r['ligand']['by_beads'].items():

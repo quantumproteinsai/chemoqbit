@@ -159,3 +159,27 @@ def pocket_contacts(ens, pocket, beads=1):
 def ligand_shift(n, eps, x, T):
     """free-energy shift per conformation from a ligand at activity x."""
     return -T * np.log1p(x * np.exp(eps * n / T))
+
+
+# --------------------------------------------------------------- deletions
+def delete(seq, pos):
+    return seq[:pos] + seq[pos + 1:]
+
+
+def surviving_contacts(key, pos):
+    """Parent native contacts among the residues that survive deleting `pos`,
+    renumbered for the shorter chain. Contacts involving `pos` are lost."""
+    shift = lambda i: i - (i > pos)
+    return tuple(sorted((shift(i), shift(j)) for i, j in key if pos not in (i, j)))
+
+
+def keeps_fold(ens_del, key, pos):
+    """Conformations of the shortened chain that still make every surviving
+    parent native contact. A deletion changes the chain length, so the native
+    state cannot be compared by contact map alone: this is the weaker test of
+    whether the fold's remaining contacts are still formed."""
+    want = surviving_contacts(key, pos)
+    idx = [ens_del.pairs.index(p) for p in want if p in ens_del.pairs]
+    if len(idx) < len(want):
+        return None                       # a surviving contact is not realisable at this length
+    return np.all(ens_del.A[:, idx] == 1, axis=1)
