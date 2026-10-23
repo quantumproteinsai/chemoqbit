@@ -35,6 +35,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT)); sys.path.insert(0, str(ROOT / 'scripts'))
 from chemoqbit.enzyme import abstraction as A
 from chemoqbit.enzyme.frozen import optimise_frozen
+from chemoqbit import sanity
 
 OUT = ROOT / 'results' / 'ts_abstraction.json'
 K = 627.509474
@@ -110,8 +111,13 @@ def stage_prep(res):
         S, P, lab, frozen, h = model(c5)
         t0 = time.time()
         X, E = optimise_frozen(S, P, charge=0, frozen=frozen)
+        g = geom(X, lab, h)
         res['prep'][c5] = dict(symbols=S, labels=lab, frozen=frozen, hydrogen=h, X=X.tolist(),
-                               E=float(E), geometry=geom(X, lab, h), seconds=time.time() - t0)
+                               E=float(E), geometry=g, seconds=time.time() - t0)
+        # the covalent ternary complex must survive relaxation, or there is no reactant
+        sanity.record(res, 'bond_CS', g['C6-SG'], label=f'prep {c5} C6-S', fatal=True)
+        sanity.record(res, 'bond_CC', g['C5-C11'], label=f'prep {c5} C5-C11', fatal=True)
+        sanity.record(res, 'bond_CC', g['C11-N5'], label=f'prep {c5} C11-N5')
         save(res)
         print(f"prep {c5}: E {E:.6f}  "
               + '  '.join(f'{k} {v:.2f}' for k, v in res['prep'][c5]['geometry'].items()), flush=True)
@@ -133,10 +139,27 @@ def stage_acceptor(res):
             X, E, ok = _relax_safe(p, X, [(i5, ja, float(r))])
             rows.append(dict(r=float(r), E=E, rel=None if E is None else float((E - p['E']) * K),
                              converged=ok, X=X.tolist() if ok else None, **geom(X, lab, h)))
+            if ok:
+                sanity.record(res, 'bond_CS', rows[-1]['C6-SG'], label=f'approach {name} r {r}')
             print(f"  approach {name} r {r:.2f}  "
                   + ('failed' if E is None else f"{(E - p['E']) * K:+8.2f} kcal/mol")
                   + f"  C5-H {rows[-1]['C5-H']:.2f} C6-SG {rows[-1]['C6-SG']:.2f}", flush=True)
+        # backward pass: re-relax each point from its inner neighbour and keep the
+        # lower energy. Without it these scans fell by 3-5 kcal/mol at single
+        # points, which is as large as the difference between the two waters.
+        for i in range(len(rows) - 2, -1, -1):
+            nxt, cur = rows[i + 1], rows[i]
+            if not nxt.get('X') or cur['rel'] is None:
+                continue
+            Xb, Eb, okb = _relax_safe(p, np.array(nxt['X']), [(i5, ja, float(cur['r']))])
+            if okb and Eb < cur['E'] - 1e-7:
+                print(f"  backward {name} r {cur['r']:.2f}  {cur['rel']:+.2f} -> "
+                      f"{(Eb - p['E']) * K:+.2f} kcal/mol", flush=True)
+                rows[i] = dict(r=cur['r'], E=Eb, rel=float((Eb - p['E']) * K), converged=True,
+                               X=Xb.tolist(), backward=True, **geom(Xb, lab, h))
         good = [x for x in rows if x['rel'] is not None]
+        drop = sanity.largest_drop([x['rel'] for x in sorted(good, key=lambda x: -x['r'])])
+        sanity.record(res, 'scan_drop', drop, label=f'approach {name} after the backward pass')
         res['acceptor'][name] = dict(
             atom=key, r_reactant=r0, scan=rows,
             cost_close=(min(good, key=lambda x: x['r'])['rel'] if good else None),

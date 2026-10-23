@@ -29,6 +29,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from chemoqbit.pocket import cut, protonate, mutate_to_alanine
+from chemoqbit import sanity
 
 from chemoqbit.enzyme.frozen import optimise_frozen
 from chemoqbit.enzyme.xtb import energy_grad
@@ -102,6 +103,7 @@ def stage_wt(res):
     res['geometry'] = dict(symbols=sym, X=X.tolist(), lig=lig.tolist(), labels=c['labels'],
                            hofs={str(k): v for k, v in hofs.items()})
     save(res)
+    sanity.record(res, 'interaction_energy', ei, label='wild type', fatal=True)
     print(f"wild type: {len(sym)} atoms, charge {q:+d}, {len(c['residues'])} residues, "
           f"E_int {ei:+.2f} kcal/mol ({time.time() - t0:.0f}s)", flush=True)
     print('  residues: ' + ', '.join(c['residues']), flush=True)
@@ -126,6 +128,7 @@ def stage_scan(res):
             ei, parts = interaction(s2, X2, q - dq, lig2)
             res['alanine'][resid] = dict(E_int=ei, ddE=ei - res['wt']['E_int'], charge=q - dq,
                                          atoms=len(s2), seconds=time.time() - t0, **parts)
+            sanity.record(res, 'alanine_ddE', ei - res['wt']['E_int'], label=f'{resid} -> Ala')
             print(f"  {resid:8s} -> Ala  E_int {ei:+8.2f}  ddE {ei - res['wt']['E_int']:+7.2f} kcal/mol "
                   f"({time.time() - t0:.0f}s)", flush=True)
         except Exception as e:

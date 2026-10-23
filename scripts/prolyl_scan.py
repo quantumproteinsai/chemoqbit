@@ -25,6 +25,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from chemoqbit.prolyl import MODELS, build, torsion
 from chemoqbit.enzyme.frozen import optimise_frozen
+from chemoqbit import sanity
 
 OUT = ROOT / 'results' / 'prolyl.json'
 K = 627.509474
@@ -72,8 +73,13 @@ def sweep(sym, X, om, q, targets, label):
         Xn, E, ok = relax(sym, Xc, q, [('tor', *om, float(w))])
         if ok:
             Xc = Xn
-        rows[w] = dict(omega_target=w, omega=torsion(Xc, om) if ok else None, E=E,
+        w_act = torsion(Xc, om) if ok else None
+        rows[w] = dict(omega_target=w, omega=w_act, E=E,
                        X=Xc.tolist() if ok else None, seconds=time.time() - t0)
+        if w_act is not None:
+            err = abs(((w_act - w) + 180) % 360 - 180)
+            rows[w]['omega_error'] = err
+            sanity.check('torsion_error', err, label=f'{label} target {w:+d}')
         print(f'  {label} omega {w:+4d} -> {rows[w]["omega"] if ok else float("nan"):+7.1f}  '
               + ('failed' if E is None else f'E {E:.6f}') + f'  ({time.time() - t0:.0f}s)', flush=True)
     for w in list(reversed(targets))[1:]:
@@ -119,6 +125,15 @@ def stage_scan(res):
         top = max(prof.values())
         print(f'  {name}: trans {tr} ({prof.get(tr, float("nan")):.2f}), cis {ci} '
               f'({prof.get(ci, float("nan")):.2f}), highest {top:.2f} kcal/mol', flush=True)
+        # the profile must look like an amide rotation before the next model runs
+        e_tr = prof.get(tr)
+        sanity.record(res, 'prolyl_barrier', top - (e_tr or 0.0), label=f'{name} scan')
+        if e_tr is not None and ci in prof:
+            sanity.record(res, 'prolyl_cis_trans', prof[ci] - e_tr, label=f'{name} scan')
+        sanity.record(res, 'scan_step', sanity.profile_steps(prof), label=f'{name} profile')
+        worst = max((v.get('omega_error', 0.0) for v in rows.values() if v.get('omega_error')), default=0.0)
+        sanity.record(res, 'torsion_error', worst, label=f'{name} worst point')
+        save(res)
 
 
 def _stationary(prof):
@@ -152,6 +167,14 @@ def stage_points(res):
                             X=Xn.tolist() if ok else None)
             print(f'  point {name:6s} {tag:8s} omega {out[tag]["omega"]}  '
                   + ('failed' if E is None else f'E {E:.6f}'), flush=True)
+        if 'trans' in out and out['trans']['E'] is not None:
+            e_tr = out['trans']['E']
+            for tag in ('saddle+', 'saddle-'):
+                if tag in out and out[tag]['E'] is not None:
+                    sanity.record(res, 'prolyl_barrier', (out[tag]['E'] - e_tr) * K,
+                                  label=f'{name} {tag}')
+            if 'cis' in out and out['cis']['E'] is not None:
+                sanity.record(res, 'prolyl_cis_trans', (out['cis']['E'] - e_tr) * K, label=f'{name} cis')
         res['points'][name] = out
         save(res)
 

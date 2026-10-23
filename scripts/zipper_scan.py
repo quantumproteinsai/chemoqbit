@@ -28,6 +28,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from chemoqbit.zipper import build, protonate
 from chemoqbit.enzyme.frozen import optimise_frozen
+from chemoqbit import sanity
 from chemoqbit.enzyme.xtb import energy_grad
 
 PDB = ROOT / 'data' / 'rcsb_2on9' / '2ON9.pdb'
@@ -79,6 +80,7 @@ def stage_wt(res):
     res['wt'] = dict(atoms=len(sym), charge=q, neighbours=NEIGHBOURS, E_int=ei,
                      seconds=time.time() - t0, **parts)
     save(res)
+    sanity.record(res, 'interaction_energy', ei, label='zipper wild type', fatal=True)
     print(f'wild type: {len(sym)} atoms, charge {q:+d}, E_int {ei:+.2f} kcal/mol '
           f'({time.time() - t0:.0f}s)', flush=True)
 
@@ -95,6 +97,7 @@ def stage_scan(res):
             ei, parts = interaction(sym, X, q, sheet)
             res['alanine'][key] = dict(E_int=ei, ddE=ei - res['wt']['E_int'], charge=q,
                                        atoms=len(sym), seconds=time.time() - t0, **parts)
+            sanity.record(res, 'alanine_ddE', ei - res['wt']['E_int'], label=f'{key} -> Ala')
             print(f"  {key} -> Ala  E_int {ei:+8.2f}  ddE {ei - res['wt']['E_int']:+7.2f} kcal/mol "
                   f"({time.time() - t0:.0f}s)", flush=True)
         except Exception as e:
