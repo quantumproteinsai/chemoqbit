@@ -162,13 +162,18 @@ def stage_scan(res):
         ci = min((k_ for k_ in prof if abs(k_) <= 30), key=lambda k_: prof[k_], default=None)
         print(f'  {name}: trans {tr} ({prof.get(tr, float("nan")):.2f}), cis {ci} '
               f'({prof.get(ci, float("nan")):.2f}), highest {max(prof.values()):.2f} kcal/mol', flush=True)
-        for lab_, rr in (('>', rp), ('<', rm)):
-            e = [(v['E'] - e0) * K for v in rr.values() if v['E'] is not None]
-            if len(e) > 4:
-                sanity.record(res, 'profile_segments', sanity.monotonic_segments(e),
-                              label=f'{name} sweep {lab_}')
-                sanity.record(res, 'scan_drop', sanity.segment_drop(e),
-                              label=f'{name} sweep {lab_}, inside a monotonic run')
+        # Check the MERGED profile, which is what every later stage uses -- not each
+        # raw sweep. The two sweeps exist precisely so that a point trapped in one
+        # is replaced by the other's better value, and testing a sweep alone reports
+        # that repair as a fault: it flagged thr with 5 monotonic runs while the
+        # merged profile had the textbook 4.
+        prof = res['scan'][name]['profile']
+        prof = {int(k_): x for k_, x in prof.items()}
+        seq = [prof[k_] for k_ in sorted(prof)]
+        sanity.record(res, 'profile_segments', sanity.monotonic_segments(seq),
+                      label=f'{name} merged profile')
+        sanity.record(res, 'scan_drop', sanity.segment_drop(seq),
+                      label=f'{name} merged profile, inside a monotonic run')
         worst = max((v.get('omega_error', 0.0) for v in rows.values() if v.get('omega_error')), default=0.0)
         sanity.record(res, 'torsion_error', worst, label=f'{name} worst point')
         save(res)
