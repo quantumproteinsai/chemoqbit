@@ -29,7 +29,12 @@ ROOT = Path(__file__).resolve().parents[1]
 PENDING = ROOT / 'results' / 'notify_pending.jsonl'
 CRED = Path.home() / '.config' / 'chemoqbit' / 'smtp.ini'
 STEP = re.compile(r'^(DFT |focal |ONIOM\(|oniom |active |barrier |KIE |reactant: |product: |'
-                  r'\S+: barrier |\S+: scan maximum |ONIOM-OPT |\S+: minimax |qmsize |.*(Error|Traceback|failed))')
+                  r'\S+: barrier |\S+: scan maximum |ONIOM-OPT |\S+: minimax |qmsize |'
+                  # the proton-abstraction, prolyl, pocket and zipper jobs
+                  r'relay: |relay saddle: |approach cost|closest approach |wild type: |'
+                  r'side chains whose loss|system |  interface: |DFT E_int |'
+                  r'  \S+: trans |  \S+: barrier |SANITY |'
+                  r'.*(Error|Traceback|failed))')
 
 
 def send(to, subject, body):

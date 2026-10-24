@@ -1,15 +1,21 @@
 [Unit]
 Description=chemoqbit: mail step completions of the running NUC jobs
-Wants=chemoqbit-cs2d.service chemoqbit-o4h.service chemoqbit-qmsize.service
-After=chemoqbit-cs2d.service
 
 [Service]
 Type=simple
 WorkingDirectory=/home/deploy/dev/chemoqbit
-ExecCondition=/home/deploy/dev/chemoqbit/.venv/bin/python /home/deploy/dev/chemoqbit/scripts/nuc_todo.py any
-ExecStart=/home/deploy/dev/chemoqbit/.venv/bin/python -u /home/deploy/dev/chemoqbit/scripts/notify_watch.py --to bartmercier@gmail.com --watch cs2d:results/service_cs2d.log:chemoqbit-cs2d --watch o4h:results/service_o4h.log:chemoqbit-o4h --watch qmsize:results/service_qmsize.log:chemoqbit-qmsize
-StandardOutput=append:/home/deploy/dev/chemoqbit/results/notify_watch.log
-StandardError=append:/home/deploy/dev/chemoqbit/results/notify_watch.log
+MemoryMax=1G
+TimeoutStartSec=infinity
+ExecStart=/home/deploy/dev/chemoqbit/.venv/bin/python -u /home/deploy/dev/chemoqbit/scripts/notify_watch.py --to bartmercier@gmail.com \
+  --watch abstraction:results/service_abstraction.log:chemoqbit-abstraction \
+  --watch prolyl:results/service_prolyl.log:chemoqbit-prolyl \
+  --watch cftr:results/service_pocket_cftr.log:chemoqbit-cftr \
+  --watch ache:results/service_pocket_ache.log:chemoqbit-ache \
+  --watch zipper-asyn47:results/service_zip_asyn47.log:chemoqbit-zip-asyn47
+StandardOutput=append:/home/deploy/dev/chemoqbit/results/service_notify.log
+StandardError=append:/home/deploy/dev/chemoqbit/results/service_notify.log
+Restart=on-failure
+RestartSec=60
 
 [Install]
 WantedBy=default.target
