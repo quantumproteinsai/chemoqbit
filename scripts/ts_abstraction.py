@@ -280,6 +280,68 @@ def relay_guide(X, hops):
     return g
 
 
+def stage_concerted(res):
+    """The elimination as the literature describes it: the C5 proton and the
+    Cys146 thiolate leaving together.
+
+    Driving the protons alone is not enough. Along the relay scan C6-S barely
+    moved (1.86 -> 1.90 A) while C5-H stretched to 1.23, so the coordinate was
+    building a carbanion at C5 with the thiolate still bonded, and the energy
+    reached +24.8 kcal/mol with the proton only a quarter transferred. A relaxed
+    scan at fixed proton position finds the local minimum, which keeps the C-S
+    bond intact; the bond has to be driven too.
+
+    Here r(C6-S) follows a ramp tied to the relay coordinate, so the two leave in
+    step. If the concerted picture is right this barrier falls well below the
+    25.10 kcal/mol that C6-S cleavage alone costs FdUMP.
+    """
+    p = res['prep']['H']; lab, h = p['labels'], p['hydrogen']
+    X0 = np.array(p['X'])
+    hops, h2 = relay_hops(p, X0)
+    i6, isg = lab.index('nucleotide:C6'), lab.index('cys146:SG')
+    i5 = lab.index('nucleotide:C5')
+    xi0 = sum(float(np.linalg.norm(X0[d] - X0[hy]) - np.linalg.norm(X0[hy] - X0[a]))
+              for d, hy, a in hops)
+    r0 = float(np.linalg.norm(X0[i6] - X0[isg]))
+    XI_END, RCS_END = 1.5, 2.70
+    s = res.setdefault('concerted', dict(hops=[list(t) for t in hops], water_h=h2,
+                                         xi_reactant=xi0, rcs_reactant=r0,
+                                         rcs_end=RCS_END, points={}))
+    targets = [round(v, 2) for v in np.arange(round(xi0 * 2) / 2, XI_END + 0.01, 0.2)]
+    X = X0.copy()
+    for xi in targets:
+        k_ = str(xi)
+        if k_ in s['points']:
+            if s['points'][k_].get('X'):
+                X = np.array(s['points'][k_]['X'])
+            continue
+        frac = min(max((xi - xi0) / (XI_END - xi0), 0.0), 1.0)
+        rcs = r0 + frac * (RCS_END - r0)
+        t0 = time.time()
+        X, E, ok = _relax_safe(p, X, [('relay', hops, float(xi)), (i6, isg, float(rcs))])
+        g = geom(X, lab, h)
+        d = lambda a, b: float(np.linalg.norm(X[a] - X[b]))
+        s['points'][k_] = dict(xi=xi, rcs_target=rcs, E=E,
+                               rel=None if E is None else float((E - p['E']) * K),
+                               converged=ok, X=X.tolist() if ok else None,
+                               C5_H=d(i5, h), H_O327=d(h, lab.index('wat327:O')),
+                               O327_H2=d(lab.index('wat327:O'), h2),
+                               H2_Glu58=d(h2, lab.index('glu58:OE2')), **g)
+        save(res)
+        v = s['points'][k_]
+        print(f"  concerted xi {xi:+5.2f} rCS->{rcs:.2f}  "
+              + ('failed' if E is None else f"{v['rel']:+8.2f} kcal/mol")
+              + f"  C5-H {v['C5_H']:.2f} H..O {v['H_O327']:.2f} C6-S {g['C6-SG']:.2f}"
+                f"  ({time.time() - t0:.0f}s)", flush=True)
+    good = [v for v in s['points'].values() if v['rel'] is not None]
+    if good:
+        s['barrier'] = max(v['rel'] for v in good)
+        sanity.record(res, 'reaction_barrier', s['barrier'], label='concerted barrier')
+        print(f"concerted: highest point {s['barrier']:+.2f} kcal/mol "
+              f"(FdUMP's cleavage-only route costs {res['cleave']['F']['barrier']:+.2f})", flush=True)
+    save(res)
+
+
 def stage_saddle(res):
     """Refine the relay maximum into a genuine transition state and prove it with
     frequencies: a restrained scan point is not a stationary point."""
@@ -347,7 +409,8 @@ def stage_band(res):
 
 
 STAGES = dict(prep=stage_prep, acceptor=stage_acceptor, cleave=stage_cleave,
-              relay=stage_relay, saddle=stage_saddle, band=stage_band)
+              relay=stage_relay, concerted=stage_concerted,
+              saddle=stage_saddle, band=stage_band)
 
 
 def main(names):
@@ -360,4 +423,4 @@ def main(names):
 
 
 if __name__ == '__main__':
-    main(sys.argv[1:] or ['prep', 'acceptor', 'cleave', 'relay', 'saddle'])
+    main(sys.argv[1:] or ['prep', 'acceptor', 'cleave', 'relay', 'concerted', 'saddle'])
