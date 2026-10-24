@@ -228,11 +228,14 @@ def _backward(res, p, s, hops, lab, h, h2, label, extra=None):
     switched from moving the C5 proton to protonating Glu58 first, and the two
     channels were stitched together into a path that is not a path.
     """
+    if s.get('backward_converged'):
+        print(f'  {label}: backward pass already converged, skipping', flush=True)
+        return
     i5 = lab.index('nucleotide:C5')
     pts = sorted([v for v in s['points'].values() if v.get('rel') is not None],
                  key=lambda v: v['xi'])
     d = lambda X, a, b: float(np.linalg.norm(X[a] - X[b]))
-    improved = 0
+    improved, best_gain = 0, 0.0
     for i in range(len(pts) - 2, -1, -1):
         nxt, cur = pts[i + 1], pts[i]
         if not nxt.get('X'):
@@ -251,10 +254,20 @@ def _backward(res, p, s, hops, lab, h, h2, label, extra=None):
             s['points'][str(cur['xi'])] = rec
             pts[i] = rec
             improved += 1
+            best_gain = max(best_gain, cur['rel'] - rec['rel'])
             print(f"  backward {label} xi {cur['xi']:+5.2f}  {cur['rel']:+.2f} -> "
                   f"{rec['rel']:+.2f} kcal/mol", flush=True)
             save(res)
-    print(f'  {label}: backward pass improved {improved} points', flush=True)
+    # One full pass costs an hour on 26 points, and it is repeated on every
+    # restart. Once a pass changes nothing beyond numerical noise there is
+    # nothing left for it to find, so record that and skip it next time.
+    if best_gain < 0.05:
+        s['backward_converged'] = True
+    print(f'  {label}: backward pass improved {improved} points '
+          f'(largest gain {best_gain:.2f} kcal/mol)'
+          + ('; converged, it will be skipped from now on' if best_gain < 0.05 else ''),
+          flush=True)
+    save(res)
 
 
 def stage_relay(res):
