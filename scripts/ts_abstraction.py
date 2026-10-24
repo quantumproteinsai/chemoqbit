@@ -220,6 +220,43 @@ def relay_hops(p, X):
     return [(c5, h, ow), (ow, h2, oe)], h2
 
 
+def _backward(res, p, s, hops, lab, h, h2, label, extra=None):
+    """Re-relax each point from its neighbour on the far side and keep the lower
+    energy, so a cheaper channel found late in the scan propagates back.
+
+    Without it the relay profile fell 11 kcal/mol at one point: the scan had
+    switched from moving the C5 proton to protonating Glu58 first, and the two
+    channels were stitched together into a path that is not a path.
+    """
+    i5 = lab.index('nucleotide:C5')
+    pts = sorted([v for v in s['points'].values() if v.get('rel') is not None],
+                 key=lambda v: v['xi'])
+    d = lambda X, a, b: float(np.linalg.norm(X[a] - X[b]))
+    improved = 0
+    for i in range(len(pts) - 2, -1, -1):
+        nxt, cur = pts[i + 1], pts[i]
+        if not nxt.get('X'):
+            continue
+        cons = [('relay', hops, float(cur['xi']))]
+        if extra is not None and cur.get('rcs_target') is not None:
+            cons.append((extra[0], extra[1], float(cur['rcs_target'])))
+        X, E, ok = _relax_safe(p, np.array(nxt['X']), cons)
+        if ok and E < cur['E'] - 1e-7:
+            g = geom(X, lab, h)
+            rec = dict(cur); rec.update(E=E, rel=float((E - p['E']) * K), X=X.tolist(),
+                                        backward=True, C5_H=d(X, i5, h),
+                                        H_O327=d(X, h, lab.index('wat327:O')),
+                                        O327_H2=d(X, lab.index('wat327:O'), h2),
+                                        H2_Glu58=d(X, h2, lab.index('glu58:OE2')), **g)
+            s['points'][str(cur['xi'])] = rec
+            pts[i] = rec
+            improved += 1
+            print(f"  backward {label} xi {cur['xi']:+5.2f}  {cur['rel']:+.2f} -> "
+                  f"{rec['rel']:+.2f} kcal/mol", flush=True)
+            save(res)
+    print(f'  {label}: backward pass improved {improved} points', flush=True)
+
+
 def stage_relay(res):
     """The concerted two-proton relay: the route the network makes available."""
     p = res['prep']['H']; lab, h = p['labels'], p['hydrogen']
@@ -255,10 +292,13 @@ def stage_relay(res):
               + f"  C5-H {v['C5_H']:.2f} H..O327 {v['H_O327']:.2f} | O327-H {v['O327_H2']:.2f} "
                 f"H..Glu58 {v['H2_Glu58']:.2f}  C6-S {g['C6-SG']:.2f}  ({time.time() - t0:.0f}s)",
               flush=True)
+    _backward(res, p, s, hops, lab, h, h2, label='relay')
     good = [v for v in s['points'].values() if v['rel'] is not None]
     if good:
         s['barrier'] = max(v['rel'] for v in good)
         sanity.record(res, 'reaction_barrier', s['barrier'], label='relay barrier')
+        seq = [v['rel'] for v in sorted(good, key=lambda v: v['xi'])]
+        sanity.record(res, 'scan_drop', sanity.largest_drop(seq), label='relay profile')
         print(f"relay: highest point {s['barrier']:+.2f} kcal/mol "
               f"(FdUMP's cleavage-only route costs {res['cleave']['F']['barrier']:+.2f})", flush=True)
     save(res)
@@ -333,10 +373,13 @@ def stage_concerted(res):
               + ('failed' if E is None else f"{v['rel']:+8.2f} kcal/mol")
               + f"  C5-H {v['C5_H']:.2f} H..O {v['H_O327']:.2f} C6-S {g['C6-SG']:.2f}"
                 f"  ({time.time() - t0:.0f}s)", flush=True)
+    _backward(res, p, s, hops, lab, h, h2, label='concerted', extra=(i6, isg))
     good = [v for v in s['points'].values() if v['rel'] is not None]
     if good:
         s['barrier'] = max(v['rel'] for v in good)
         sanity.record(res, 'reaction_barrier', s['barrier'], label='concerted barrier')
+        seq = [v['rel'] for v in sorted(good, key=lambda v: v['xi'])]
+        sanity.record(res, 'scan_drop', sanity.largest_drop(seq), label='concerted profile')
         print(f"concerted: highest point {s['barrier']:+.2f} kcal/mol "
               f"(FdUMP's cleavage-only route costs {res['cleave']['F']['barrier']:+.2f})", flush=True)
     save(res)
