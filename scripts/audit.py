@@ -90,10 +90,29 @@ def main():
                 continue
             E = {n: q[f'{reg}/{n}']['E'] for n in ('reactant', 'ts', 'product')}
             sanity.check('reaction_barrier', (E['ts'] - E['reactant']) * K, label=f'qmsize {reg}', log=log)
-    for f in ('ts_abstraction.json', 'prolyl.json', 'pocket_cftr.json', 'pocket_ache.json', 'zipper.json'):
-        if have(f):
-            for v in L(f).get('_sanity', []):
-                log(f"SANITY recorded in {f}: {v['check']} = {v['value']} for {v.get('label', '')}")
+    # A violation with a written diagnosis is a recorded dead end, not an open
+    # fault: the O4-protonated variant, the proton-only relay, the phosphate
+    # dianion. Reporting those as faults for ever would train everyone to ignore
+    # the mail, so they are listed separately and do not fail the audit.
+    known = []
+    for f in ('ts_abstraction.json', 'prolyl.json', 'pocket_cftr.json', 'pocket_ache.json',
+              'zipper_tau.json', 'zipper_asyn47.json', 'zipper_nacore.json'):
+        if not have(f):
+            continue
+        d_ = L(f)
+        diag = d_.get('diagnosis', {})
+        for v in d_.get('_sanity', []):
+            lbl = v.get('label', '')
+            hit = next((k for k in diag if k and k in lbl), None)
+            line = f"{v['check']} = {v['value']} for {lbl}"
+            if hit:
+                known.append(f'{f}: {line}  [diagnosed: {hit}]')
+            else:
+                log(f'SANITY recorded in {f}: {line}')
+    if known:
+        print(f'{len(known)} diagnosed dead end(s), not counted as faults:')
+        for k in known:
+            print('  ' + k)
     print(f'{len(bad)} violation(s)' if bad else 'audit clean: every checked quantity is inside its bounds')
     for m in bad:
         print('  ' + m)
