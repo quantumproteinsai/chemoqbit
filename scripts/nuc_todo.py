@@ -61,7 +61,7 @@ def qmsize():
     return not (p.exists() and json.loads(p.read_text()).get('_done'))
 
 
-STAGES_ABSTRACTION = ('prep', 'acceptor', 'cleave', 'relay')
+STAGES_ABSTRACTION = ('prep', 'acceptor', 'cleave', 'relay', 'saddle')
 
 
 def abstraction():

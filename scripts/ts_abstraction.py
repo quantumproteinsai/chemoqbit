@@ -264,6 +264,59 @@ def stage_relay(res):
     save(res)
 
 
+def relay_guide(X, hops):
+    """d(xi_relay)/dX: the collective displacement a saddle search should follow.
+
+    Each hop contributes the unit vectors of its donor-H and H-acceptor bonds, so
+    the components are O(1) and well scaled -- unlike d(omega)/dX for a torsion,
+    which blows up with the lever arms and made the search lock onto a stretch.
+    This is the same form of guide that worked for the hydride transfer.
+    """
+    g = np.zeros_like(X)
+    for d, h, a in hops:
+        u1 = X[d] - X[h]; u1 = u1 / np.linalg.norm(u1)
+        u2 = X[h] - X[a]; u2 = u2 / np.linalg.norm(u2)
+        g[d] += u1; g[h] += -u1 - u2; g[a] += u2
+    return g
+
+
+def stage_saddle(res):
+    """Refine the relay maximum into a genuine transition state and prove it with
+    frequencies: a restrained scan point is not a stationary point."""
+    from chemoqbit.enzyme import tsopt as T
+    from chemoqbit.enzyme.xtb import energy_grad
+    p = res['prep']['H']; sym = p['symbols']; lab = p['labels']; h = p['hydrogen']
+    frozen = p['frozen']
+    hops = [tuple(t) for t in res['relay']['hops']]
+    good = [v for v in res['relay']['points'].values() if v.get('rel') is not None and v.get('X')]
+    assert good, 'the relay scan has no usable points'
+    top = max(good, key=lambda v: v['rel'])
+    X = np.array(top['X'])
+    print(f"  refining the relay maximum: xi {top['xi']:+.2f}, {top['rel']:+.2f} kcal/mol", flush=True)
+    fn = lambda Y: (lambda r: (float(r[0]), r[1]))(energy_grad(sym, Y, 0))
+    gfn = lambda Y: energy_grad(sym, Y, 0)[1]
+    free = [i for i in range(len(sym)) if i not in set(frozen)]
+    t0 = time.time()
+    Xn, E, info = T.prfo_follow(X, fn, relay_guide(X, hops), grad_fn=gfn, frozen=frozen,
+                                trust=0.06, gtol=3e-4, maxiter=60, neg=0.02, log=lambda m: None)
+    nu = T.frequencies(np.array(Xn), T.fd_hessian(np.array(Xn), gfn, free=free),
+                       [T.AMU[s_] for s_ in sym], free=free)
+    nim = int((nu < -50).sum())
+    g = geom(np.array(Xn), lab, h)
+    res['saddle'] = dict(E=float(E), rel=float((E - p['E']) * K), X=np.array(Xn).tolist(),
+                         n_imaginary=nim, nu_imag=float(nu.min()) if nim else None,
+                         followed_eig=info.get('followed_eig'), seconds=time.time() - t0, **g)
+    sanity.record(res, 'imag_freq_ts', nim, label='relay saddle')
+    if nim:
+        sanity.record(res, 'imag_wavenumber', abs(nu.min()), label='relay saddle')
+    sanity.record(res, 'reaction_barrier', res['saddle']['rel'], label='relay barrier')
+    save(res)
+    print(f"relay saddle: {res['saddle']['rel']:+.2f} kcal/mol, imaginary modes {nim}"
+          + (f" ({abs(nu.min()):.0f}i cm-1)" if nim else '')
+          + f", C6-S {g['C6-SG']:.2f} ({time.time() - t0:.0f}s)", flush=True)
+    print(f"  FdUMP's only route costs {res['cleave']['F']['barrier']:+.2f} kcal/mol", flush=True)
+
+
 def stage_band(res):
     """2D band over the approach and the proton transfer, for the best acceptor."""
     p = res['prep']['H']; lab, h = p['labels'], p['hydrogen']
@@ -294,7 +347,7 @@ def stage_band(res):
 
 
 STAGES = dict(prep=stage_prep, acceptor=stage_acceptor, cleave=stage_cleave,
-              relay=stage_relay, band=stage_band)
+              relay=stage_relay, saddle=stage_saddle, band=stage_band)
 
 
 def main(names):
@@ -307,4 +360,4 @@ def main(names):
 
 
 if __name__ == '__main__':
-    main(sys.argv[1:] or ['prep', 'acceptor', 'cleave', 'relay'])
+    main(sys.argv[1:] or ['prep', 'acceptor', 'cleave', 'relay', 'saddle'])
