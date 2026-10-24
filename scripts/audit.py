@@ -95,6 +95,21 @@ def main():
     # dianion. Reporting those as faults for ever would train everyone to ignore
     # the mail, so they are listed separately and do not fail the audit.
     known = []
+    # Manuscript 1's circuit errors, read from the active-space checkpoint rather
+    # than retyped: a hard-coded number cannot go stale, but it also cannot notice
+    # that the checkpoint changed.
+    act = next((L(f) for f in ('ts_active_20261019.json',) if have(f)), None)
+    if act:
+        n_ck = 0
+        for key, v in act.items():                     # keys are 'reactant/4e4o' etc
+            if not isinstance(v, dict):
+                continue
+            for tag in ('uccsd', 'adapt'):
+                e = (v.get(tag) or {}).get('err_mha')
+                if e is not None:
+                    sanity.check('circuit_error_mha', abs(float(e)), label=f'{key} {tag}', log=log)
+                    n_ck += 1
+        print(f'  circuit errors checked from the checkpoint: {n_ck}')
     for f in ('ts_abstraction.json', 'prolyl.json', 'pocket_cftr.json', 'pocket_ache.json',
               'zipper_tau.json', 'zipper_asyn47.json', 'zipper_nacore.json'):
         if not have(f):
@@ -103,12 +118,21 @@ def main():
         diag = d_.get('diagnosis', {})
         for v in d_.get('_sanity', []):
             lbl = v.get('label', '')
-            hit = next((k for k in diag if k and k in lbl), None)
             line = f"{v['check']} = {v['value']} for {lbl}"
+            # a diagnosis covers named checks only: {subject: {'checks': [...], 'why': str}}
+            # or, for the older plain-string form, every check for that subject
+            hit = None
+            for k, entry in diag.items():
+                if not k or k not in lbl:
+                    continue
+                covers = entry.get('checks') if isinstance(entry, dict) else None
+                if covers is None or v['check'] in covers:
+                    hit = k
+                    break
             if hit:
                 known.append(f'{f}: {line}  [diagnosed: {hit}]')
             else:
-                log(f'SANITY recorded in {f}: {line}')
+                log(f'SANITY recorded in {f}: {line}  (no diagnosis covers this check)')
     if known:
         print(f'{len(known)} diagnosed dead end(s), not counted as faults:')
         for k in known:

@@ -208,6 +208,114 @@ if tyr:
            False, f'rises {e[0]:+.1f} to {e[-1]:+.1f}, no fall')
 
 
+# ---------------------------------------------- bounds that had no test at all
+# Each is exercised in both directions: a value that must fire and one that must not.
+# Where a real result exists it is used; where the job has not run yet (the drug
+# pockets) the bound itself is tested on values whose verdict is not in doubt.
+
+prep_ = ((load('ts_abstraction.json') or {}).get('prep') or {}).get('H') or {}
+g_ = prep_.get('geometry') or {}
+if g_:
+    record('covalent adduct C6-S in the relaxed reactant', 'bond_CS',
+           not sanity.check('bond_CS', g_['C6-SG'], log=lambda m: None), False,
+           f"{g_['C6-SG']:.2f} A")
+    record('covalent adduct C5-C11', 'bond_CC',
+           not sanity.check('bond_CC', g_['C5-C11'], log=lambda m: None), False,
+           f"{g_['C5-C11']:.2f} A")
+    record('a broken C-S bond at 3.2 A', 'bond_CS',
+           not sanity.check('bond_CS', 3.2, log=lambda m: None), True, 'the adduct has come apart')
+    record('C5-H in the relaxed reactant', 'bond_CH',
+           not sanity.check('bond_CH', g_.get('C5-H', 1.1), log=lambda m: None), False,
+           f"{g_.get('C5-H', 1.1):.2f} A")
+    record('a proton lost to the cavity at 2.1 A', 'bond_CH',
+           not sanity.check('bond_CH', 2.1, log=lambda m: None), True, 'bonded to neither partner')
+
+th_ = load('ts_thermo.json') or {}
+for model, conds in th_.items():
+    for cond, v in list(conds.items())[:1]:
+        record(f'published free energy, {model}', 'zpe_change',
+               not sanity.check('zpe_change', v['dZPE'], log=lambda m: None), False,
+               f"dZPE {v['dZPE']:.2f}")
+        record(f'published free energy, {model}', 'entropy_term',
+               not sanity.check('entropy_term', v['TdS'], log=lambda m: None), False,
+               f"-TdS {v['TdS']:.2f}")
+record('an entropy term of -40 kcal/mol', 'entropy_term',
+       not sanity.check('entropy_term', -40.0, log=lambda m: None), True,
+       'impossible for a unimolecular step in a fixed cluster')
+
+r_ = load('ts_cluster_run.json') or {}
+for pair, dd in (r_.get('analysis', {}).get('kie', {})).items():
+    for iso, kap in (dd.get('kappa') or {}).items():
+        for m_ in ('wigner', 'eckart'):
+            record(f'published tunnelling factor {pair} {iso} {m_}', 'kappa_tunnelling',
+                   not sanity.check('kappa_tunnelling', kap[m_], log=lambda x: None), False,
+                   f"{kap[m_]:.3f}")
+        break
+    break
+record('a tunnelling factor below 1', 'kappa_tunnelling',
+       not sanity.check('kappa_tunnelling', 0.8, log=lambda m: None), True,
+       'tunnelling cannot slow a reaction')
+
+cur_p = load('prolyl.json') or {}
+for m, v in (cur_p.get('scan') or {}).items():
+    if m == 'pthr2' or 'e_free' not in v:
+        continue
+    record(f'current prolyl {m}, sweep start', 'start_wrench',
+           not sanity.check('start_wrench',
+                            abs(((v['omega_free'] - round(v['omega_free'] / 15) * 15) + 180) % 360 - 180),
+                            log=lambda x: None), False, 'sweep begins at the free minimum')
+    prof_m = {int(k): x for k, x in v['profile'].items()}
+    ci_ = min((k for k in prof_m if abs(k) <= 30), key=lambda k: prof_m[k], default=None)
+    tr_m = min((k for k in prof_m if abs(abs(k) - 180) <= 30), key=lambda k: prof_m[k], default=None)
+    if ci_ is not None and tr_m is not None:
+        record(f'current prolyl {m}, cis minus trans', 'prolyl_cis_trans',
+               not sanity.check('prolyl_cis_trans', prof_m[ci_] - prof_m[tr_m], log=lambda x: None),
+               False, f'{prof_m[ci_] - prof_m[tr_m]:+.2f} kcal/mol')
+    break
+record('a cis amide 20 kcal/mol below trans', 'prolyl_cis_trans',
+       not sanity.check('prolyl_cis_trans', -20.0, log=lambda m: None), True,
+       'the inversion the soft-restraint run produced')
+
+record('a bound complex that is uphill', 'interaction_energy',
+       not sanity.check('interaction_energy', +12.0, log=lambda m: None), True,
+       'a ligand that does not bind')
+record('a plausible pocket interaction energy', 'interaction_energy',
+       not sanity.check('interaction_energy', -84.0, log=lambda m: None), False, '-84 kcal/mol')
+record('an alanine truncation worth 120 kcal/mol', 'alanine_ddE',
+       not sanity.check('alanine_ddE', 120.0, log=lambda m: None), True,
+       'one side chain cannot be worth that')
+record('a plausible alanine ddE', 'alanine_ddE',
+       not sanity.check('alanine_ddE', 3.4, log=lambda m: None), False, '+3.4 kcal/mol')
+
+o_ = load('ts_oniom_opt.json') or {}
+an_ = (o_.get('analysis') or {}).get('kie', {})
+record('published ONIOM imaginary wavenumber', 'imag_wavenumber',
+       not sanity.check('imag_wavenumber', 695.0, log=lambda m: None), False, '695i cm-1')
+record('an imaginary mode of 40i cm-1', 'imag_wavenumber',
+       not sanity.check('imag_wavenumber', 40.0, log=lambda m: None), True,
+       'the shoulder the saddle search used to accept')
+record('a minimum with one imaginary mode', 'imag_freq_min',
+       not sanity.check('imag_freq_min', 1, log=lambda m: None), True, 'not a minimum')
+record('a minimum with none', 'imag_freq_min',
+       not sanity.check('imag_freq_min', 0, log=lambda m: None), False, 'as it should be')
+
+a_ = load('ts_active_20261019.json') or {}
+n_circ = 0
+for key, v in a_.items():
+    if not isinstance(v, dict):
+        continue
+    for tag in ('uccsd', 'adapt'):
+        e = (v.get(tag) or {}).get('err_mha')
+        if e is not None:
+            record(f'published circuit error, {key} {tag}', 'circuit_error_mha',
+                   not sanity.check('circuit_error_mha', abs(float(e)), log=lambda x: None),
+                   False, f'{abs(float(e)):.4f} mHa')
+            n_circ += 1
+record('an uncapped fragment at 58 mHa', 'circuit_error_mha',
+       not sanity.check('circuit_error_mha', 58.0, log=lambda m: None), True,
+       '36x chemical accuracy')
+
+
 def main():
     w = max(len(r[0]) for r in rows)
     print(f'{"case":{w}}  {"check":18}  {"fires":5}  {"want":5}  verdict')

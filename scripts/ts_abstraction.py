@@ -286,6 +286,7 @@ def stage_relay(res):
                                H2_Glu58=d(h2, lab.index('glu58:OE2')), **g)
         if ok:
             sanity.record(res, 'bond_CS', g['C6-SG'], label=f'relay xi {xi}')
+            sanity.record(res, 'bond_CH', v['C5_H'], label=f'relay xi {xi}, C5-H')
         save(res)
         v = s['points'][k_]
         print(f"  relay xi {xi:+5.2f}  " + ('failed' if E is None else f"{v['rel']:+8.2f} kcal/mol")
@@ -369,6 +370,9 @@ def stage_concerted(res):
                                H2_Glu58=d(h2, lab.index('glu58:OE2')), **g)
         save(res)
         v = s['points'][k_]
+        if ok:
+            sanity.record(res, 'bond_CS', g['C6-SG'], label=f'concerted xi {xi}')
+            sanity.record(res, 'bond_CH', v['C5_H'], label=f'concerted xi {xi}, C5-H')
         print(f"  concerted xi {xi:+5.2f} rCS->{rcs:.2f}  "
               + ('failed' if E is None else f"{v['rel']:+8.2f} kcal/mol")
               + f"  C5-H {v['C5_H']:.2f} H..O {v['H_O327']:.2f} C6-S {g['C6-SG']:.2f}"
