@@ -63,7 +63,38 @@ def kies(r):
                     sanity.check('kappa_tunnelling', kap[m], label=f'{lvl} {pair} {iso} {m}', log=log)
 
 
+STALL_MIN = 90        # the slowest legitimate point seen so far is about 35 minutes
+
+
+def stalls():
+    """A unit that is active but whose log has not advanced is hung: it produces
+    no new line for the notifier and no exit for systemd, so nothing else would
+    notice it. The threshold is well beyond the slowest legitimate step."""
+    import subprocess, time as _t
+    out = []
+    units = {'chemoqbit-abstraction': 'service_abstraction.log',
+             'chemoqbit-prolyl': 'service_prolyl.log',
+             'chemoqbit-cftr': 'service_pocket_cftr.log',
+             'chemoqbit-ache': 'service_pocket_ache.log',
+             'chemoqbit-zip-asyn47': 'service_zip_asyn47.log'}
+    for u, lg in units.items():
+        st = subprocess.run(['systemctl', '--user', 'show', '-p', 'SubState', '--value', u],
+                            capture_output=True, text=True).stdout.strip()
+        if st != 'running':
+            continue                      # queued or idle units have nothing to stall
+        p_ = RES / lg
+        if not p_.exists():
+            continue
+        quiet = (_t.time() - p_.stat().st_mtime) / 60.0
+        if quiet > STALL_MIN:
+            out.append(f'SANITY {u} has been running but silent for {quiet:.0f} minutes '
+                       f'(threshold {STALL_MIN}); its log is {lg}')
+    return out
+
+
 def main():
+    for m_ in stalls():
+        log(m_)
     r = L('ts_cluster_run.json')
     scan_continuity(r)
     frequencies(r)
