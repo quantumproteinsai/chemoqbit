@@ -249,11 +249,14 @@ def stage_points(res):
                     Xn, E, ok = relax(sym, X, q, [], k=0.0, maxiter=1500)
                     kind = 'minimum'
                 else:
-                    # neg=1e-3 Eh/A^2 is only about 80 cm-1: the search stopped on an
-                    # almost flat mode, which frequencies() then discarded as one of the
-                    # six near-zero modes, so the 'saddle' had no imaginary frequency.
+                    # Curvature in Eh/A^2 and frequency in cm-1 differ by the reduced
+                    # mass. This mode rotates the whole proline ring, so a genuine
+                    # transition state shows only -3e-4 Eh/A^2: demanding -0.02, set for
+                    # a light local mode, rejected all seven. The optimiser's job is to
+                    # find a stationary point; classifying it is the frequencies' job,
+                    # and n_imaginary == 1 is checked straight after.
                     Xn, E, info = TS.prfo_follow(X, fn, rotation_guide(sym, X, om), grad_fn=gfn,
-                                                 trust=0.05, gtol=3e-4, maxiter=60, neg=0.02,
+                                                 trust=0.05, gtol=3e-4, maxiter=60, neg=1e-4,
                                                  log=lambda m: None)
                     E, ok, kind = float(E), True, 'saddle'
             except Exception as e:
@@ -292,7 +295,7 @@ def stage_dft(res):
         res['dft'].setdefault(name, {})
         sym, q = res['scan'][name]['symbols'], res['scan'][name]['charge']
         for tag, p in pts.items():
-            if tag in res['dft'][name] or not p['X']:
+            if tag in res['dft'][name] or not p.get('X'):
                 continue
             t0 = time.time()
             mol = gto.M(atom=[(s, x) for s, x in zip(sym, p['X'])], basis=BASIS, charge=q,

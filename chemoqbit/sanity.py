@@ -62,6 +62,11 @@ BOUNDS = {
     'bond_CS': (1.6, 2.3, 'A', 'a C-S single bond; beyond this the adduct has broken'),
     'bond_CC': (1.3, 1.8, 'A', 'a C-C single bond'),
     'bond_CH': (0.9, 1.8, 'A', 'a C-H bond, or a hydrogen in flight between donor and acceptor'),
+    'proton_bonded': (0.85, 1.35, 'A',
+                      'the shorter of a transferring proton\'s two distances. In flight it is '
+                      'bonded to one partner or the other; if BOTH are long it has been pulled '
+                      'into the cavity. Testing the donor distance alone calls a completed '
+                      'transfer a fault'),
     # interaction energies of a drug in its pocket, or a zipper interface
     'interaction_energy': (-200.0, 0.0, 'kcal/mol',
                            'a bound complex must be downhill against its separated parts'),
@@ -73,8 +78,11 @@ BOUNDS = {
     'kappa_tunnelling': (1.0, 10.0, '-', 'a tunnelling correction raises a rate, never lowers it'),
     'imag_freq_ts': (1, 1, 'count', 'a transition state has exactly one imaginary mode'),
     'imag_freq_min': (0, 0, 'count', 'a minimum has none'),
-    'imag_wavenumber': (200.0, 2500.0, 'cm-1',
-                        'the magnitude of a hydrogen-transfer imaginary mode'),
+    'imag_wavenumber': (50.0, 2500.0, 'cm-1',
+                        'the magnitude of a transition mode. The lower bound was 200, set '
+                        'for a hydrogen transfer; an amide rotation turns a whole ring and '
+                        'sits far lower, so 200 would have rejected real transition states. '
+                        'Below 50 it is a shoulder, not a saddle'),
     'zpe_change': (-15.0, 5.0, 'kcal/mol', 'the zero-point change over one bond-forming step'),
     'entropy_term': (-10.0, 10.0, 'kcal/mol',
                      '-T dS for a unimolecular step inside a cluster with fixed atoms'),

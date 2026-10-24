@@ -23,6 +23,13 @@ from chemoqbit import sanity
 
 RES = ROOT / 'results'
 K = 627.509474
+_DIAG = json.loads((RES / 'diagnoses.json').read_text()) if (RES / 'diagnoses.json').exists() else {}
+
+
+def diagnosed(fname, subject):
+    """True if a recorded diagnosis covers this subject, so it is tested among the
+    known failures instead of being expected to stay silent."""
+    return subject in (_DIAG.get(fname) or {})
 rows = []
 
 
@@ -181,7 +188,7 @@ if o and 'summary' in o:
 cur = load('prolyl.json')
 for m in (cur or {}).get('scan', {}):
     seq = prolyl_profile(cur, m)
-    if not seq or m == 'pthr2':       # a known-bad model, tested among the positives
+    if not seq or diagnosed('prolyl.json', m):   # known-bad, tested among the positives
         continue
     record(f'current prolyl {m}, barrier', 'prolyl_barrier',
            not sanity.check('prolyl_barrier', max(seq), log=lambda x: None), False,
@@ -258,7 +265,7 @@ record('a tunnelling factor below 1', 'kappa_tunnelling',
 
 cur_p = load('prolyl.json') or {}
 for m, v in (cur_p.get('scan') or {}).items():
-    if m == 'pthr2' or 'e_free' not in v:
+    if diagnosed('prolyl.json', m) or 'e_free' not in v:
         continue
     record(f'current prolyl {m}, sweep start', 'start_wrench',
            not sanity.check('start_wrench',

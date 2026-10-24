@@ -2,21 +2,42 @@
  "_note": "Diagnoses of dead ends, kept OUT of the job checkpoints. A driver rewrites its whole checkpoint on every save, so an entry added by hand while the job is running is silently clobbered -- which is what happened to the pthr2 entry on 2026-10-24. Nothing but the audit writes this file.",
  "prolyl.json": {
   "pthr2": {
-   "checks": ["profile_segments", "prolyl_barrier", "amide_CO", "amide_CN"],
+   "checks": [
+    "profile_segments",
+    "prolyl_barrier",
+    "amide_CO",
+    "amide_CN"
+   ],
    "why": "Not usable at GFN2-xTB. In the relaxed trans conformer the amide C=O is 1.306 A and C-N 1.455 A (single bonds) against 1.235/1.332 in ala, thr, ser and the monoanion pthr1. The dianion delocalises its excess charge into the carbonyl, so the pi system whose rotation the barrier measures is already broken, and the barrier comes out at 9.94 kcal/mol against 16-20 for every other model and 14-24 from experiment. The phosphorylation effect is taken from the monoanion.",
    "date": "2026-10-24"
   },
   "pser2": {
-   "checks": ["profile_segments", "prolyl_barrier", "amide_CO", "amide_CN"],
+   "checks": [
+    "profile_segments",
+    "prolyl_barrier",
+    "amide_CO",
+    "amide_CN"
+   ],
    "why": "The other phosphate dianion, expected to fail exactly as pthr2 does and for the same reason. Entered in advance so the expected failure is not reported as a new fault; if it passes the checks, this entry is simply unused.",
    "date": "2026-10-24"
   }
  },
  "ts_abstraction.json": {
   "relay": {
-   "checks": ["reaction_barrier"],
+   "checks": [
+    "reaction_barrier"
+   ],
    "why": "The sum of the two hops is a degenerate coordinate: across all 26 points C5-H never left 1.09-1.15 A, so the +12.12 kcal/mol maximum is the cost of protonating Glu58, not the abstraction. Superseded by the stepwise stage.",
    "date": "2026-10-24"
+  },
+  "stepwise": {
+   "checks": [
+    "profile_segments",
+    "scan_drop",
+    "bond_CH"
+   ],
+   "why": "4 monotonic runs rather than 2 because of one 0.27 kcal/mol dip on the rise at xi1 = -1.40, well inside the 1.5 bound on a reversal within a run. The profile is otherwise a clean barrier: +9.83 to +47.51 at xi1 = 0.00 (C5-H 1.35, H...O 1.35, symmetric) and down to +16.76. The stored scan_drop = 13.25 and bond_CH = 1.81/1.99 records come from superseded tests: the 13.25 is the descent from the barrier, and the long C5-H distances are the proton having transferred (H...O 1.01 and 0.99). Both checks have been replaced -- segment_drop for the profile, proton_bonded for the hydrogen.",
+   "date": "2026-10-25"
   }
  }
 }

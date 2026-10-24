@@ -299,7 +299,8 @@ def stage_relay(res):
                                H2_Glu58=d(h2, lab.index('glu58:OE2')), **g)
         if ok:
             sanity.record(res, 'bond_CS', g['C6-SG'], label=f'relay xi {xi}')
-            sanity.record(res, 'bond_CH', v['C5_H'], label=f'relay xi {xi}, C5-H')
+            sanity.record(res, 'proton_bonded', min(v['C5_H'], v['H_O327']),
+                          label=f'relay xi {xi}')
         save(res)
         v = s['points'][k_]
         print(f"  relay xi {xi:+5.2f}  " + ('failed' if E is None else f"{v['rel']:+8.2f} kcal/mol")
@@ -387,7 +388,11 @@ def stage_stepwise(res):
                                C5_H=d(i5, h), H_O327=d(h, iow),
                                H2_Glu58=d(h2, lab.index('glu58:OE2')), **g)
         if ok:
-            sanity.record(res, 'bond_CH', s['points'][k_]['C5_H'], label=f'stepwise xi1 {xi}')
+            # the proton must be bonded to C5 or to the acceptor; a completed
+            # transfer leaves C5-H long and that is the reaction, not a fault
+            sanity.record(res, 'proton_bonded',
+                          min(s['points'][k_]['C5_H'], s['points'][k_]['H_O327']),
+                          label=f'stepwise xi1 {xi}')
         save(res)
         v = s['points'][k_]
         print(f"  stepwise xi1 {xi:+5.2f} rCS->{rcs:.2f}  "
@@ -398,8 +403,13 @@ def stage_stepwise(res):
     if good:
         s['barrier'] = max(v['rel'] for v in good)
         sanity.record(res, 'reaction_barrier', s['barrier'], label='stepwise barrier')
+        # This profile is meant to rise to a barrier and fall to the product, so the
+        # descent is the reaction itself. largest_drop reported that 13 kcal/mol
+        # descent as a fault; the right test is a reversal INSIDE a monotonic run.
         seq = [v['rel'] for v in sorted(good, key=lambda v: v['xi1'])]
-        sanity.record(res, 'scan_drop', sanity.largest_drop(seq), label='stepwise profile')
+        sanity.record(res, 'scan_drop', sanity.segment_drop(seq), label='stepwise profile')
+        sanity.record(res, 'profile_segments', sanity.monotonic_segments(seq),
+                      label='stepwise profile')
         moved = [v for v in good if v['C5_H'] > 1.3]
         print(f"stepwise: highest {s['barrier']:+.2f} kcal/mol, C5-H reached "
               f"{max(v['C5_H'] for v in good):.2f} A at {len(moved)} points "
@@ -458,7 +468,8 @@ def stage_concerted(res):
         v = s['points'][k_]
         if ok:
             sanity.record(res, 'bond_CS', g['C6-SG'], label=f'concerted xi {xi}')
-            sanity.record(res, 'bond_CH', v['C5_H'], label=f'concerted xi {xi}, C5-H')
+            sanity.record(res, 'proton_bonded', min(v['C5_H'], v['H_O327']),
+                          label=f'concerted xi {xi}')
         print(f"  concerted xi {xi:+5.2f} rCS->{rcs:.2f}  "
               + ('failed' if E is None else f"{v['rel']:+8.2f} kcal/mol")
               + f"  C5-H {v['C5_H']:.2f} H..O {v['H_O327']:.2f} C6-S {g['C6-SG']:.2f}"
