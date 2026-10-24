@@ -127,6 +127,31 @@ def stage_scan(res):
                 rows[k_] = v
         good = {int(k_): v for k_, v in rows.items() if v['E'] is not None}
         e0 = min(v['E'] for v in good.values())
+        # If the sweep found an arrangement better than the free minimisation it
+        # started from, that start was not the global minimum -- the phosphate and
+        # hydroxyl rotamers give several basins -- so re-relax from the best point
+        # and sweep again from there. One refinement, to keep it bounded.
+        if e0 < Ef - 1.0 / K:
+            best = min(good.values(), key=lambda v: v['E'])
+            Xb, Eb, okb = relax(sym, np.array(best['X']), q, [], k=0.0, maxiter=2000)
+            if okb and Eb < Ef:
+                print(f'  {name}: the sweep found a basin {(Ef - Eb) * K:.2f} kcal/mol lower; '
+                      f'restarting it from there', flush=True)
+                Ef, Xf = Eb, Xb
+                w0 = torsion(Xf, om)
+                start = int(round(w0 / STEP) * STEP)
+                fwd = [((start - k * STEP + 180) % 360) - 180 for k in range(1, 360 // STEP + 1)]
+                bwd = [((start + k * STEP + 180) % 360) - 180 for k in range(1, 360 // STEP + 1)]
+                r0 = {start: dict(omega_target=start, omega=w0, E=Ef, X=Xf.tolist(), omega_error=0.0)}
+                rp = sweep(sym, Xf, om, q, fwd, f'{name:6s} >2')
+                rm = sweep(sym, Xf, om, q, bwd, f'{name:6s} <2')
+                rows = {}
+                for w, v in list(r0.items()) + list(rp.items()) + list(rm.items()):
+                    k_ = str(((int(w) + 180) % 360) - 180)
+                    if k_ not in rows or (v['E'] is not None and (rows[k_]['E'] is None or v['E'] < rows[k_]['E'])):
+                        rows[k_] = v
+                good = {int(k_): v for k_, v in rows.items() if v['E'] is not None}
+                e0 = min(v['E'] for v in good.values())
         res['scan'][name] = dict(charge=q, omega_atoms=list(om), symbols=sym, points=rows,
                                  e_min=e0, e_free=Ef, omega_free=w0,
                                  profile={k_: (v['E'] - e0) * K for k_, v in sorted(good.items())})
@@ -197,13 +222,18 @@ def stage_points(res):
                 continue
             X = np.array(d['points'][str(w)]['X'])
             t0 = time.time()
+            info = {}
             try:
                 if tag in ('trans', 'cis'):
                     Xn, E, ok = relax(sym, X, q, [], k=0.0, maxiter=1500)
                     kind = 'minimum'
                 else:
-                    Xn, E, _info = TS.prfo_follow(X, fn, rotation_guide(sym, X, om), grad_fn=gfn,
-                                           trust=0.05, gtol=5e-4, maxiter=40, log=lambda m: None)
+                    # neg=1e-3 Eh/A^2 is only about 80 cm-1: the search stopped on an
+                    # almost flat mode, which frequencies() then discarded as one of the
+                    # six near-zero modes, so the 'saddle' had no imaginary frequency.
+                    Xn, E, info = TS.prfo_follow(X, fn, rotation_guide(sym, X, om), grad_fn=gfn,
+                                                 trust=0.05, gtol=3e-4, maxiter=60, neg=0.02,
+                                                 log=lambda m: None)
                     E, ok, kind = float(E), True, 'saddle'
             except Exception as e:
                 print(f'  point {name:6s} {tag:8s} failed: {type(e).__name__}: {e}', flush=True)
@@ -211,7 +241,9 @@ def stage_points(res):
             nu = TS.frequencies(np.array(Xn), TS.fd_hessian(np.array(Xn), gfn), masses)
             nim = int((nu < -50).sum())
             out[tag] = dict(omega_scan=w, omega=torsion(Xn, om), E=E, X=Xn.tolist(), kind=kind,
-                            n_imaginary=nim, nu_imag=float(nu.min()) if nim else None,
+                            n_imaginary=nim, nu_lowest=float(nu.min()),
+                            nu_imag=float(nu.min()) if nim else None,
+                            followed_eig=(info.get('followed_eig') if tag == 'saddle' else None),
                             seconds=time.time() - t0)
             sanity.record(res, 'imag_freq_ts' if tag == 'saddle' else 'imag_freq_min', nim,
                           label=f'{name} {tag}')
