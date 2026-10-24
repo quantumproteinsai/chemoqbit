@@ -204,6 +204,66 @@ def stage_cleave(res):
         save(res)
 
 
+def relay_hops(p, X):
+    """The two hops of the proton relay: C5's proton to water 327, and one of that
+    water's protons to the Glu58 carboxylate, which sits 2.8 A away. Driving only
+    the first hop builds a hydronium the 103-atom cluster cannot stabilise, which
+    cost over 40 kcal/mol before the proton was even halfway; the relay is charge
+    balanced, since Glu58 goes from -1 to neutral as the thiolate forms."""
+    lab, h = p['labels'], p['hydrogen']
+    i = lambda k: lab.index(k)
+    c5, ow, oe = i('nucleotide:C5'), i('wat327:O'), i('glu58:OE2')
+    hw = [j for j, s_ in enumerate(p['symbols'])
+          if s_ == 'H' and np.linalg.norm(X[j] - X[ow]) < 1.2]
+    assert len(hw) == 2, f'water 327 has {len(hw)} hydrogens'
+    h2 = min(hw, key=lambda j: np.linalg.norm(X[j] - X[oe]))     # the one facing Glu58
+    return [(c5, h, ow), (ow, h2, oe)], h2
+
+
+def stage_relay(res):
+    """The concerted two-proton relay: the route the network makes available."""
+    p = res['prep']['H']; lab, h = p['labels'], p['hydrogen']
+    X0 = np.array(p['X'])
+    hops, h2 = relay_hops(p, X0)
+    xi0 = sum(float(np.linalg.norm(X0[d] - X0[hy]) - np.linalg.norm(X0[hy] - X0[a]))
+              for d, hy, a in hops)
+    s = res.setdefault('relay', dict(hops=[list(t) for t in hops], water_h=h2, xi_reactant=xi0,
+                                     points={}))
+    targets = [round(v, 2) for v in np.arange(round(xi0 * 2) / 2, 1.61, 0.2)]
+    X = X0.copy()
+    for xi in targets:
+        k_ = str(xi)
+        if k_ in s['points']:
+            if s['points'][k_].get('X'):
+                X = np.array(s['points'][k_]['X'])
+            continue
+        t0 = time.time()
+        X, E, ok = _relax_safe(p, X, [('relay', hops, float(xi))])
+        g = geom(X, lab, h)
+        d = lambda a, b: float(np.linalg.norm(X[a] - X[b]))
+        s['points'][k_] = dict(xi=xi, E=E, rel=None if E is None else float((E - p['E']) * K),
+                               converged=ok, X=X.tolist() if ok else None,
+                               C5_H=d(lab.index('nucleotide:C5'), h),
+                               H_O327=d(h, lab.index('wat327:O')),
+                               O327_H2=d(lab.index('wat327:O'), h2),
+                               H2_Glu58=d(h2, lab.index('glu58:OE2')), **g)
+        if ok:
+            sanity.record(res, 'bond_CS', g['C6-SG'], label=f'relay xi {xi}')
+        save(res)
+        v = s['points'][k_]
+        print(f"  relay xi {xi:+5.2f}  " + ('failed' if E is None else f"{v['rel']:+8.2f} kcal/mol")
+              + f"  C5-H {v['C5_H']:.2f} H..O327 {v['H_O327']:.2f} | O327-H {v['O327_H2']:.2f} "
+                f"H..Glu58 {v['H2_Glu58']:.2f}  C6-S {g['C6-SG']:.2f}  ({time.time() - t0:.0f}s)",
+              flush=True)
+    good = [v for v in s['points'].values() if v['rel'] is not None]
+    if good:
+        s['barrier'] = max(v['rel'] for v in good)
+        sanity.record(res, 'reaction_barrier', s['barrier'], label='relay barrier')
+        print(f"relay: highest point {s['barrier']:+.2f} kcal/mol "
+              f"(FdUMP's cleavage-only route costs {res['cleave']['F']['barrier']:+.2f})", flush=True)
+    save(res)
+
+
 def stage_band(res):
     """2D band over the approach and the proton transfer, for the best acceptor."""
     p = res['prep']['H']; lab, h = p['labels'], p['hydrogen']
@@ -233,7 +293,8 @@ def stage_band(res):
     save(res)
 
 
-STAGES = dict(prep=stage_prep, acceptor=stage_acceptor, cleave=stage_cleave, band=stage_band)
+STAGES = dict(prep=stage_prep, acceptor=stage_acceptor, cleave=stage_cleave,
+              relay=stage_relay, band=stage_band)
 
 
 def main(names):
@@ -246,4 +307,4 @@ def main(names):
 
 
 if __name__ == '__main__':
-    main(sys.argv[1:] or ['prep', 'acceptor', 'cleave', 'band'])
+    main(sys.argv[1:] or ['prep', 'acceptor', 'cleave', 'relay'])

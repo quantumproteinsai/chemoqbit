@@ -12,7 +12,11 @@ def penalty(Y, constraints, k=20.0):
     (i, j, d0)             d_ij = d0
     (i, j, l, m, x0)       d_ij - d_lm = x0
     ('min', i, j, d0)      d_ij >= d0 (flat-bottom: no force once d_ij >= d0)
-    ('tor', i, j, k, l, p0) dihedral(i,j,k,l) = p0 degrees (periodic, k in Eh/rad^2)"""
+    ('tor', i, j, k, l, p0) dihedral(i,j,k,l) = p0 degrees (periodic, k in Eh/rad^2)
+    ('relay', [(d,h,a), ...], x0)  sum over hops of (d_dh - d_ha) = x0, so several
+                           protons move together: a Grotthuss relay along a hydrogen
+                           bond chain, which driving one hop alone cannot describe
+                           (it builds an unstabilised hydronium instead)"""
     E, G = 0.0, np.zeros_like(Y)
     for c in constraints:
         if c[0] == 'min':
@@ -22,6 +26,20 @@ def penalty(Y, constraints, k=20.0):
                 E += k * (d - d0) ** 2
                 g = 2 * k * (d - d0) * u / d
                 G[i] += g; G[j] -= g
+        elif c[0] == 'relay':
+            _, hops, x0 = c
+            tot, terms = 0.0, []
+            for dn, hy, ac in hops:
+                u1 = Y[dn] - Y[hy]; d1 = np.linalg.norm(u1)
+                u2 = Y[hy] - Y[ac]; d2 = np.linalg.norm(u2)
+                tot += d1 - d2
+                terms.append((dn, hy, ac, u1, d1, u2, d2))
+            dev = tot - x0
+            E += k * dev ** 2
+            ff = 2 * k * dev
+            for dn, hy, ac, u1, d1, u2, d2 in terms:
+                G[dn] += ff * u1 / d1; G[hy] -= ff * u1 / d1
+                G[hy] -= ff * u2 / d2; G[ac] += ff * u2 / d2
         elif c[0] == 'tor':
             _, i, j, k_, l_, p0 = c
             b1, b2, b3 = Y[j] - Y[i], Y[k_] - Y[j], Y[l_] - Y[k_]
