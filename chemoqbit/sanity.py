@@ -23,8 +23,16 @@ class Violation(Exception):
 BOUNDS = {
     # prolyl amide rotation: experiments put prolyl cis/trans barriers at
     # 14-24 kcal/mol, and PPIases lower them by about 8
-    'prolyl_barrier': (8.0, 40.0, 'kcal/mol',
-                       'prolyl cis/trans barriers are measured at 14-24 kcal/mol'),
+    'prolyl_barrier': (12.0, 32.0, 'kcal/mol',
+                       'prolyl cis/trans barriers are measured at 14-24 kcal/mol, and our '
+                       'neutral and monoanionic models all give 16-20. The first bound here '
+                       'was 8-40, loose enough to pass the dianion at 9.94 whose amide had '
+                       'stopped being an amide'),
+    'amide_CO': (1.19, 1.27, 'A',
+                 'the carbonyl of a conjugated amide. At 1.31 the pi system is gone and the '
+                 'rotation barrier it is supposed to measure no longer exists'),
+    'amide_CN': (1.29, 1.39, 'A',
+                 'the C-N bond of a conjugated amide; 1.45 is a single bond'),
     'prolyl_cis_trans': (-4.0, 6.0, 'kcal/mol',
                          'trans is modestly favoured for Xaa-Pro; cis is populated at a few to 30 %'),
     'scan_vs_free_min': (0.0, 2.0, 'kcal/mol',

@@ -170,6 +170,22 @@ def stage_scan(res):
         prof = res['scan'][name]['profile']
         prof = {int(k_): x for k_, x in prof.items()}
         seq = [prof[k_] for k_ in sorted(prof)]
+        # the amide must still be an amide: a dianion at GFN2-xTB delocalised its
+        # excess charge into the carbonyl, leaving C=O 1.31 and C-N 1.46 (single
+        # bonds) and a 'rotation barrier' of 9.9 with no pi system left to break
+        tr_ = min((k_ for k_ in prof if abs(abs(k_) - 180) <= 30), key=lambda k_: prof[k_],
+                  default=None)
+        if tr_ is not None and rows[str(tr_)].get('X'):
+            Xt = np.array(rows[str(tr_)]['X'])
+            c_, n_ = om[1], om[2]
+            co = min((i for i, s_ in enumerate(sym)
+                      if s_ == 'O' and np.linalg.norm(Xt[i] - Xt[c_]) < 1.6),
+                     key=lambda i: np.linalg.norm(Xt[i] - Xt[c_]), default=None)
+            if co is not None:
+                sanity.record(res, 'amide_CO', float(np.linalg.norm(Xt[co] - Xt[c_])),
+                              label=f'{name} trans')
+            sanity.record(res, 'amide_CN', float(np.linalg.norm(Xt[n_] - Xt[c_])),
+                          label=f'{name} trans')
         sanity.record(res, 'profile_segments', sanity.monotonic_segments(seq),
                       label=f'{name} merged profile')
         sanity.record(res, 'scan_drop', sanity.segment_drop(seq),

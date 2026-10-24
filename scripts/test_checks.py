@@ -138,6 +138,26 @@ if d and 'ts' in d and 'reactant' in d:
     record('saddle search that displaced the frozen caps', 'constraint',
            moved > 0.05, True, f'frozen atoms moved up to {moved:.2f} A (barrier {b:.1f})')
 
+# the dianion whose amide stopped being an amide at GFN2-xTB
+import numpy as _np
+cur_ = load('prolyl.json') or {}
+v_ = (cur_.get('scan') or {}).get('pthr2')
+if v_:
+    prof_ = {int(k): x for k, x in v_['profile'].items()}
+    tr_ = min((k for k in prof_ if abs(abs(k) - 180) <= 30), key=lambda k: prof_[k])
+    X_ = _np.array(v_['points'][str(tr_)]['X']); sym_ = v_['symbols']; om_ = v_['omega_atoms']
+    c_, n_ = om_[1], om_[2]
+    co_ = min((i for i, t in enumerate(sym_)
+               if t == 'O' and _np.linalg.norm(X_[i] - X_[c_]) < 1.6),
+              key=lambda i: _np.linalg.norm(X_[i] - X_[c_]))
+    fired_ = (not sanity.check('amide_CO', float(_np.linalg.norm(X_[co_] - X_[c_])), log=lambda m: None)
+              or not sanity.check('amide_CN', float(_np.linalg.norm(X_[n_] - X_[c_])), log=lambda m: None))
+    record('phosphate dianion: the amide lost its conjugation', 'amide_CO/CN', fired_, True,
+           f'C=O {_np.linalg.norm(X_[co_] - X_[c_]):.3f}, C-N {_np.linalg.norm(X_[n_] - X_[c_]):.3f} A')
+    record('the same model, its barrier', 'prolyl_barrier',
+           not sanity.check('prolyl_barrier', max(prof_.values()), log=lambda m: None), True,
+           f'{max(prof_.values()):.2f} kcal/mol, half the other models')
+
 # ---------------------------------------------------------------- negatives
 # everything the manuscripts rest on, and the current clean runs, must stay silent
 
@@ -161,8 +181,11 @@ if o and 'summary' in o:
 cur = load('prolyl.json')
 for m in (cur or {}).get('scan', {}):
     seq = prolyl_profile(cur, m)
-    if not seq:
+    if not seq or m == 'pthr2':       # a known-bad model, tested among the positives
         continue
+    record(f'current prolyl {m}, barrier', 'prolyl_barrier',
+           not sanity.check('prolyl_barrier', max(seq), log=lambda x: None), False,
+           f'{max(seq):.2f} kcal/mol')
     record(f'current prolyl {m}, merged profile', 'profile_segments',
            not sanity.check('profile_segments', sanity.monotonic_segments(seq), log=lambda x: None),
            False, f'{sanity.monotonic_segments(seq)} monotonic runs')
