@@ -98,6 +98,32 @@ def main():
     # Manuscript 1's circuit errors, read from the active-space checkpoint rather
     # than retyped: a hard-coded number cannot go stale, but it also cannot notice
     # that the checkpoint changed.
+    # Derive the amide check from the stored geometry rather than trusting the
+    # driver to have recorded it: a job started before the check existed still
+    # gets audited, so a code change needs no recomputation.
+    pr = L('prolyl.json') if have('prolyl.json') else None
+    if pr:
+        diag_p = pr.get('diagnosis', {})
+        for m, v in (pr.get('scan') or {}).items():
+            prof = {int(k): x for k, x in v['profile'].items()}
+            tr = min((k for k in prof if abs(abs(k) - 180) <= 30), key=lambda k: prof[k],
+                     default=None)
+            if tr is None or not v['points'][str(tr)].get('X'):
+                continue
+            X = np.array(v['points'][str(tr)]['X']); sym = v['symbols']; om = v['omega_atoms']
+            c, npro = om[1], om[2]
+            co = min((i for i, t in enumerate(sym)
+                      if t == 'O' and np.linalg.norm(X[i] - X[c]) < 1.6),
+                     key=lambda i: np.linalg.norm(X[i] - X[c]), default=None)
+            covered = (diag_p.get(m) or {}).get('checks', []) if isinstance(diag_p.get(m), dict) else \
+                      (list(sanity.BOUNDS) if m in diag_p else [])
+            for nm, val in (('amide_CO', float(np.linalg.norm(X[co] - X[c])) if co is not None else None),
+                            ('amide_CN', float(np.linalg.norm(X[npro] - X[c]))),
+                            ('prolyl_barrier', max(prof.values()))):
+                if val is None or nm in covered:
+                    continue
+                sanity.check(nm, val, label=f'prolyl {m} (recomputed from the checkpoint)', log=log)
+
     act = next((L(f) for f in ('ts_active_20261019.json',) if have(f)), None)
     if act:
         n_ck = 0
