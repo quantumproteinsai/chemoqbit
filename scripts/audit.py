@@ -92,6 +92,21 @@ def stalls():
     return out
 
 
+def diagnoses(fname):
+    """Recorded dead ends for one checkpoint, read from results/diagnoses.json.
+
+    They are kept out of the checkpoints because a driver rewrites its whole
+    checkpoint on every save: an entry added by hand while the job is running is
+    clobbered without warning, which is exactly what happened to the pthr2 entry.
+    Anything already inside a checkpoint is still honoured.
+    """
+    out = {}
+    f = RES / 'diagnoses.json'
+    if f.exists():
+        out.update((json.loads(f.read_text()).get(fname) or {}))
+    return out
+
+
 def main():
     for m_ in stalls():
         log(m_)
@@ -134,7 +149,7 @@ def main():
     # gets audited, so a code change needs no recomputation.
     pr = L('prolyl.json') if have('prolyl.json') else None
     if pr:
-        diag_p = pr.get('diagnosis', {})
+        diag_p = {**pr.get('diagnosis', {}), **diagnoses('prolyl.json')}
         for m, v in (pr.get('scan') or {}).items():
             prof = {int(k): x for k, x in v['profile'].items()}
             tr = min((k for k in prof if abs(abs(k) - 180) <= 30), key=lambda k: prof[k],
@@ -172,7 +187,7 @@ def main():
         if not have(f):
             continue
         d_ = L(f)
-        diag = d_.get('diagnosis', {})
+        diag = {**d_.get('diagnosis', {}), **diagnoses(f)}
         for v in d_.get('_sanity', []):
             lbl = v.get('label', '')
             line = f"{v['check']} = {v['value']} for {lbl}"

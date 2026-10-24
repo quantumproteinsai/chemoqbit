@@ -1,0 +1,22 @@
+{
+ "_note": "Diagnoses of dead ends, kept OUT of the job checkpoints. A driver rewrites its whole checkpoint on every save, so an entry added by hand while the job is running is silently clobbered -- which is what happened to the pthr2 entry on 2026-10-24. Nothing but the audit writes this file.",
+ "prolyl.json": {
+  "pthr2": {
+   "checks": ["profile_segments", "prolyl_barrier", "amide_CO", "amide_CN"],
+   "why": "Not usable at GFN2-xTB. In the relaxed trans conformer the amide C=O is 1.306 A and C-N 1.455 A (single bonds) against 1.235/1.332 in ala, thr, ser and the monoanion pthr1. The dianion delocalises its excess charge into the carbonyl, so the pi system whose rotation the barrier measures is already broken, and the barrier comes out at 9.94 kcal/mol against 16-20 for every other model and 14-24 from experiment. The phosphorylation effect is taken from the monoanion.",
+   "date": "2026-10-24"
+  },
+  "pser2": {
+   "checks": ["profile_segments", "prolyl_barrier", "amide_CO", "amide_CN"],
+   "why": "The other phosphate dianion, expected to fail exactly as pthr2 does and for the same reason. Entered in advance so the expected failure is not reported as a new fault; if it passes the checks, this entry is simply unused.",
+   "date": "2026-10-24"
+  }
+ },
+ "ts_abstraction.json": {
+  "relay": {
+   "checks": ["reaction_barrier"],
+   "why": "The sum of the two hops is a degenerate coordinate: across all 26 points C5-H never left 1.09-1.15 A, so the +12.12 kcal/mol maximum is the cost of protonating Glu58, not the abstraction. Superseded by the stepwise stage.",
+   "date": "2026-10-24"
+  }
+ }
+}
