@@ -21,8 +21,16 @@ def main():
     ap.add_argument('--to', default='bartmercier@gmail.com')
     ap.add_argument('--quiet', action='store_true')
     a = ap.parse_args()
+    # the checks are themselves under test: if a known failure stops firing, or a
+    # verified-good result starts firing, the checker is broken and says so
+    t = subprocess.run([str(ROOT / '.venv/bin/python'), str(ROOT / 'scripts/test_checks.py')],
+                       capture_output=True, text=True)
     r = subprocess.run([str(ROOT / '.venv/bin/python'), str(ROOT / 'scripts/audit.py')],
                        capture_output=True, text=True)
+    if t.returncode:
+        bad = [l for l in t.stdout.splitlines() if 'WRONG' in l]
+        r.stdout = ('SANITY the checker itself failed its own test cases:\n'
+                    + '\n'.join(bad) + '\n\n') + r.stdout
     lines = [l.strip() for l in r.stdout.splitlines() if l.strip().startswith('SANITY')]
     seen = set(json.loads(STATE.read_text())) if STATE.exists() else set()
     new = [l for l in lines if l not in seen]
