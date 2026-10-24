@@ -321,6 +321,79 @@ def relay_guide(X, hops):
     return g
 
 
+def stage_stepwise(res):
+    """Drive the C5 proton explicitly, from the state where Glu58 is already
+    protonated.
+
+    One restraint on the SUM of the two hops is degenerate: across all 26 relay
+    points C5-H never left 1.09-1.15 A, because the sum could be satisfied by the
+    water-to-Glu58 hop alone and then by distances drifting. The relay scan
+    therefore measured the cost of protonating Glu58 (about +10 kcal/mol), not
+    the abstraction.
+
+    The water donates its proton to Glu58 early and cheaply, which leaves
+    hydroxide beside C5 -- a far stronger base. So the question that remains is
+    the cost of that hydroxide taking the C5 proton, and it is driven here by its
+    own antisymmetric stretch, with C6-S ramped alongside since the elimination
+    is concerted.
+    """
+    p = res['prep']['H']; lab, h = p['labels'], p['hydrogen']
+    hops, h2 = relay_hops(p, np.array(p['X']))
+    i5, iow = lab.index('nucleotide:C5'), lab.index('wat327:O')
+    i6, isg = lab.index('nucleotide:C6'), lab.index('cys146:SG')
+    # start from the relay point where Glu58 is protonated and the energy lowest
+    cand = [v for v in res['relay']['points'].values()
+            if v.get('rel') is not None and v.get('X') and v['H2_Glu58'] < 1.2]
+    assert cand, 'no relay point has Glu58 protonated'
+    start = min(cand, key=lambda v: v['rel'])
+    X = np.array(start['X'])
+    e_ref = start['rel']
+    xi1_0 = float(np.linalg.norm(X[i5] - X[h]) - np.linalg.norm(X[h] - X[iow]))
+    r0 = float(np.linalg.norm(X[i6] - X[isg]))
+    XI_END, RCS_END = 1.0, 2.70
+    s = res.setdefault('stepwise', dict(start_xi=start['xi'], start_rel=e_ref,
+                                        xi1_start=xi1_0, rcs_start=r0, points={}))
+    targets = [round(v, 2) for v in np.arange(round(xi1_0 * 5) / 5, XI_END + 0.01, 0.2)]
+    print(f'  starting from the relay point xi {start["xi"]:+.2f} ({e_ref:+.2f} kcal/mol), '
+          f'Glu58 protonated; driving d(C5-H) - d(H-O327) from {xi1_0:+.2f}', flush=True)
+    for xi in targets:
+        k_ = str(xi)
+        if k_ in s['points']:
+            if s['points'][k_].get('X'):
+                X = np.array(s['points'][k_]['X'])
+            continue
+        frac = min(max((xi - xi1_0) / (XI_END - xi1_0), 0.0), 1.0)
+        rcs = r0 + frac * (RCS_END - r0)
+        t0 = time.time()
+        X, E, ok = _relax_safe(p, X, [(i5, h, h, iow, float(xi)), (i6, isg, float(rcs))])
+        g = geom(X, lab, h)
+        d = lambda a, b: float(np.linalg.norm(X[a] - X[b]))
+        s['points'][k_] = dict(xi1=xi, rcs_target=rcs, E=E,
+                               rel=None if E is None else float((E - p['E']) * K),
+                               converged=ok, X=X.tolist() if ok else None,
+                               C5_H=d(i5, h), H_O327=d(h, iow),
+                               H2_Glu58=d(h2, lab.index('glu58:OE2')), **g)
+        if ok:
+            sanity.record(res, 'bond_CH', s['points'][k_]['C5_H'], label=f'stepwise xi1 {xi}')
+        save(res)
+        v = s['points'][k_]
+        print(f"  stepwise xi1 {xi:+5.2f} rCS->{rcs:.2f}  "
+              + ('failed' if E is None else f"{v['rel']:+8.2f} kcal/mol")
+              + f"  C5-H {v['C5_H']:.2f} H..O {v['H_O327']:.2f} C6-S {g['C6-SG']:.2f}"
+                f"  ({time.time() - t0:.0f}s)", flush=True)
+    good = [v for v in s['points'].values() if v['rel'] is not None]
+    if good:
+        s['barrier'] = max(v['rel'] for v in good)
+        sanity.record(res, 'reaction_barrier', s['barrier'], label='stepwise barrier')
+        seq = [v['rel'] for v in sorted(good, key=lambda v: v['xi1'])]
+        sanity.record(res, 'scan_drop', sanity.largest_drop(seq), label='stepwise profile')
+        moved = [v for v in good if v['C5_H'] > 1.3]
+        print(f"stepwise: highest {s['barrier']:+.2f} kcal/mol, C5-H reached "
+              f"{max(v['C5_H'] for v in good):.2f} A at {len(moved)} points "
+              f"(FdUMP's only route costs {res['cleave']['F']['barrier']:+.2f})", flush=True)
+    save(res)
+
+
 def stage_concerted(res):
     """The elimination as the literature describes it: the C5 proton and the
     Cys146 thiolate leaving together.
@@ -456,7 +529,7 @@ def stage_band(res):
 
 
 STAGES = dict(prep=stage_prep, acceptor=stage_acceptor, cleave=stage_cleave,
-              relay=stage_relay, concerted=stage_concerted,
+              relay=stage_relay, stepwise=stage_stepwise, concerted=stage_concerted,
               saddle=stage_saddle, band=stage_band)
 
 
@@ -470,4 +543,4 @@ def main(names):
 
 
 if __name__ == '__main__':
-    main(sys.argv[1:] or ['prep', 'acceptor', 'cleave', 'relay', 'concerted', 'saddle'])
+    main(sys.argv[1:] or ['prep', 'acceptor', 'cleave', 'relay', 'stepwise', 'saddle'])
