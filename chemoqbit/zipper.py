@@ -23,6 +23,12 @@ from .pocket import read as _read
 
 CH = 1.09
 NTERM, CTERM, LYS = 1, -1, 1          # free amine, free carboxylate, lysine
+# Crystallisation and purification additives: present in the crystal, not in the
+# biology. 5WMJ carries a trifluoroacetate, whose own OXT was being charged as a
+# peptide C-terminus and left the model one unit short.
+ADDITIVES = {'TFA', 'GOL', 'EDO', 'PEG', 'PG4', 'MPD', 'SO4', 'PO4', 'ACT', 'ACY', 'CIT',
+             'DMS', 'IMD', 'TRS', 'EPE', 'MES', 'NA', 'CL', 'K', 'MG', 'CA', 'ZN', 'NO3',
+             'FMT', 'IPA', 'BME', 'DTT'}
 
 
 def cell(pdb):
@@ -54,11 +60,21 @@ def symmetry_ops(pdb):
 
 
 def stacking_axis(V, lo=4.4, hi=5.1):
-    """The cell vector that is the beta-strand repeat: a cell edge of 4.4-5.1 A."""
+    """The cell vector that is the beta-strand repeat, about 4.8 A.
+
+    An antiparallel sheet repeats by a 2-fold screw, so its cell edge holds TWO
+    strands and comes out near 9.5 A: SOD1 30-35 (5WMJ) is such a case. Half of
+    that edge is then the strand-to-strand spacing, even though the operation
+    relating neighbours is a screw rather than a pure translation.
+    """
     lens = np.linalg.norm(V, axis=1)
     i = [k for k in range(3) if lo <= lens[k] <= hi]
-    assert len(i) == 1, f'expected one cell edge in {lo}-{hi} A, got lengths {lens.round(2)}'
-    return V[i[0]], i[0]
+    if len(i) == 1:
+        return V[i[0]], i[0]
+    j = [k for k in range(3) if 2 * lo <= lens[k] <= 2 * hi]
+    if len(j) == 1:
+        return V[j[0]] / 2.0, j[0]
+    raise AssertionError(f'no cell edge near {lo}-{hi} A or twice it; lengths {lens.round(2)}')
 
 
 BACKBONE = {'N', 'CA', 'C', 'O', 'OXT'}
@@ -144,7 +160,7 @@ def build(pdb, chain='A', mate=None, neighbours=0, to_alanine=(), substitutions=
     V, _sg = cell(pdb)
     axis, _ai = stacking_axis(V)
     at = _read(pdb, chain)
-    res = sorted({(rn, num) for rn, num, _ in at})
+    res = sorted({(rn, num) for rn, num, _ in at if rn not in ADDITIVES})
     if mate is None:
         R, t, _desc = mating_sheet(pdb, chain)
         sheets = [(np.eye(3), np.zeros(3), chain), (R, t, chain)]
@@ -158,7 +174,7 @@ def build(pdb, chain='A', mate=None, neighbours=0, to_alanine=(), substitutions=
     n_lys = 0
     for s_, (R, t, ch) in enumerate(sheets):
         a_ch = _read(pdb, ch)
-        rs = sorted({(rn, num) for rn, num, _ in a_ch})
+        rs = sorted({(rn, num) for rn, num, _ in a_ch if rn not in ADDITIVES})
         for k in range(-neighbours, neighbours + 1):
             for rn, num in rs:
                 keep = None if num not in to_alanine else ['N', 'CA', 'C', 'O', 'CB', 'OXT']

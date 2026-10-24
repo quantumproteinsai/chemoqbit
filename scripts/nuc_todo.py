@@ -101,7 +101,9 @@ if __name__ == '__main__':
     todo = {'tzvp': tzvp, 'xc': xc, 'profile': profile, 'oniomopt': oniomopt, 'his147p': his147p, 'cs2d': cs2d, 'o4h': o4h, 'qmsize': qmsize, 'abstraction': abstraction, 'prolyl': prolyl,
             'pocket_cftr': lambda: pocket('cftr'), 'pocket_ache': lambda: pocket('ache'), 'zipper_tau': lambda: zipper('tau'), 'zipper_asyn47': lambda: zipper('asyn47'),
             'zipper_nacore': lambda: zipper('nacore'),
+            'zipper_sod1': lambda: zipper('sod1'), 'zipper_sod1ct': lambda: zipper('sod1ct'),
             'any': lambda: tzvp() or oniomopt() or his147p() or cs2d() or o4h() or qmsize() or abstraction() or prolyl()
-                           or pocket('cftr') or pocket('ache') or zipper('tau') or zipper('asyn47') or zipper('nacore')}[job]()
+                           or pocket('cftr') or pocket('ache') or zipper('tau') or zipper('asyn47') or zipper('nacore')
+                           or zipper('sod1') or zipper('sod1ct')}[job]()
     print(f'{job}: {"work remaining" if todo else "complete, skipping"}')
     sys.exit(0 if todo else 1)

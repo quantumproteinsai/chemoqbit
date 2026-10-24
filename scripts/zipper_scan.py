@@ -48,6 +48,12 @@ SYSTEMS = {
                    note='alpha-synuclein 47-56, the A53T familial Parkinson mutant; '
                         'truncating Thr53 to Ala restores the wild-type sequence'),
     'nacore': dict(pdb='rcsb_4ril/4RIL.pdb', mate=None, note='alpha-synuclein NACore 68-78'),
+    'sod1':   dict(pdb='rcsb_5wmj/5WMJ.pdb', mate='B',
+                   note='SOD1 30-35 KVWGSI, the ALS-linked oligomer-forming segment '
+                        '(Charcot disease). Sangwan et al., Protein Sci 2018, 1.40 A'),
+    'sod1ct': dict(pdb='rcsb_4nip/4NIP.pdb', mate=None,
+                   note='SOD1 147-153 GVIGIAQ, a C-terminal amyloid segment; '
+                        'Ivanova et al., PNAS 2013, 1.90 A'),
 }
 S = {}
 PDB = None
