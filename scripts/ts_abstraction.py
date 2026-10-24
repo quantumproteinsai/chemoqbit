@@ -486,6 +486,79 @@ def stage_concerted(res):
     save(res)
 
 
+def stage_surface2d(res):
+    """Map the abstraction over both coordinates instead of guessing a path.
+
+    The stepwise stage ramped C6-S linearly with the proton and got +47.51
+    kcal/mol, above the 25.10 that cleavage alone costs FdUMP. A linear ramp is
+    an arbitrary path through a two-dimensional space, so that number is an upper
+    bound on the barrier, not the barrier. Here the surface is mapped over the
+    proton coordinate and the C6-S distance independently, and the path taken is
+    the one whose highest point is lowest.
+    """
+    p = res['prep']['H']; lab, h = p['labels'], p['hydrogen']
+    hops, h2 = relay_hops(p, np.array(p['X']))
+    i5, iow = lab.index('nucleotide:C5'), lab.index('wat327:O')
+    i6, isg = lab.index('nucleotide:C6'), lab.index('cys146:SG')
+    cand = [v for v in res['relay']['points'].values()
+            if v.get('rel') is not None and v.get('X') and v['H2_Glu58'] < 1.2]
+    start = min(cand, key=lambda v: v['rel'])
+    XI = [round(v, 2) for v in np.arange(-3.0, 1.01, 0.4)]
+    RCS = [round(v, 2) for v in np.arange(1.87, 2.72, 0.2)]
+    s = res.setdefault('surface2d', dict(xi=XI, rcs=RCS, start_xi=start['xi'], points={}))
+    for xi in XI:
+        X = np.array(start['X'])                 # each column restarts from the same state
+        for rcs in RCS:
+            k_ = f'{xi}_{rcs}'
+            if k_ in s['points']:
+                if s['points'][k_].get('X'):
+                    X = np.array(s['points'][k_]['X'])
+                continue
+            t0 = time.time()
+            X, E, ok = _relax_safe(p, X, [(i5, h, h, iow, float(xi)), (i6, isg, float(rcs))])
+            g = geom(X, lab, h)
+            d = lambda a, b: float(np.linalg.norm(X[a] - X[b]))
+            s['points'][k_] = dict(xi1=xi, rcs=rcs, E=E,
+                                   rel=None if E is None else float((E - p['E']) * K),
+                                   converged=ok, X=X.tolist() if ok else None,
+                                   C5_H=d(i5, h), H_O327=d(h, iow), **g)
+            if ok:
+                sanity.record(res, 'proton_bonded',
+                              min(s['points'][k_]['C5_H'], s['points'][k_]['H_O327']),
+                              label=f'surface2d {k_}')
+            save(res)
+            v = s['points'][k_]
+            print(f"  surface xi1 {xi:+5.2f} rCS {rcs:.2f}  "
+                  + ('failed' if E is None else f"{v['rel']:+8.2f}")
+                  + f"  C5-H {v['C5_H']:.2f} ({time.time() - t0:.0f}s)", flush=True)
+    # minimax path: from the reactant column to the product column, the route whose
+    # highest point is lowest. Moves are one step in xi, optionally changing rcs.
+    grid = {}
+    for v in s['points'].values():
+        if v['rel'] is not None:
+            grid[(v['xi1'], v['rcs'])] = v['rel']
+    best = {}
+    for r in RCS:
+        if (XI[0], r) in grid:
+            best[r] = grid[(XI[0], r)]
+    for xi in XI[1:]:
+        nxt = {}
+        for r in RCS:
+            if (xi, r) not in grid:
+                continue
+            reach = [max(best[r0], grid[(xi, r)]) for r0 in best]
+            if reach:
+                nxt[r] = min(reach)
+        best = nxt or best
+    if best:
+        s['minimax_barrier'] = min(best.values())
+        sanity.record(res, 'reaction_barrier', s['minimax_barrier'], label='surface2d minimax')
+        print(f"surface2d: lowest barrier over the grid {s['minimax_barrier']:+.2f} kcal/mol "
+              f"(the linear ramp gave {res['stepwise']['barrier']:+.2f}; FdUMP's only route "
+              f"costs {res['cleave']['F']['barrier']:+.2f})", flush=True)
+    save(res)
+
+
 def stage_saddle(res):
     """Refine the relay maximum into a genuine transition state and prove it with
     frequencies: a restrained scan point is not a stationary point."""
@@ -553,7 +626,8 @@ def stage_band(res):
 
 
 STAGES = dict(prep=stage_prep, acceptor=stage_acceptor, cleave=stage_cleave,
-              relay=stage_relay, stepwise=stage_stepwise, concerted=stage_concerted,
+              relay=stage_relay, stepwise=stage_stepwise, surface2d=stage_surface2d,
+              concerted=stage_concerted,
               saddle=stage_saddle, band=stage_band)
 
 
@@ -567,4 +641,4 @@ def main(names):
 
 
 if __name__ == '__main__':
-    main(sys.argv[1:] or ['prep', 'acceptor', 'cleave', 'relay', 'stepwise', 'saddle'])
+    main(sys.argv[1:] or ['prep', 'acceptor', 'cleave', 'relay', 'stepwise', 'surface2d'])
