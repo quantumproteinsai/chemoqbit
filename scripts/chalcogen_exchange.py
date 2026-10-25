@@ -216,57 +216,142 @@ def stage_scan(res):
           f'hysteresis {hysteresis:.2f} at xi {worst[0]["xi"]:+.2f}', flush=True)
 
 
-def stage_saddle(res):
-    """DFT saddle from the scan maximum, with one imaginary mode as the certificate."""
-    if 'saddle' in res:
-        return
-    from chemoqbit.enzyme.tsopt import fd_hessian, frequencies, prfo_bofill
+XC, DFT_BASIS = 'wb97x-d3bj', 'def2-svp'    # the hyphen form; the underscore one is not a
+                                            # libxc name and fails to parse
+# The two environments the question turns on. Thiolate-disulfide exchange is reported to
+# pass through a bound trichalcogen anion in low dielectric and a plain saddle once
+# solvated, so the topology is a property of the surroundings and not of the molecule.
+# SOD1 decides which applies: Cys6, Cys57 and Cys146 are all at 0.00 A^2 accessible
+# surface, so that reaction happens desolvated, in the eps ~ 4 column.
+DIELECTRIC = dict(protein=4.0, water=78.3553)
+
+
+def _dft_energy_grad(sym, charge, eps, basis=DFT_BASIS):
     from pyscf import dft, gto
 
-    t0 = time.time()
-    p, s = res['prep'], res['scan']
-    sym, charge, idx = p['symbols'], p['charge'], p['idx']
-    X0 = np.array(s['geometries'][f"{s['top_xi']:.2f}"])
-
-    def energy_grad(X):
-        mol = gto.M(atom=[(a, tuple(r)) for a, r in zip(sym, X)], basis='def2-svp',
+    def eg(X):
+        mol = gto.M(atom=[(a, tuple(r)) for a, r in zip(sym, X)], basis=basis,
                     charge=charge, verbose=0)
         mf = dft.RKS(mol).density_fit()
-        mf.xc = 'wb97x_d3bj'
+        mf.xc = XC
         mf = mf.PCM()
         mf.with_solvent.method = 'C-PCM'
-        mf.with_solvent.eps = 78.3553
+        mf.with_solvent.eps = eps
         e = mf.kernel()
         g = mf.nuc_grad_method().kernel()
         return float(e), np.array(g)
-
-    # the guide is the lowest eigenvector of the Hessian, not a hand-built vector:
-    # a guessed displacement overlapped 0.72 with a rotational null-space residual in
-    # the prolyl work and followed the wrong mode
-    H = fd_hessian(np.array(X0), lambda Y: energy_grad(Y), free=range(len(sym)), h=0.01)
-    w, V = np.linalg.eigh(H)
-    guide = V[:, 0]
-
-    X, info = prfo_bofill(np.array(X0), energy_grad, H, guide, frozen=(),
-                          trust=0.06, gtol=3e-4, maxiter=120, neg=1e-5)
-    Hs = fd_hessian(X, lambda Y: energy_grad(Y), free=range(len(sym)), h=0.01)
-    nu = frequencies(Hs, sym)
-    imag = [v for v in nu if v < 0]
-
-    res['saddle'] = dict(X=X.tolist(), E=info['E'], n_imag=len(imag),
-                         imag_cm=[abs(v) for v in imag],
-                         angle=CH.attack_angle(X, idx), **CH.bond_lengths(X, idx),
-                         xi=CH.xi(X, idx), seconds=time.time() - t0)
-    sanity.record(res, 'n_imaginary', len(imag), label=f'{LAB} saddle', fatal=False)
-    if imag:
-        sanity.record(res, 'imag_wavenumber', abs(imag[0]), label=f'{LAB} saddle')
-    sanity.record(res, 'chalcogen_attack_angle', res['saddle']['angle'],
-                  label=f'{LAB} saddle')
-    print(f'{LAB}: saddle has {len(imag)} imaginary mode(s) '
-          f'{[f"{abs(v):.0f}i" for v in imag]}, xi {CH.xi(X, idx):+.2f}', flush=True)
+    return eg
 
 
-STAGES = dict(prep=stage_prep, scan=stage_scan, saddle=stage_saddle)
+def _xi_penalty(idx, x0, k):
+    """Harmonic restraint on xi and its gradient, matching the xTB 'relay' form."""
+    def pen(Y):
+        u1 = Y[idx['nuc']] - Y[idx['attacked']]
+        d1 = np.linalg.norm(u1)
+        u2 = Y[idx['attacked']] - Y[idx['leaving']]
+        d2 = np.linalg.norm(u2)
+        dev = (d1 - d2) - x0
+        G = np.zeros_like(Y)
+        ff = 2 * k * dev
+        G[idx['nuc']] += ff * u1 / d1
+        G[idx['attacked']] -= ff * u1 / d1
+        G[idx['attacked']] -= ff * u2 / d2
+        G[idx['leaving']] += ff * u2 / d2
+        return k * dev ** 2, G
+    return pen
+
+
+def _minimise(X0, eg, pen=None, maxiter=80, gtol=3e-4):
+    from scipy.optimize import minimize
+    shape = np.array(X0).shape
+
+    def f(v):
+        Y = v.reshape(shape)
+        e, g = eg(Y)
+        if pen is not None:
+            ep, gp = pen(Y)
+            e, g = e + ep, g + gp
+        return e, g.ravel()
+
+    r = minimize(f, np.array(X0, float).ravel(), jac=True, method='L-BFGS-B',
+                 options=dict(maxiter=maxiter, gtol=gtol, ftol=1e-12))
+    return r.x.reshape(shape), float(r.fun), bool(r.success)
+
+
+def stage_topology(res):
+    """Is the symmetric trichalcogen arrangement a minimum or a saddle, and does the
+    answer change with the dielectric?
+
+    This replaces a single saddle search, which assumed the answer. The protocol is the
+    same in both columns: hold xi at zero and relax everything else, so the symmetric
+    structure is clean; release the restraint and minimise; then take a
+    finite-difference Hessian and count imaginary modes at whatever it converged to.
+
+        0 imaginary  ->  a bound intermediate, so the mechanism is addition-elimination
+        1 imaginary  ->  the transition state, so the mechanism is concerted
+        runs away    ->  xi = 0 is not a stationary point at all
+
+    A bound intermediate is the therapeutically interesting answer, because an
+    intermediate is a species that exists long enough to be stabilised or occupied and
+    a saddle is not.
+    """
+    res.setdefault('topology', {})
+    p, s = res['prep'], res['scan']
+    sym, charge, idx = p['symbols'], p['charge'], p['idx']
+    key = min(s['geometries'], key=lambda k: abs(float(k)))
+    X_sym = np.array(s['geometries'][key])
+
+    # A full finite-difference Hessian is 90 gradients, and one DFT gradient on this
+    # system costs 77 s, so that is two hours per column before anything is learned.
+    # The curvature along xi answers the same question for a fifth of the cost: fit a
+    # parabola to five relaxed points either side of the symmetric arrangement and read
+    # its sign. Positive curvature means xi = 0 is a minimum along the reaction
+    # coordinate, hence a bound intermediate; negative means it is the barrier top.
+    GRID = (-0.30, -0.15, 0.00, 0.15, 0.30)
+
+    for name, eps in DIELECTRIC.items():
+        if name in res['topology']:
+            continue
+        t0 = time.time()
+        eg = _dft_energy_grad(sym, charge, eps)
+
+        X = np.array(X_sym, float)
+        pts = []
+        for x0 in GRID:
+            # seeded from the neighbour, so every point after the first needs few steps
+            X, E, conv = _minimise(X, eg, pen=_xi_penalty(idx, x0, 20.0), maxiter=40)
+            Ec, _ = eg(X)                      # energy without the restraint term
+            pts.append(dict(xi_target=x0, xi=CH.xi(X, idx), E=Ec, converged=conv,
+                            angle=CH.attack_angle(X, idx), **CH.bond_lengths(X, idx)))
+            print(f'  {name} xi {x0:+.2f} -> {pts[-1]["xi"]:+.3f}  E {Ec:+.6f} Eh  '
+                  f'angle {pts[-1]["angle"]:.0f}', flush=True)
+
+        xs = np.array([q['xi'] for q in pts])
+        es = (np.array([q['E'] for q in pts]) - min(q['E'] for q in pts)) * HARTREE_KCAL
+        c2, c1, c0 = np.polyfit(xs, es, 2)      # kcal/mol per A^2
+
+        verdict = ('bound intermediate' if c2 > 0 else 'barrier top')
+        res['topology'][name] = dict(
+            eps=eps, profile=pts, rel_kcal=es.tolist(),
+            curvature=float(c2), slope=float(c1), verdict=verdict,
+            seconds=time.time() - t0)
+        save(res)
+
+        for q in pts:
+            sanity.record(res, 'chalcogen_attack_angle', q['angle'],
+                          label=f'{LAB} {name} xi {q["xi"]:+.2f}')
+        print(f'{LAB} eps={eps:.1f} ({name}): d2E/dxi2 = {c2:+.1f} kcal/mol/A^2 '
+              f'-> {verdict}  ({time.time() - t0:.0f}s)', flush=True)
+
+    a, b = res['topology'].get('protein'), res['topology'].get('water')
+    if a and b:
+        res['topology']['solvent_changes_topology'] = (a['verdict'] != b['verdict'])
+        print(f"{LAB}: protein-interior '{a['verdict']}' vs water '{b['verdict']}' -- "
+              f"dielectric {'DOES' if a['verdict'] != b['verdict'] else 'does not'} "
+              f"change the mechanism", flush=True)
+
+
+STAGES = dict(prep=stage_prep, scan=stage_scan, topology=stage_topology)
 
 
 def main(label, names):

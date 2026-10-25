@@ -103,7 +103,11 @@ if __name__ == '__main__':
                 not (RES / f'chalcogen_{l}.json').exists()
                 or not all(x in json.loads((RES / f'chalcogen_{l}.json').read_text()).get('_stages_done', [])
                            for x in ('prep', 'scan'))
-                for l in ('ss', 'se_s', 's_se', 'sese', 'se_nuc', 'neutral')),
+                for l in ('ss', 'se_s', 's_se', 'sese', 'se_nuc', 'neutral'))
+            or any(  # the two-dielectric topology experiment, ss and se_s only
+                not (RES / f'chalcogen_{l}.json').exists()
+                or len((json.loads((RES / f'chalcogen_{l}.json').read_text()).get('topology') or {}))< 3
+                for l in ('ss', 'se_s')),
             'pocket_cftr': lambda: pocket('cftr', ('wt', 'scan')),
             'pocket_ache': lambda: pocket('ache', ('wt', 'scan')),
             'pocket_cftr_dft': lambda: pocket('cftr'), 'pocket_ache_dft': lambda: pocket('ache'), 'zipper_tau': lambda: zipper('tau'), 'zipper_asyn47': lambda: zipper('asyn47'),

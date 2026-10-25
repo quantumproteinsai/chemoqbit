@@ -8,12 +8,12 @@ Type=simple
 WorkingDirectory=/home/deploy/dev/chemoqbit
 # one thread: measured 7x faster than four on these 15-atom systems, and it leaves
 # the cores for the DFT queue instead of competing with it
-Environment=OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
-CPUQuota=100%
+Environment=OMP_NUM_THREADS=2 MKL_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2
+CPUQuota=200%
 TimeoutStartSec=infinity
 ExecCondition=/home/deploy/dev/chemoqbit/.venv/bin/python /home/deploy/dev/chemoqbit/scripts/nuc_todo.py chalcogen
 ExecStartPre=/bin/sh -c 'echo "=== $(date "+%%F %%T")  start: chalcogen ladder"'
-ExecStart=/home/deploy/dev/chemoqbit/.venv/bin/python -u /home/deploy/dev/chemoqbit/scripts/chalcogen_exchange.py all prep scan
+ExecStart=/bin/sh -c '/home/deploy/dev/chemoqbit/.venv/bin/python -u /home/deploy/dev/chemoqbit/scripts/chalcogen_exchange.py all prep scan && /home/deploy/dev/chemoqbit/.venv/bin/python -u /home/deploy/dev/chemoqbit/scripts/chalcogen_exchange.py ss topology && /home/deploy/dev/chemoqbit/.venv/bin/python -u /home/deploy/dev/chemoqbit/scripts/chalcogen_exchange.py se_s topology'
 StandardOutput=append:/home/deploy/dev/chemoqbit/results/service_chalcogen.log
 StandardError=append:/home/deploy/dev/chemoqbit/results/service_chalcogen.log
 Restart=on-failure
