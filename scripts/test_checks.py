@@ -371,6 +371,12 @@ record('a profile with no descent', 'exchange_segments',
        not sanity.check('exchange_segments', 1, log=_q), True,
        'the scan never reached the product')
 
+record('an identity exchange coming out thermoneutral', 'identity_asymmetry',
+       not sanity.check('identity_asymmetry', 0.03, log=_q), False, 'as symmetry requires')
+record('an identity exchange off by 4 kcal/mol', 'identity_asymmetry',
+       not sanity.check('identity_asymmetry', 4.0, log=_q), True,
+       'pure scan error: the two ends are the same two species')
+
 record('a symmetric species level with the reactants', 'exchange_well',
        not sanity.check('exchange_well', 0.2, log=_q), False, 'as an S_N2 should be')
 record('GFN2-xTB making the trisulfur anion 8.1 kcal/mol bound', 'exchange_well',

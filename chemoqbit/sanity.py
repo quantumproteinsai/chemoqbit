@@ -122,6 +122,13 @@ BOUNDS = {
                           'product: exactly two monotonic runs. The amide bound of 1 to 4 is '
                           'right for a full rotation and too loose here, and a loose bound is '
                           'what let a broken-amide dianion through at 9.94'),
+    'identity_asymmetry': (-1.0, 1.0, 'kcal/mol',
+                           'reactants and products of an IDENTITY exchange are the same two '
+                           'species, so its reaction energy is exactly zero by symmetry. Any '
+                           'departure is scan error and nothing else, which makes this the one '
+                           'check here with no physics in its tolerance: ss and sese give the '
+                           'true numerical noise floor, and a barrier difference smaller than '
+                           'it cannot be claimed for se_s or se_nuc'),
     'exchange_well': (0.0, 2.0, 'kcal/mol',
                       'how far the symmetric arrangement of a displacement sits BELOW the '
                       'reactant complex. For an S_N2 it should be about zero, because that '

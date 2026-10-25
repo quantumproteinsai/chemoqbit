@@ -155,38 +155,55 @@ def stage_scan(res):
     # harmless for an identity exchange, where the two ends are equal by symmetry, and
     # wrong for se_s and s_se, where they are not.
     r_end = int(np.argmin([abs(pt['xi'] - p['reactant']['xi']) for pt in prof]))
+    p_end = int(np.argmin([abs(pt['xi'] - p['product']['xi']) for pt in prof]))
     top = int(np.argmax(rel))
-    bot = int(np.argmin(rel))
     barrier = rel[top] - rel[r_end]
-    # how far the symmetric species sits BELOW the reactant complex. For a displacement
-    # this should be about zero: the symmetric arrangement IS the transition state. A
-    # deep well there means the method has made the hypervalent anion a bound species,
-    # so the surface has the wrong topology and not merely the wrong number.
-    well_depth = rel[r_end] - rel[bot]
+    reaction_energy = rel[p_end] - rel[r_end]
 
-    hysteresis = max(abs(f['E'] - b['E']) for f, b in
-                     zip(fwd, bwd[::-1])) * HARTREE_KCAL
+    # Whether the SYMMETRIC arrangement is bound, measured against the lower of the two
+    # ends. Taking the global minimum instead conflates a bound hypervalent species with
+    # an exothermic reaction: s_se runs 29.8 kcal/mol downhill to its product because
+    # selenolate is far more stable than thiolate, and the first version of this reported
+    # that as a 29.8 kcal/mol well when the profile is in fact monotonic.
+    sym = int(np.argmin([abs(pt['xi']) for pt in prof]))
+    well_depth = max(0.0, min(rel[r_end], rel[p_end]) - rel[sym])
+
+    # Per-direction energies, because a hysteresis failure is only diagnosable if the
+    # two sweeps are kept: the merge takes the lower point at each xi and therefore
+    # hides whichever sweep blew up. se_s disagreed by 46 kcal/mol and the merged
+    # profile looked clean, with nothing left on disk to say where it went wrong.
+    sweeps = dict(forward=[dict(xi=q['xi'], E=q['E']) for q in fwd],
+                  backward=[dict(xi=q['xi'], E=q['E']) for q in bwd])
+    worst = max(zip(fwd, bwd[::-1]), key=lambda fb: abs(fb[0]['E'] - fb[1]['E']))
+    hysteresis = abs(worst[0]['E'] - worst[1]['E']) * HARTREE_KCAL
 
     res['scan'] = dict(
         profile=[{k: v for k, v in pt.items() if k != 'X'} for pt in prof],
         geometries={f"{pt['xi']:.2f}": pt['X'] for pt in prof},
+        sweeps=sweeps,
         barrier_xtb=barrier, top_xi=prof[top]['xi'], well_depth=well_depth,
-        well_xi=prof[bot]['xi'], reactant_xi=prof[r_end]['xi'],
-        hysteresis=hysteresis, seconds=time.time() - t0)
+        well_xi=prof[sym]['xi'], reactant_xi=prof[r_end]['xi'],
+        reaction_energy=reaction_energy,
+        hysteresis=hysteresis, hysteresis_xi=worst[0]['xi'],
+        seconds=time.time() - t0)
 
     sanity.record(res, 'scan_drop', sanity.largest_drop(rel), label=f'{LAB} profile')
     sanity.record(res, 'exchange_segments', sanity.monotonic_segments(rel),
                   label=f'{LAB} merged profile')
     sanity.record(res, 'chalcogen_barrier', barrier, label=f'{LAB} xTB')
     sanity.record(res, 'exchange_well', well_depth, label=f'{LAB} symmetric species')
+    if LAB in ('ss', 'sese'):
+        # the two ends are the same two species, so this is pure scan error
+        sanity.record(res, 'identity_asymmetry', reaction_energy,
+                      label=f'{LAB} identity exchange')
     sanity.record(res, 'scan_hysteresis', hysteresis, label=f'{LAB} fwd vs bwd')
     for pt in prof:
         sanity.record(res, 'chalcogen_attack_angle', pt['angle'],
                       label=f"{LAB} xi {pt['xi']:+.2f}")
 
     print(f'{LAB}: xTB barrier {barrier:+.2f} kcal/mol at xi {prof[top]["xi"]:+.2f}, '
-          f'well {well_depth:+.2f} deep at xi {prof[bot]["xi"]:+.2f}, '
-          f'hysteresis {hysteresis:.2f}', flush=True)
+          f'dE_rxn {reaction_energy:+.2f}, symmetric species {well_depth:+.2f} bound, '
+          f'hysteresis {hysteresis:.2f} at xi {worst[0]["xi"]:+.2f}', flush=True)
 
 
 def stage_saddle(res):
