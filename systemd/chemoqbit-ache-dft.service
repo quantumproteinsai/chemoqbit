@@ -1,0 +1,21 @@
+[Unit]
+Description=chemoqbit: ache pocket, DFT cross-check of the interaction energy (resumable)
+StartLimitIntervalSec=6h
+StartLimitBurst=3
+
+[Service]
+Type=simple
+WorkingDirectory=/home/deploy/dev/chemoqbit
+Environment=OMP_NUM_THREADS=3 PYSCF_MAX_MEMORY=12000
+MemoryMax=16G
+TimeoutStartSec=infinity
+ExecCondition=/home/deploy/dev/chemoqbit/.venv/bin/python /home/deploy/dev/chemoqbit/scripts/nuc_todo.py pocket_ache_dft
+ExecStartPre=/bin/sh -c '/home/deploy/dev/chemoqbit/scripts/wait_units.sh chemoqbit-abstraction chemoqbit-prolyl chemoqbit-cftr chemoqbit-ache chemoqbit-zip-sod1 chemoqbit-zip-sod1ct chemoqbit-zip-asyn47 chemoqbit-zip-tau chemoqbit-zip-nacore chemoqbit-cftr-dft; echo "=== $(date "+%%F %%T")  start: ache DFT"'
+ExecStart=/home/deploy/dev/chemoqbit/.venv/bin/python -u /home/deploy/dev/chemoqbit/scripts/pocket_scan.py ache dft
+StandardOutput=append:/home/deploy/dev/chemoqbit/results/service_pocket_ache.log
+StandardError=append:/home/deploy/dev/chemoqbit/results/service_pocket_ache.log
+Restart=on-failure
+RestartSec=120
+
+[Install]
+WantedBy=default.target

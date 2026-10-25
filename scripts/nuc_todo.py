@@ -4,7 +4,7 @@ Used as ExecCondition= in the chemoqbit-*.service user units, so a finished
 job is skipped at boot instead of re-running (and the notifier does not mail
 "finished" again on every boot).
 
-    python scripts/nuc_todo.py tzvp|xc|profile|oniomopt|his147p|cs2d|o4h|qmsize|abstraction|prolyl|pocket_cftr|pocket_ache|zipper_tau|zipper_asyn47|zipper_nacore|any
+    python scripts/nuc_todo.py tzvp|xc|profile|oniomopt|his147p|cs2d|o4h|qmsize|abstraction|prolyl|pocket_cftr|pocket_ache|pocket_cftr_dft|pocket_ache_dft|zipper_tau|zipper_asyn47|zipper_nacore|any
 """
 import json, sys
 from pathlib import Path
@@ -80,12 +80,12 @@ def prolyl():
     return not all(x in done for x in ('scan', 'points', 'dft'))
 
 
-def pocket(system):
+def pocket(system, stages=('wt', 'scan', 'dft')):
     p = RES / f'pocket_{system}.json'
     if not p.exists():
         return True
     done = json.loads(p.read_text()).get('_stages_done', [])
-    return not all(x in done for x in ('wt', 'scan', 'dft'))
+    return not all(x in done for x in stages)
 
 
 def zipper(system):
@@ -99,7 +99,9 @@ def zipper(system):
 if __name__ == '__main__':
     job = sys.argv[1]
     todo = {'tzvp': tzvp, 'xc': xc, 'profile': profile, 'oniomopt': oniomopt, 'his147p': his147p, 'cs2d': cs2d, 'o4h': o4h, 'qmsize': qmsize, 'abstraction': abstraction, 'prolyl': prolyl,
-            'pocket_cftr': lambda: pocket('cftr'), 'pocket_ache': lambda: pocket('ache'), 'zipper_tau': lambda: zipper('tau'), 'zipper_asyn47': lambda: zipper('asyn47'),
+            'pocket_cftr': lambda: pocket('cftr', ('wt', 'scan')),
+            'pocket_ache': lambda: pocket('ache', ('wt', 'scan')),
+            'pocket_cftr_dft': lambda: pocket('cftr'), 'pocket_ache_dft': lambda: pocket('ache'), 'zipper_tau': lambda: zipper('tau'), 'zipper_asyn47': lambda: zipper('asyn47'),
             'zipper_nacore': lambda: zipper('nacore'),
             'zipper_sod1': lambda: zipper('sod1'), 'zipper_sod1ct': lambda: zipper('sod1ct'),
             'any': lambda: tzvp() or oniomopt() or his147p() or cs2d() or o4h() or qmsize() or abstraction() or prolyl()
