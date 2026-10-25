@@ -52,9 +52,11 @@
   "ss": {
    "checks": [
     "chalcogen_barrier",
-    "exchange_well"
+    "exchange_well",
+    "scan_drop",
+    "exchange_segments"
    ],
-   "why": "GFN2-xTB gives this displacement no barrier at all and puts the symmetric arrangement 8.09 kcal/mol BELOW the reactant complex, so the hypervalent trisulfur anion comes out a bound species and the surface is a well instead of a barrier. Measured on ss, where thiolate-disulfide exchange is known to be second order with a real barrier, so the shape is wrong and not merely the number. Same over-stabilisation of a thiolate that Manuscript 2 found at the semiempirical level. Consequence: no saddle search can be seeded from this surface, and the DFT stage must start from a built symmetric guess. The scans are kept because showing the failure is systematic across all six systems is itself the result.",
+   "why": "GFN2-xTB puts the symmetric arrangement of this displacement 8-9 kcal/mol BELOW the reactant complex, so the hypervalent trichalcogen anion comes out a bound species and the surface is a well where it must be a barrier. Measured first on ss, where thiolate-disulfide exchange is known to be second order with a real barrier, so the shape is wrong and not merely the number. Same over-stabilisation of a thiolate that Manuscript 2 found at the semiempirical level. chalcogen_barrier and exchange_well report it directly; scan_drop and exchange_segments are consequences, because a nearly flat well has wobbles at the step size and a barrierless exothermic profile such as s_se is monotonic rather than the two runs a displacement should show. Consequence: no saddle search can be seeded from this surface and the DFT stage must build its own symmetric guess. The scans are kept because showing the failure is systematic across all six systems is itself the result. Note this does NOT cover scan_hysteresis, which was a real fault of ours and is fixed: the backward sweep now starts from where the forward sweep arrived instead of from a constructed product, and se_s went from 46.27 to 2.91 kcal/mol.",
    "date": "2026-10-25"
   }
  },
@@ -62,9 +64,11 @@
   "se_s": {
    "checks": [
     "chalcogen_barrier",
-    "exchange_well"
+    "exchange_well",
+    "scan_drop",
+    "exchange_segments"
    ],
-   "why": "GFN2-xTB gives this displacement no barrier at all and puts the symmetric arrangement 8.09 kcal/mol BELOW the reactant complex, so the hypervalent trisulfur anion comes out a bound species and the surface is a well instead of a barrier. Measured on ss, where thiolate-disulfide exchange is known to be second order with a real barrier, so the shape is wrong and not merely the number. Same over-stabilisation of a thiolate that Manuscript 2 found at the semiempirical level. Consequence: no saddle search can be seeded from this surface, and the DFT stage must start from a built symmetric guess. The scans are kept because showing the failure is systematic across all six systems is itself the result.",
+   "why": "GFN2-xTB puts the symmetric arrangement of this displacement 8-9 kcal/mol BELOW the reactant complex, so the hypervalent trichalcogen anion comes out a bound species and the surface is a well where it must be a barrier. Measured first on ss, where thiolate-disulfide exchange is known to be second order with a real barrier, so the shape is wrong and not merely the number. Same over-stabilisation of a thiolate that Manuscript 2 found at the semiempirical level. chalcogen_barrier and exchange_well report it directly; scan_drop and exchange_segments are consequences, because a nearly flat well has wobbles at the step size and a barrierless exothermic profile such as s_se is monotonic rather than the two runs a displacement should show. Consequence: no saddle search can be seeded from this surface and the DFT stage must build its own symmetric guess. The scans are kept because showing the failure is systematic across all six systems is itself the result. Note this does NOT cover scan_hysteresis, which was a real fault of ours and is fixed: the backward sweep now starts from where the forward sweep arrived instead of from a constructed product, and se_s went from 46.27 to 2.91 kcal/mol.",
    "date": "2026-10-25"
   }
  },
@@ -72,9 +76,11 @@
   "s_se": {
    "checks": [
     "chalcogen_barrier",
-    "exchange_well"
+    "exchange_well",
+    "scan_drop",
+    "exchange_segments"
    ],
-   "why": "GFN2-xTB gives this displacement no barrier at all and puts the symmetric arrangement 8.09 kcal/mol BELOW the reactant complex, so the hypervalent trisulfur anion comes out a bound species and the surface is a well instead of a barrier. Measured on ss, where thiolate-disulfide exchange is known to be second order with a real barrier, so the shape is wrong and not merely the number. Same over-stabilisation of a thiolate that Manuscript 2 found at the semiempirical level. Consequence: no saddle search can be seeded from this surface, and the DFT stage must start from a built symmetric guess. The scans are kept because showing the failure is systematic across all six systems is itself the result.",
+   "why": "GFN2-xTB puts the symmetric arrangement of this displacement 8-9 kcal/mol BELOW the reactant complex, so the hypervalent trichalcogen anion comes out a bound species and the surface is a well where it must be a barrier. Measured first on ss, where thiolate-disulfide exchange is known to be second order with a real barrier, so the shape is wrong and not merely the number. Same over-stabilisation of a thiolate that Manuscript 2 found at the semiempirical level. chalcogen_barrier and exchange_well report it directly; scan_drop and exchange_segments are consequences, because a nearly flat well has wobbles at the step size and a barrierless exothermic profile such as s_se is monotonic rather than the two runs a displacement should show. Consequence: no saddle search can be seeded from this surface and the DFT stage must build its own symmetric guess. The scans are kept because showing the failure is systematic across all six systems is itself the result. Note this does NOT cover scan_hysteresis, which was a real fault of ours and is fixed: the backward sweep now starts from where the forward sweep arrived instead of from a constructed product, and se_s went from 46.27 to 2.91 kcal/mol.",
    "date": "2026-10-25"
   }
  },
@@ -82,9 +88,11 @@
   "sese": {
    "checks": [
     "chalcogen_barrier",
-    "exchange_well"
+    "exchange_well",
+    "scan_drop",
+    "exchange_segments"
    ],
-   "why": "GFN2-xTB gives this displacement no barrier at all and puts the symmetric arrangement 8.09 kcal/mol BELOW the reactant complex, so the hypervalent trisulfur anion comes out a bound species and the surface is a well instead of a barrier. Measured on ss, where thiolate-disulfide exchange is known to be second order with a real barrier, so the shape is wrong and not merely the number. Same over-stabilisation of a thiolate that Manuscript 2 found at the semiempirical level. Consequence: no saddle search can be seeded from this surface, and the DFT stage must start from a built symmetric guess. The scans are kept because showing the failure is systematic across all six systems is itself the result.",
+   "why": "GFN2-xTB puts the symmetric arrangement of this displacement 8-9 kcal/mol BELOW the reactant complex, so the hypervalent trichalcogen anion comes out a bound species and the surface is a well where it must be a barrier. Measured first on ss, where thiolate-disulfide exchange is known to be second order with a real barrier, so the shape is wrong and not merely the number. Same over-stabilisation of a thiolate that Manuscript 2 found at the semiempirical level. chalcogen_barrier and exchange_well report it directly; scan_drop and exchange_segments are consequences, because a nearly flat well has wobbles at the step size and a barrierless exothermic profile such as s_se is monotonic rather than the two runs a displacement should show. Consequence: no saddle search can be seeded from this surface and the DFT stage must build its own symmetric guess. The scans are kept because showing the failure is systematic across all six systems is itself the result. Note this does NOT cover scan_hysteresis, which was a real fault of ours and is fixed: the backward sweep now starts from where the forward sweep arrived instead of from a constructed product, and se_s went from 46.27 to 2.91 kcal/mol.",
    "date": "2026-10-25"
   }
  },
@@ -92,9 +100,11 @@
   "se_nuc": {
    "checks": [
     "chalcogen_barrier",
-    "exchange_well"
+    "exchange_well",
+    "scan_drop",
+    "exchange_segments"
    ],
-   "why": "GFN2-xTB gives this displacement no barrier at all and puts the symmetric arrangement 8.09 kcal/mol BELOW the reactant complex, so the hypervalent trisulfur anion comes out a bound species and the surface is a well instead of a barrier. Measured on ss, where thiolate-disulfide exchange is known to be second order with a real barrier, so the shape is wrong and not merely the number. Same over-stabilisation of a thiolate that Manuscript 2 found at the semiempirical level. Consequence: no saddle search can be seeded from this surface, and the DFT stage must start from a built symmetric guess. The scans are kept because showing the failure is systematic across all six systems is itself the result.",
+   "why": "GFN2-xTB puts the symmetric arrangement of this displacement 8-9 kcal/mol BELOW the reactant complex, so the hypervalent trichalcogen anion comes out a bound species and the surface is a well where it must be a barrier. Measured first on ss, where thiolate-disulfide exchange is known to be second order with a real barrier, so the shape is wrong and not merely the number. Same over-stabilisation of a thiolate that Manuscript 2 found at the semiempirical level. chalcogen_barrier and exchange_well report it directly; scan_drop and exchange_segments are consequences, because a nearly flat well has wobbles at the step size and a barrierless exothermic profile such as s_se is monotonic rather than the two runs a displacement should show. Consequence: no saddle search can be seeded from this surface and the DFT stage must build its own symmetric guess. The scans are kept because showing the failure is systematic across all six systems is itself the result. Note this does NOT cover scan_hysteresis, which was a real fault of ours and is fixed: the backward sweep now starts from where the forward sweep arrived instead of from a constructed product, and se_s went from 46.27 to 2.91 kcal/mol.",
    "date": "2026-10-25"
   }
  },
@@ -102,9 +112,11 @@
   "neutral": {
    "checks": [
     "chalcogen_barrier",
-    "exchange_well"
+    "exchange_well",
+    "scan_drop",
+    "exchange_segments"
    ],
-   "why": "GFN2-xTB gives this displacement no barrier at all and puts the symmetric arrangement 8.09 kcal/mol BELOW the reactant complex, so the hypervalent trisulfur anion comes out a bound species and the surface is a well instead of a barrier. Measured on ss, where thiolate-disulfide exchange is known to be second order with a real barrier, so the shape is wrong and not merely the number. Same over-stabilisation of a thiolate that Manuscript 2 found at the semiempirical level. Consequence: no saddle search can be seeded from this surface, and the DFT stage must start from a built symmetric guess. The scans are kept because showing the failure is systematic across all six systems is itself the result.",
+   "why": "GFN2-xTB puts the symmetric arrangement of this displacement 8-9 kcal/mol BELOW the reactant complex, so the hypervalent trichalcogen anion comes out a bound species and the surface is a well where it must be a barrier. Measured first on ss, where thiolate-disulfide exchange is known to be second order with a real barrier, so the shape is wrong and not merely the number. Same over-stabilisation of a thiolate that Manuscript 2 found at the semiempirical level. chalcogen_barrier and exchange_well report it directly; scan_drop and exchange_segments are consequences, because a nearly flat well has wobbles at the step size and a barrierless exothermic profile such as s_se is monotonic rather than the two runs a displacement should show. Consequence: no saddle search can be seeded from this surface and the DFT stage must build its own symmetric guess. The scans are kept because showing the failure is systematic across all six systems is itself the result. Note this does NOT cover scan_hysteresis, which was a real fault of ours and is fixed: the backward sweep now starts from where the forward sweep arrived instead of from a constructed product, and se_s went from 46.27 to 2.91 kcal/mol.",
    "date": "2026-10-25"
   }
  }

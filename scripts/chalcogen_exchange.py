@@ -85,21 +85,25 @@ def stage_prep(res):
     ang = CH.attack_angle(Xr, idx)
     sanity.record(res, 'chalcogen_attack_angle', ang, label=f'{LAB} reactant', fatal=False)
 
-    # product guess, mirrored through the symmetric point, then relaxed at -x_start
-    Xp0 = CH.product_geometry(sym, Xr, idx)
-    Xp, Ep = _relax_at(sym, Xp0, charge, idx, -x_start)
-
-    bl_r, bl_p = CH.bond_lengths(Xr, idx), CH.bond_lengths(Xp, idx)
+    # No constructed product. Mirroring the reactant through the symmetric point put
+    # se_s's backward sweep 40 kcal/mol above its forward sweep at EVERY point, not at
+    # one: the guess landed in another basin and the sweep never left it. The cause was
+    # product_geometry running its connectivity walk on coordinates whose nucleophile
+    # had already been shifted in, so the walk crossed the fragment boundary and
+    # displaced atoms belonging to the other side. The product is instead taken from the
+    # far end of the forward sweep, which arrives there by neighbour seeding -- the same
+    # fix that stopped the 2D abstraction columns wrenching the proton off its donor.
+    # By the definition of xi the product sits at -x_start, so the grid needs no guess.
+    bl_r = CH.bond_lengths(Xr, idx)
     res['prep'] = dict(
         symbols=sym, charge=charge, idx={k: v for k, v in idx.items()},
         reactant=dict(X=Xr.tolist(), E=Er, xi=CH.xi(Xr, idx), angle=ang, **bl_r),
-        product=dict(X=Xp.tolist(), E=Ep, xi=CH.xi(Xp, idx),
-                     angle=CH.attack_angle(Xp, idx), **bl_p),
+        product_xi=-x_start,
         seconds=time.time() - t0)
     print(f'{LAB}: reactant xi {CH.xi(Xr, idx):+.2f} A, forming {bl_r["forming"]:.2f}, '
           f'breaking {bl_r["breaking"]:.2f}, angle {ang:.1f} deg', flush=True)
-    print(f'{LAB}: product  xi {CH.xi(Xp, idx):+.2f} A, forming {bl_p["forming"]:.2f}, '
-          f'breaking {bl_p["breaking"]:.2f}', flush=True)
+    print(f'{LAB}: product end of the grid at xi {-x_start:+.2f}, reached by sweeping',
+          flush=True)
 
 
 def _sweep(sym, X0, charge, idx, grid):
@@ -123,17 +127,23 @@ def stage_scan(res):
     p = res['prep']
     sym, charge, idx = p['symbols'], p['charge'], p['idx']
     Xr = np.array(p['reactant']['X'])
-    Xp = np.array(p['product']['X'])
 
-    x_r, x_p = p['reactant']['xi'], p['product']['xi']
+    x_r = p['reactant']['xi']
+    x_p = p.get('product_xi', -x_r)
     lo, hi = min(x_r, x_p), max(x_r, x_p)
     grid = np.arange(lo, hi + 0.5 * STEP, STEP)
 
-    print(f'{LAB}: forward sweep, {len(grid)} points from {grid[0]:+.2f} to {grid[-1]:+.2f}',
-          flush=True)
-    fwd = _sweep(sym, Xr, charge, idx, grid)
-    print(f'{LAB}: backward sweep', flush=True)
-    bwd = _sweep(sym, Xp, charge, idx, grid[::-1])
+    # the forward sweep starts at the reactant, wherever on the grid that falls
+    fwd_grid = grid if abs(grid[0] - x_r) < abs(grid[-1] - x_r) else grid[::-1]
+    print(f'{LAB}: forward sweep, {len(grid)} points from {fwd_grid[0]:+.2f} '
+          f'to {fwd_grid[-1]:+.2f}', flush=True)
+    fwd = _sweep(sym, Xr, charge, idx, fwd_grid)
+
+    # and the backward sweep starts from where the forward one ARRIVED, not from a
+    # constructed product. That is the whole point: the far end is reached by relaxing
+    # through every intermediate geometry, so it is in the right basin by construction.
+    print(f'{LAB}: backward sweep from the far end of the forward sweep', flush=True)
+    bwd = _sweep(sym, np.array(fwd[-1]['X']), charge, idx, fwd_grid[::-1])
 
     # keep the lower of the two passes at each xi: a relaxed scan can be trapped in
     # one direction and not the other, and the lower branch is the physical one
@@ -155,7 +165,7 @@ def stage_scan(res):
     # harmless for an identity exchange, where the two ends are equal by symmetry, and
     # wrong for se_s and s_se, where they are not.
     r_end = int(np.argmin([abs(pt['xi'] - p['reactant']['xi']) for pt in prof]))
-    p_end = int(np.argmin([abs(pt['xi'] - p['product']['xi']) for pt in prof]))
+    p_end = int(np.argmin([abs(pt['xi'] - x_p) for pt in prof]))
     top = int(np.argmax(rel))
     barrier = rel[top] - rel[r_end]
     reaction_energy = rel[p_end] - rel[r_end]

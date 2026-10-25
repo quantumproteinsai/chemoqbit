@@ -178,36 +178,3 @@ def expected_bond(idx, which='forming'):
     else:
         key = (idx['attacked_el'], idx['leaving_el'])
     return BONDED.get(key, 2.05)
-
-
-def product_geometry(sym, X, idx):
-    """Mirror the reactant complex through the symmetric point: the leaving group
-    pushed out to the approach distance and the nucleophile brought in to bonding.
-    A starting guess for the product relaxation, not a product."""
-    X = np.array(X, float)
-    axis = X[idx['attacked']] - X[idx['leaving']]
-    axis /= np.linalg.norm(axis)
-    d_new = BONDED.get((idx['attacked_el'], idx['leaving_el']), 2.05)
-    # move the whole nucleophile fragment in to bonding distance
-    n0 = idx['n_di']
-    shift = (X[idx['attacked']] + d_new * axis) - X[idx['nuc']]
-    X[n0:] += shift
-    # and push the leaving fragment out along the same axis
-    leaving_side = _fragment(sym, X, idx['leaving'], exclude=idx['attacked'])
-    X[list(leaving_side)] -= APPROACH * axis
-    return X
-
-
-def _fragment(sym, X, seed, exclude):
-    """Atoms connected to `seed` without passing through `exclude`, by distance."""
-    cut = 2.6
-    seen, stack = {seed}, [seed]
-    while stack:
-        a = stack.pop()
-        for b in range(len(X)):
-            if b in seen or b == exclude:
-                continue
-            if np.linalg.norm(X[a] - X[b]) < cut:
-                seen.add(b)
-                stack.append(b)
-    return seen
