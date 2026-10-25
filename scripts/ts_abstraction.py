@@ -506,13 +506,24 @@ def stage_surface2d(res):
     XI = [round(v, 2) for v in np.arange(-3.0, 1.01, 0.4)]
     RCS = [round(v, 2) for v in np.arange(1.87, 2.72, 0.2)]
     s = res.setdefault('surface2d', dict(xi=XI, rcs=RCS, start_xi=start['xi'], points={}))
+    # Seed each point from its nearest computed neighbour -- the same rcs in the
+    # previous column, else the previous rcs in this one -- instead of restarting
+    # every column from the reactant. Restarting meant a column far from the start
+    # had to jump its whole coordinate in one optimisation, and at xi1 = -0.60,
+    # rCS = 1.87 that tore the proton off: C5-H 2.18 and H...O 2.78, bonded to
+    # neither, at +89.84 kcal/mol where its neighbours sit near +16.
+    done = {}
     for xi in XI:
-        X = np.array(start['X'])                 # each column restarts from the same state
+        X = np.array(start['X'])
         for rcs in RCS:
+            seed = done.get((round(XI[max(XI.index(xi) - 1, 0)], 2), rcs))
+            if seed is not None:
+                X = np.array(seed)
             k_ = f'{xi}_{rcs}'
             if k_ in s['points']:
                 if s['points'][k_].get('X'):
                     X = np.array(s['points'][k_]['X'])
+                    done[(xi, rcs)] = s['points'][k_]['X']
                 continue
             t0 = time.time()
             X, E, ok = _relax_safe(p, X, [(i5, h, h, iow, float(xi)), (i6, isg, float(rcs))])
@@ -522,6 +533,8 @@ def stage_surface2d(res):
                                    rel=None if E is None else float((E - p['E']) * K),
                                    converged=ok, X=X.tolist() if ok else None,
                                    C5_H=d(i5, h), H_O327=d(h, iow), **g)
+            if ok:
+                done[(xi, rcs)] = X.tolist()
             if ok:
                 sanity.record(res, 'proton_bonded',
                               min(s['points'][k_]['C5_H'], s['points'][k_]['H_O327']),

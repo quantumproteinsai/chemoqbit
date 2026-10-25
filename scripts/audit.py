@@ -63,7 +63,8 @@ def kies(r):
                     sanity.check('kappa_tunnelling', kap[m], label=f'{lvl} {pair} {iso} {m}', log=log)
 
 
-STALL_MIN = 90        # the slowest legitimate point seen so far is about 35 minutes
+STALL_MIN = 150       # a surface point has legitimately taken 52 minutes, so 90 was
+                      # a near miss; this still catches a genuine hang within 2.5 h
 
 
 def stalls():
