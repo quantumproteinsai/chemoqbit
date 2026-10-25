@@ -23,6 +23,16 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+
+
+def _diagnosed(model):
+    """Models written off in results/diagnoses.json get no saddle search and no DFT.
+    Both dianions broke their own amide, so a transition state for a rotation that
+    no longer exists is hours of CPU for a number that would mean nothing."""
+    f = ROOT / 'results' / 'diagnoses.json'
+    if not f.exists():
+        return False
+    return model in (json.loads(f.read_text()).get('prolyl.json') or {})
 from chemoqbit.prolyl import MODELS, build, torsion, rotation_guide
 from chemoqbit.enzyme.frozen import optimise_frozen
 from chemoqbit.enzyme import tsopt as TS
@@ -229,18 +239,27 @@ def stage_points(res):
     """
     res.setdefault('points', {})
     for name, d in res['scan'].items():
-        if name in res['points']:
+        # resume per stationary point, not per model: skipping any model that had
+        # an entry meant the failed saddles were never retried after the curvature
+        # threshold was corrected
+        existing = res['points'].get(name, {})
+        if 'skipped' in existing or ('saddle' in existing and existing['saddle'].get('E')):
             continue
+        if _diagnosed(name):
+            res['points'][name] = dict(skipped='diagnosed in diagnoses.json')
+            save(res); print(f'  {name}: diagnosed, skipped', flush=True); continue
         prof = {int(k): v for k, v in d['profile'].items()}
         tr, ci, sp, sn = _stationary(prof)
         sym, q, om = d['symbols'], d['charge'], tuple(d['omega_atoms'])
         masses = [TS.AMU[s_] for s_ in sym]
+        out = dict(existing)
         fn = lambda Y: (lambda r: (float(r[0]), r[1]))(energy_grad(sym, Y, q, solvent=SOLVENT))
         gfn = lambda Y: energy_grad(sym, Y, q, solvent=SOLVENT)[1]
-        out = {}
         for tag, w in (('trans', tr), ('cis', ci), ('saddle', sp if sp is not None else sn)):
             if w is None or not d['points'][str(w)].get('X'):
                 continue
+            if tag in out and out[tag].get('E') is not None:
+                continue                       # already computed and sound
             X = np.array(d['points'][str(w)]['X'])
             t0 = time.time()
             info = {}
@@ -292,6 +311,8 @@ def stage_dft(res):
     from pyscf import gto, dft
     res.setdefault('dft', {})
     for name, pts in res['points'].items():
+        if _diagnosed(name) or 'skipped' in pts:
+            continue
         res['dft'].setdefault(name, {})
         sym, q = res['scan'][name]['symbols'], res['scan'][name]['charge']
         for tag, p in pts.items():
