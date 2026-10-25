@@ -4,7 +4,7 @@ Used as ExecCondition= in the chemoqbit-*.service user units, so a finished
 job is skipped at boot instead of re-running (and the notifier does not mail
 "finished" again on every boot).
 
-    python scripts/nuc_todo.py tzvp|xc|profile|oniomopt|his147p|cs2d|o4h|qmsize|abstraction|prolyl|pocket_cftr|pocket_ache|pocket_cftr_dft|pocket_ache_dft|zipper_tau|zipper_asyn47|zipper_nacore|any
+    python scripts/nuc_todo.py tzvp|xc|profile|oniomopt|his147p|cs2d|o4h|qmsize|abstraction|prolyl|chalcogen|pocket_cftr|pocket_ache|pocket_cftr_dft|pocket_ache_dft|zipper_tau|zipper_asyn47|zipper_nacore|any
 """
 import json, sys
 from pathlib import Path
@@ -99,6 +99,11 @@ def zipper(system):
 if __name__ == '__main__':
     job = sys.argv[1]
     todo = {'tzvp': tzvp, 'xc': xc, 'profile': profile, 'oniomopt': oniomopt, 'his147p': his147p, 'cs2d': cs2d, 'o4h': o4h, 'qmsize': qmsize, 'abstraction': abstraction, 'prolyl': prolyl,
+            'chalcogen': lambda: any(
+                not (RES / f'chalcogen_{l}.json').exists()
+                or not all(x in json.loads((RES / f'chalcogen_{l}.json').read_text()).get('_stages_done', [])
+                           for x in ('prep', 'scan'))
+                for l in ('ss', 'se_s', 's_se', 'sese', 'se_nuc', 'neutral')),
             'pocket_cftr': lambda: pocket('cftr', ('wt', 'scan')),
             'pocket_ache': lambda: pocket('ache', ('wt', 'scan')),
             'pocket_cftr_dft': lambda: pocket('cftr'), 'pocket_ache_dft': lambda: pocket('ache'), 'zipper_tau': lambda: zipper('tau'), 'zipper_asyn47': lambda: zipper('asyn47'),

@@ -1,0 +1,99 @@
+{
+  "question": "If the Cys57-Cys146 disulfide is unreachable from outside, can it be attacked from inside, by Cys6 or Cys111 on the same subunit?",
+  "why": "The companion accessibility result ruled out an external reductant: both disulfide sulfurs are 0.00 A^2 exposed. But the disulfide-scrambling literature (Toichi et al., JBC 2013) reports that destabilised apo-SOD1 is attacked intramolecularly by Cys6/Cys111, so reduction by glutathione is not the only entry. For an internal nucleophile solvent accessibility is the wrong measure: what gates an SN2 at sulfur is the S...S distance and a backside, near-linear S_nuc...S-S approach.",
+  "structure": "PDB 2C9U, 1.24 A, Cu/Zn human SOD1 (Strange et al. 2006)",
+  "chains": "A has the SSBOND record but models S-S at 2.75 A, too long to be bonded; F conformer B is 2.00 A and is the intact disulfide. Both reported; F is the one to use.",
+  "method": "S(gamma) coordinates from the deposited model; attack angle = angle(S_nuc, S_attacked, S_leaving)",
+  "reference_values": {
+    "reactive_encounter_d_S_S": "3.0-3.5 A",
+    "reactive_attack_angle": "near 180 deg",
+    "formed_disulfide": "2.03-2.08 A",
+    "S_S_van_der_Waals_contact": "3.6 A"
+  },
+  "result": {
+    "A": {
+      "chain": "A",
+      "altlocs": {
+        "6": "-",
+        "57": "-",
+        "111": "-",
+        "146": "-"
+      },
+      "disulfide_SS": 2.75,
+      "approaches": [
+        {
+          "nucleophile": "Cys6",
+          "attacked": "Cys57",
+          "leaving": "Cys146",
+          "d_S_S": 9.86,
+          "attack_angle_deg": 34.2
+        },
+        {
+          "nucleophile": "Cys6",
+          "attacked": "Cys146",
+          "leaving": "Cys57",
+          "d_S_S": 7.74,
+          "attack_angle_deg": 134.3
+        },
+        {
+          "nucleophile": "Cys111",
+          "attacked": "Cys57",
+          "leaving": "Cys146",
+          "d_S_S": 20.39,
+          "attack_angle_deg": 31.5
+        },
+        {
+          "nucleophile": "Cys111",
+          "attacked": "Cys146",
+          "leaving": "Cys57",
+          "d_S_S": 18.1,
+          "attack_angle_deg": 143.9
+        }
+      ]
+    },
+    "F": {
+      "chain": "F",
+      "altlocs": {
+        "6": "-",
+        "57": "B",
+        "111": "-",
+        "146": "B"
+      },
+      "disulfide_SS": 2.0,
+      "approaches": [
+        {
+          "nucleophile": "Cys6",
+          "attacked": "Cys57",
+          "leaving": "Cys146",
+          "d_S_S": 9.85,
+          "attack_angle_deg": 38.2
+        },
+        {
+          "nucleophile": "Cys6",
+          "attacked": "Cys146",
+          "leaving": "Cys57",
+          "d_S_S": 8.37,
+          "attack_angle_deg": 133.2
+        },
+        {
+          "nucleophile": "Cys111",
+          "attacked": "Cys57",
+          "leaving": "Cys146",
+          "d_S_S": 20.33,
+          "attack_angle_deg": 11.0
+        },
+        {
+          "nucleophile": "Cys111",
+          "attacked": "Cys146",
+          "leaving": "Cys57",
+          "d_S_S": 18.36,
+          "attack_angle_deg": 167.8
+        }
+      ]
+    }
+  },
+  "conclusion": "In the folded protein no intramolecular route is open either, but the two candidate nucleophiles fail for opposite reasons, and that is the useful part. Cys111 -> Cys146 has an almost ideal attack angle (167.8 deg in chain F) and is 18.4 A away. Cys6 -> Cys146 is 8.4 A away with a workable 133 deg. So geometry, not chemistry, selects the nucleophile: if scrambling proceeds from a near-native state it must be Cys6, which needs ~5 A of travel and ~45 deg of angular correction, not Cys111, which needs ~15 A. The literature names 'Cys6/111' without distinguishing them; this says they are not interchangeable.",
+  "prediction": "A destabilised or locally unfolded model should bring Cys6 S(gamma) to ~3.5 A of Cys146 S(gamma) before any exchange barrier is meaningful. The conformational work to do that is the rate-determining quantity, not the SN2 barrier itself.",
+  "caveat": "Static geometry from one crystal structure of the WILD-TYPE holo enzyme. ALS mutants and the apo form are the relevant states and are not measured here. Distances this large are not bridged by thermal breathing.",
+  "date": "2026-10-25"
+}

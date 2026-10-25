@@ -323,6 +323,65 @@ record('an uncapped fragment at 58 mHa', 'circuit_error_mha',
        '36x chemical accuracy')
 
 
+# --- the chalcogen displacement bounds -------------------------------------------
+# No results yet, so these are constructed cases: each is the specific failure the
+# bound exists to catch, taken from the failure that motivated it in the cluster work.
+_q = lambda m: None
+
+record('a saddle with exactly one imaginary mode', 'n_imaginary',
+       not sanity.check('n_imaginary', 1, log=_q), False, 'the certificate')
+record('a saddle search that fell to a minimum', 'n_imaginary',
+       not sanity.check('n_imaginary', 0, log=_q), True, 'no transition mode at all')
+record('a second-order saddle', 'n_imaginary',
+       not sanity.check('n_imaginary', 2, log=_q), True, 'not a transition state')
+
+record('backside attack at 178 deg', 'chalcogen_attack_angle',
+       not sanity.check('chalcogen_attack_angle', 178.0, log=_q), False, 'collinear')
+record('Cys111 geometry, 167.8 deg', 'chalcogen_attack_angle',
+       not sanity.check('chalcogen_attack_angle', 167.8, log=_q), False,
+       'the measured SOD1 angle: geometry fine, distance not')
+record('a nucleophile pulled in sideways at 133 deg', 'chalcogen_attack_angle',
+       not sanity.check('chalcogen_attack_angle', 133.2, log=_q), True,
+       'the Cys6 angle: a contact pair, not a displacement')
+record('a frank contact pair at 90 deg', 'chalcogen_attack_angle',
+       not sanity.check('chalcogen_attack_angle', 90.0, log=_q), True, 'no displacement')
+
+record('a displacement barrier of 14 kcal/mol', 'chalcogen_barrier',
+       not sanity.check('chalcogen_barrier', 14.0, log=_q), False,
+       'consistent with the measured exchange rates')
+record('a displacement barrier of 47.5 kcal/mol', 'chalcogen_barrier',
+       not sanity.check('chalcogen_barrier', 47.51, log=_q), True,
+       'the linear C-S ramp value: one arbitrary path, not the reaction')
+record('a barrier of 0.4 kcal/mol', 'chalcogen_barrier',
+       not sanity.check('chalcogen_barrier', 0.4, log=_q), True,
+       'no barrier, which contradicts second-order kinetics')
+
+record('forward and backward agreeing to 0.3 kcal/mol', 'scan_hysteresis',
+       not sanity.check('scan_hysteresis', 0.3, log=_q), False, 'converged both ways')
+record('a 30 kcal/mol gap between directions', 'scan_hysteresis',
+       not sanity.check('scan_hysteresis', 30.0, log=_q), True,
+       'the prolyl reversed sweep, invisible until the reverse pass ran')
+
+record('a displacement profile in two runs', 'exchange_segments',
+       not sanity.check('exchange_segments', 2, log=_q), False, 'up then down')
+record('a displacement profile in nine runs', 'exchange_segments',
+       not sanity.check('exchange_segments', 9, log=_q), True,
+       'the pthr2 count: points out of place')
+record('a profile with no descent', 'exchange_segments',
+       not sanity.check('exchange_segments', 1, log=_q), True,
+       'the scan never reached the product')
+
+record('a formed S-S bond at 2.06 A', 'chalcogen_bond',
+       not sanity.check('chalcogen_bond', 2.06, log=_q), False, 'a disulfide')
+record('a formed Se-S bond at 2.19 A', 'chalcogen_bond',
+       not sanity.check('chalcogen_bond', 2.19, log=_q), False, 'a selenenyl sulfide')
+record('a formed Se-Se bond at 2.34 A', 'chalcogen_bond',
+       not sanity.check('chalcogen_bond', 2.34, log=_q), False, 'a diselenide')
+record('a "bond" at 3.40 A', 'chalcogen_bond',
+       not sanity.check('chalcogen_bond', 3.40, log=_q), True,
+       'the approach distance: nothing has formed')
+
+
 def main():
     w = max(len(r[0]) for r in rows)
     print(f'{"case":{w}}  {"check":18}  {"fires":5}  {"want":5}  verdict')

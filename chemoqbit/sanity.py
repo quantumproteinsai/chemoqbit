@@ -93,6 +93,39 @@ BOUNDS = {
     'zpe_change': (-15.0, 5.0, 'kcal/mol', 'the zero-point change over one bond-forming step'),
     'entropy_term': (-10.0, 10.0, 'kcal/mol',
                      '-T dS for a unimolecular step inside a cluster with fixed atoms'),
+    'n_imaginary': (1, 1, 'count',
+                    'a transition state has exactly one imaginary mode. Zero means the '
+                    'search fell back to a minimum, two or more means it found a '
+                    'higher-order saddle, and either way the barrier is not a barrier'),
+    'chalcogen_attack_angle': (150.0, 180.0, 'deg',
+                               'an S_N2 at sulfur or selenium proceeds by backside attack: the '
+                               'nucleophile, the atom attacked and the leaving atom must be '
+                               'close to collinear. Pulled in sideways the restraint still '
+                               'reaches its target xi, but what it reaches is a compressed '
+                               'contact pair and not a displacement, which is how the summed '
+                               'relay coordinate produced a saddle with a C5-H bond that had '
+                               'never moved'),
+    'chalcogen_barrier': (2.0, 30.0, 'kcal/mol',
+                          'thiolate-disulfide exchange in water runs on a timescale of '
+                          'milliseconds to seconds at millimolar thiol, so a barrier much '
+                          'above 30 contradicts the measured second-order rates, and one '
+                          'below 2 would mean no barrier at all, which contradicts their '
+                          'being second order in the first place'),
+    'scan_hysteresis': (0.0, 3.0, 'kcal/mol',
+                        'the largest disagreement between a forward and a backward relaxed '
+                        'scan at the same xi. They should agree: a gap means one direction is '
+                        'trapped in an arrangement the other escapes. A single-direction '
+                        'sweep left the trans end of a prolyl scan 30 kcal/mol high and the '
+                        'error was invisible until the reverse pass was run'),
+    'exchange_segments': (2, 2, 'count',
+                          'a displacement profile rises to one saddle and falls to the '
+                          'product: exactly two monotonic runs. The amide bound of 1 to 4 is '
+                          'right for a full rotation and too loose here, and a loose bound is '
+                          'what let a broken-amide dianion through at 9.94'),
+    'chalcogen_bond': (1.95, 2.45, 'A',
+                       'a formed S-S bond is 2.03-2.08, Se-S about 2.19 and Se-Se about 2.33. '
+                       'Outside this the species at the end of the scan is not the '
+                       'dichalcogenide the reaction is supposed to make'),
     'circuit_error_mha': (0.0, 1.6, 'mHa',
                           'chemical accuracy against exact CASCI in the same active space'),
 }

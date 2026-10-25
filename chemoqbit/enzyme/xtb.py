@@ -10,7 +10,7 @@ from scipy.optimize import minimize
 from tblite.interface import Calculator
 
 BOHR = 0.529177210903
-Z = {'H': 1, 'C': 6, 'N': 7, 'O': 8, 'F': 9, 'P': 15, 'S': 16, 'Cl': 17, 'Zn': 30, 'Cu': 29}
+Z = {'H': 1, 'C': 6, 'N': 7, 'O': 8, 'F': 9, 'P': 15, 'S': 16, 'Cl': 17, 'Zn': 30, 'Cu': 29, 'Se': 34, 'Br': 35}
 
 
 def energy_grad(sym, X, charge=0, solvent='chloroform'):
