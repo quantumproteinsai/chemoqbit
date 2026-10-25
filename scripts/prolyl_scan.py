@@ -274,8 +274,19 @@ def stage_points(res):
                     # a light local mode, rejected all seven. The optimiser's job is to
                     # find a stationary point; classifying it is the frequencies' job,
                     # and n_imaginary == 1 is checked straight after.
-                    Xn, E, info = TS.prfo_follow(X, fn, rotation_guide(sym, X, om), grad_fn=gfn,
-                                                 trust=0.05, gtol=3e-4, maxiter=60, neg=1e-4,
+                    # Take the transition mode from the Hessian instead of guessing
+                    # it. A rigid rotation of the proline is mostly a GLOBAL rotation,
+                    # which the projector removes, so that guide overlapped 0.72 with a
+                    # null-space residual and only 0.12 with the true mode. The lowest
+                    # eigenvector at the scan maximum is the mode by definition.
+                    H0 = TS.fd_hessian(X, gfn)
+                    Pr = TS._cart_projector(X)
+                    bb, VV = np.linalg.eigh(Pr @ H0 @ Pr)
+                    guide = VV[:, int(np.argmin(bb))].reshape(-1, 3)
+                    print(f'  {name}: lowest mode at the scan maximum {bb.min():+.2e} Eh/A^2',
+                          flush=True)
+                    Xn, E, info = TS.prfo_follow(X, fn, guide, grad_fn=gfn,
+                                                 trust=0.05, gtol=3e-4, maxiter=60, neg=1e-5,
                                                  log=lambda m: None)
                     E, ok, kind = float(E), True, 'saddle'
             except Exception as e:
