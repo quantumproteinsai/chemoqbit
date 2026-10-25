@@ -73,15 +73,32 @@ def stalls():
     notice it. The threshold is well beyond the slowest legitimate step."""
     import subprocess, time as _t
     out = []
-    units = {'chemoqbit-abstraction': 'service_abstraction.log',
-             'chemoqbit-prolyl': 'service_prolyl.log',
-             'chemoqbit-cftr': 'service_pocket_cftr.log',
-             'chemoqbit-ache': 'service_pocket_ache.log',
-             'chemoqbit-zip-asyn47': 'service_zip_asyn47.log'}
+
+    # Units and their logs come from systemd, not from a list written out here. The
+    # list that used to be here had gone stale in both directions: it was missing
+    # chalcogen and all five zippers, and the log filename it carried for asyn47 did
+    # not exist, so the `if not p_.exists(): continue` below skipped it in silence.
+    # Nothing would have reported a hung zipper. Same failure as the audit's own file
+    # list, so it gets the same cure.
+    names = subprocess.run(
+        ['systemctl', '--user', 'list-units', 'chemoqbit-*.service',
+         '--all', '--no-legend', '--plain', '--no-pager'],
+        capture_output=True, text=True).stdout.split()
+    units = {}
+    for u in [n for n in names if n.endswith('.service')]:
+        # `show -p StandardOutput` prints only the word "append" with the path cut off,
+        # so the path is read from the unit text itself.
+        txt = subprocess.run(['systemctl', '--user', 'cat', u],
+                             capture_output=True, text=True).stdout
+        for line in txt.splitlines():
+            if line.startswith('StandardOutput=') and ':' in line:
+                units[u] = line.split(':', 1)[1].strip().split('/')[-1]
+                break
+
     for u, lg in units.items():
         st = subprocess.run(['systemctl', '--user', 'show', '-p', 'SubState', '--value', u],
                             capture_output=True, text=True).stdout.strip()
-        if st != 'running':
+        if st != 'running' or u.endswith('notify.service'):
             continue                      # queued or idle units have nothing to stall
         p_ = RES / lg
         if not p_.exists():
