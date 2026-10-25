@@ -20,6 +20,14 @@
    ],
    "why": "The other phosphate dianion, expected to fail exactly as pthr2 does and for the same reason. Entered in advance so the expected failure is not reported as a new fault; if it passes the checks, this entry is simply unused.",
    "date": "2026-10-24"
+  },
+  "cis_trans_comparison": {
+   "checks": [
+    "prolyl_cis_trans",
+    "conformer_match"
+   ],
+   "why": "The cis/trans energy differences are NOT usable, except for thr. Relaxing the two minima independently let them settle into different intramolecular hydrogen-bond networks: ala trans has N-H...O 1.91 and cis has none; pthr1 trans has two and cis has none; ser cis gains one; pser1 swaps its acceptor. Only thr keeps the same two bonds in both. The resulting \"phosphorylation effect\" came out +6.70 kcal/mol for Thr and -5.87 for Ser -- opposite signs for the same chemical change on near-identical molecules, which is how the fault announced itself. What is measured is the hydrogen bond, not the amide. thr alone is sound: matched conformers, a converged saddle with one imaginary mode at 61i, a barrier of 21.38 (xTB) and 18.52 (DFT) inside the measured 14-24, and cis-trans +0.46 (xTB) / -0.39 (DFT).",
+   "date": "2026-10-25"
   }
  },
  "ts_abstraction.json": {

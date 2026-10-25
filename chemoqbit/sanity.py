@@ -33,6 +33,13 @@ BOUNDS = {
                  'rotation barrier it is supposed to measure no longer exists'),
     'amide_CN': (1.29, 1.39, 'A',
                  'the C-N bond of a conjugated amide; 1.45 is a single bond'),
+    'conformer_match': (0, 0, 'count',
+                        'hydrogen bonds present in one of a pair of minima and absent in the '
+                        'other. A cis/trans energy difference is only the amide if everything '
+                        'else is the same arrangement; with a different hydrogen-bond network '
+                        'it measures that network instead. Four of five prolyl models failed '
+                        'this, and their phosphorylation effects came out with opposite signs '
+                        'for Thr and Ser'),
     'prolyl_cis_trans': (-4.0, 6.0, 'kcal/mol',
                          'trans is modestly favoured for Xaa-Pro; cis is populated at a few to 30 %'),
     'scan_vs_free_min': (0.0, 2.0, 'kcal/mol',

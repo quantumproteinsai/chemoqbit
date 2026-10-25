@@ -306,6 +306,31 @@ def stage_points(res):
             print(f'  point {name:6s} {tag:8s} omega {out[tag]["omega"]:+7.1f}  E {E:.6f}  '
                   f'imaginary {nim}' + (f' ({abs(nu.min()):.0f}i cm-1)' if nim else '')
                   + f'  ({time.time() - t0:.0f}s)', flush=True)
+        # A cis/trans difference is only the amide if the rest of the molecule is
+        # in the same arrangement. Relaxing the two minima independently let them
+        # fall into different hydrogen-bond networks, and the difference then
+        # measured the network.
+        def _hbonds(X):
+            got = set()
+            for i, s_ in enumerate(sym):
+                if s_ != 'H':
+                    continue
+                nb = [j for j, t in enumerate(sym) if t in 'NO'
+                      and np.linalg.norm(X[i] - X[j]) < 1.25]
+                if not nb:
+                    continue
+                for j, t in enumerate(sym):
+                    if t in 'NO' and j not in nb and np.linalg.norm(X[i] - X[j]) < 2.4:
+                        got.add((nb[0], j))
+            return got
+        if out.get('trans', {}).get('X') and out.get('cis', {}).get('X'):
+            ht, hc = _hbonds(np.array(out['trans']['X'])), _hbonds(np.array(out['cis']['X']))
+            diff = len(ht ^ hc)
+            out['hbond_mismatch'] = diff
+            sanity.record(res, 'conformer_match', diff, label=f'{name} cis vs trans')
+            if diff:
+                print(f'  {name}: cis and trans differ by {diff} hydrogen bond(s); their '
+                      f'energy difference is not the amide alone', flush=True)
         res['points'][name] = out
         if 'trans' in out and out['trans'].get('E') is not None:
             e_tr = out['trans']['E']
