@@ -1,0 +1,23 @@
+[Unit]
+Description=chemoqbit: conformational work to bring Cys6 into attack range in SOD1 (resumable)
+StartLimitIntervalSec=6h
+StartLimitBurst=3
+
+[Service]
+Type=simple
+WorkingDirectory=/home/deploy/dev/chemoqbit
+# 259-atom cluster, GFN2-xTB: one thread, measured faster than four at this size,
+# and it leaves cores for the chalcogen DFT and the SOD1 zipper
+Environment=OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+CPUQuota=100%
+TimeoutStartSec=infinity
+ExecCondition=/home/deploy/dev/chemoqbit/.venv/bin/python /home/deploy/dev/chemoqbit/scripts/nuc_todo.py als_approach
+ExecStartPre=/bin/sh -c 'echo "=== $(date "+%%F %%T")  start: Cys6 approach"'
+ExecStart=/home/deploy/dev/chemoqbit/.venv/bin/python -u /home/deploy/dev/chemoqbit/scripts/als_approach.py build mobile rigid report
+StandardOutput=append:/home/deploy/dev/chemoqbit/results/service_als_approach.log
+StandardError=append:/home/deploy/dev/chemoqbit/results/service_als_approach.log
+Restart=on-failure
+RestartSec=120
+
+[Install]
+WantedBy=default.target

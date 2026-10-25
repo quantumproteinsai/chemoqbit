@@ -122,6 +122,18 @@ BOUNDS = {
                           'product: exactly two monotonic runs. The amide bound of 1 to 4 is '
                           'right for a full rotation and too loose here, and a loose bound is '
                           'what let a broken-amide dianion through at 9.94'),
+    'approach_tracking': (0.0, 0.15, 'A',
+                          'how far a restrained distance ends from its target. A scan that '
+                          'does not follow its coordinate never samples what it claims to: a '
+                          'soft torsion restraint drifted 21 deg off target in the prolyl work '
+                          'and the barriers came out at 80-120 kcal/mol'),
+    'conformational_work': (0.0, 200.0, 'kcal/mol',
+                            'the work to compress two buried side chains together against the '
+                            'packing of the fold. It must be positive, because the crystal '
+                            'structure is a minimum and squeezing it costs energy; a negative '
+                            'value means the reference was strained by the truncation rather '
+                            'than relaxed. Above 200 the cluster has broken rather than '
+                            'strained, and what is being measured is a bond snapping'),
     'identity_asymmetry': (-1.0, 1.0, 'kcal/mol',
                            'reactants and products of an IDENTITY exchange are the same two '
                            'species, so its reaction energy is exactly zero by symmetry. Any '

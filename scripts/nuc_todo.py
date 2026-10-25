@@ -4,7 +4,7 @@ Used as ExecCondition= in the chemoqbit-*.service user units, so a finished
 job is skipped at boot instead of re-running (and the notifier does not mail
 "finished" again on every boot).
 
-    python scripts/nuc_todo.py tzvp|xc|profile|oniomopt|his147p|cs2d|o4h|qmsize|abstraction|prolyl|chalcogen|pocket_cftr|pocket_ache|pocket_cftr_dft|pocket_ache_dft|zipper_tau|zipper_asyn47|zipper_nacore|any
+    python scripts/nuc_todo.py tzvp|xc|profile|oniomopt|his147p|cs2d|o4h|qmsize|abstraction|prolyl|chalcogen|als_approach|pocket_cftr|pocket_ache|pocket_cftr_dft|pocket_ache_dft|zipper_tau|zipper_asyn47|zipper_nacore|any
 """
 import json, sys
 from pathlib import Path
@@ -108,6 +108,9 @@ if __name__ == '__main__':
                 not (RES / f'chalcogen_{l}.json').exists()
                 or len((json.loads((RES / f'chalcogen_{l}.json').read_text()).get('topology') or {}))< 3
                 for l in ('ss', 'se_s')),
+            'als_approach': lambda: not (RES / 'als_approach.json').exists()
+                or not all(x in json.loads((RES / 'als_approach.json').read_text()).get('_stages_done', [])
+                           for x in ('build', 'mobile', 'rigid', 'report')),
             'pocket_cftr': lambda: pocket('cftr', ('wt', 'scan')),
             'pocket_ache': lambda: pocket('ache', ('wt', 'scan')),
             'pocket_cftr_dft': lambda: pocket('cftr'), 'pocket_ache_dft': lambda: pocket('ache'), 'zipper_tau': lambda: zipper('tau'), 'zipper_asyn47': lambda: zipper('asyn47'),

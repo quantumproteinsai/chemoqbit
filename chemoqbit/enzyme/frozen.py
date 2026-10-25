@@ -26,6 +26,16 @@ def penalty(Y, constraints, k=20.0):
                 E += k * (d - d0) ** 2
                 g = 2 * k * (d - d0) * u / d
                 G[i] += g; G[j] -= g
+        elif c[0] == 'dist':
+            # two-sided harmonic on one distance. 'min' is one-sided, so it cannot
+            # drive two atoms TOGETHER, which is what the Cys6 approach needs.
+            _, i, j, d0 = c
+            u = Y[i] - Y[j]
+            d = np.linalg.norm(u)
+            E += k * (d - d0) ** 2
+            g = 2 * k * (d - d0) * u / d
+            G[i] += g
+            G[j] -= g
         elif c[0] == 'relay':
             _, hops, x0 = c
             tot, terms = 0.0, []

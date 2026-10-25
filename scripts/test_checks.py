@@ -371,6 +371,20 @@ record('a profile with no descent', 'exchange_segments',
        not sanity.check('exchange_segments', 1, log=_q), True,
        'the scan never reached the product')
 
+record('a restraint landing 0.02 A from target', 'approach_tracking',
+       not sanity.check('approach_tracking', 0.02, log=_q), False, 'followed')
+record('a restraint drifting 0.9 A off target', 'approach_tracking',
+       not sanity.check('approach_tracking', 0.9, log=_q), True,
+       'the scan is not sampling the coordinate it names')
+record('a conformational work of 18 kcal/mol', 'conformational_work',
+       not sanity.check('conformational_work', 18.0, log=_q), False, 'a real strain cost')
+record('a NEGATIVE conformational work', 'conformational_work',
+       not sanity.check('conformational_work', -6.0, log=_q), True,
+       'the reference geometry was strained, not relaxed')
+record('a conformational work of 400 kcal/mol', 'conformational_work',
+       not sanity.check('conformational_work', 400.0, log=_q), True,
+       'something snapped; that is not strain')
+
 record('an identity exchange coming out thermoneutral', 'identity_asymmetry',
        not sanity.check('identity_asymmetry', 0.03, log=_q), False, 'as symmetry requires')
 record('an identity exchange off by 4 kcal/mol', 'identity_asymmetry',
