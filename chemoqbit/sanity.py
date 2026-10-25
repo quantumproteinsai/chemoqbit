@@ -122,6 +122,15 @@ BOUNDS = {
                           'product: exactly two monotonic runs. The amide bound of 1 to 4 is '
                           'right for a full rotation and too loose here, and a loose bound is '
                           'what let a broken-amide dianion through at 9.94'),
+    'exchange_well': (0.0, 2.0, 'kcal/mol',
+                      'how far the symmetric arrangement of a displacement sits BELOW the '
+                      'reactant complex. For an S_N2 it should be about zero, because that '
+                      'arrangement IS the transition state. GFN2-xTB puts it 8 kcal/mol lower '
+                      'for thiolate plus disulfide, making the hypervalent trisulfur anion a '
+                      'bound species and the whole surface a well instead of a barrier. That '
+                      'is the same over-stabilisation of a thiolate the second manuscript '
+                      'found, and here it changes the topology rather than just the number, so '
+                      'no saddle search seeded from this surface can succeed'),
     'chalcogen_bond': (1.95, 2.45, 'A',
                        'a formed S-S bond is 2.03-2.08, Se-S about 2.19 and Se-Se about 2.33. '
                        'Outside this the species at the end of the scan is not the '

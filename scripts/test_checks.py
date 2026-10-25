@@ -371,6 +371,12 @@ record('a profile with no descent', 'exchange_segments',
        not sanity.check('exchange_segments', 1, log=_q), True,
        'the scan never reached the product')
 
+record('a symmetric species level with the reactants', 'exchange_well',
+       not sanity.check('exchange_well', 0.2, log=_q), False, 'as an S_N2 should be')
+record('GFN2-xTB making the trisulfur anion 8.1 kcal/mol bound', 'exchange_well',
+       not sanity.check('exchange_well', 8.1, log=_q), True,
+       'measured on ss: a well, not a barrier, so the topology is wrong')
+
 record('a formed S-S bond at 2.06 A', 'chalcogen_bond',
        not sanity.check('chalcogen_bond', 2.06, log=_q), False, 'a disulfide')
 record('a formed Se-S bond at 2.19 A', 'chalcogen_bond',

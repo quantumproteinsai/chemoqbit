@@ -47,5 +47,65 @@
    "why": "4 monotonic runs rather than 2 because of one 0.27 kcal/mol dip on the rise at xi1 = -1.40, well inside the 1.5 bound on a reversal within a run. The profile is otherwise a clean barrier: +9.83 to +47.51 at xi1 = 0.00 (C5-H 1.35, H...O 1.35, symmetric) and down to +16.76. The stored scan_drop = 13.25 and bond_CH = 1.81/1.99 records come from superseded tests: the 13.25 is the descent from the barrier, and the long C5-H distances are the proton having transferred (H...O 1.01 and 0.99). Both checks have been replaced -- segment_drop for the profile, proton_bonded for the hydrogen.",
    "date": "2026-10-25"
   }
+ },
+ "chalcogen_ss.json": {
+  "ss": {
+   "checks": [
+    "chalcogen_barrier",
+    "exchange_well"
+   ],
+   "why": "GFN2-xTB gives this displacement no barrier at all and puts the symmetric arrangement 8.09 kcal/mol BELOW the reactant complex, so the hypervalent trisulfur anion comes out a bound species and the surface is a well instead of a barrier. Measured on ss, where thiolate-disulfide exchange is known to be second order with a real barrier, so the shape is wrong and not merely the number. Same over-stabilisation of a thiolate that Manuscript 2 found at the semiempirical level. Consequence: no saddle search can be seeded from this surface, and the DFT stage must start from a built symmetric guess. The scans are kept because showing the failure is systematic across all six systems is itself the result.",
+   "date": "2026-10-25"
+  }
+ },
+ "chalcogen_se_s.json": {
+  "se_s": {
+   "checks": [
+    "chalcogen_barrier",
+    "exchange_well"
+   ],
+   "why": "GFN2-xTB gives this displacement no barrier at all and puts the symmetric arrangement 8.09 kcal/mol BELOW the reactant complex, so the hypervalent trisulfur anion comes out a bound species and the surface is a well instead of a barrier. Measured on ss, where thiolate-disulfide exchange is known to be second order with a real barrier, so the shape is wrong and not merely the number. Same over-stabilisation of a thiolate that Manuscript 2 found at the semiempirical level. Consequence: no saddle search can be seeded from this surface, and the DFT stage must start from a built symmetric guess. The scans are kept because showing the failure is systematic across all six systems is itself the result.",
+   "date": "2026-10-25"
+  }
+ },
+ "chalcogen_s_se.json": {
+  "s_se": {
+   "checks": [
+    "chalcogen_barrier",
+    "exchange_well"
+   ],
+   "why": "GFN2-xTB gives this displacement no barrier at all and puts the symmetric arrangement 8.09 kcal/mol BELOW the reactant complex, so the hypervalent trisulfur anion comes out a bound species and the surface is a well instead of a barrier. Measured on ss, where thiolate-disulfide exchange is known to be second order with a real barrier, so the shape is wrong and not merely the number. Same over-stabilisation of a thiolate that Manuscript 2 found at the semiempirical level. Consequence: no saddle search can be seeded from this surface, and the DFT stage must start from a built symmetric guess. The scans are kept because showing the failure is systematic across all six systems is itself the result.",
+   "date": "2026-10-25"
+  }
+ },
+ "chalcogen_sese.json": {
+  "sese": {
+   "checks": [
+    "chalcogen_barrier",
+    "exchange_well"
+   ],
+   "why": "GFN2-xTB gives this displacement no barrier at all and puts the symmetric arrangement 8.09 kcal/mol BELOW the reactant complex, so the hypervalent trisulfur anion comes out a bound species and the surface is a well instead of a barrier. Measured on ss, where thiolate-disulfide exchange is known to be second order with a real barrier, so the shape is wrong and not merely the number. Same over-stabilisation of a thiolate that Manuscript 2 found at the semiempirical level. Consequence: no saddle search can be seeded from this surface, and the DFT stage must start from a built symmetric guess. The scans are kept because showing the failure is systematic across all six systems is itself the result.",
+   "date": "2026-10-25"
+  }
+ },
+ "chalcogen_se_nuc.json": {
+  "se_nuc": {
+   "checks": [
+    "chalcogen_barrier",
+    "exchange_well"
+   ],
+   "why": "GFN2-xTB gives this displacement no barrier at all and puts the symmetric arrangement 8.09 kcal/mol BELOW the reactant complex, so the hypervalent trisulfur anion comes out a bound species and the surface is a well instead of a barrier. Measured on ss, where thiolate-disulfide exchange is known to be second order with a real barrier, so the shape is wrong and not merely the number. Same over-stabilisation of a thiolate that Manuscript 2 found at the semiempirical level. Consequence: no saddle search can be seeded from this surface, and the DFT stage must start from a built symmetric guess. The scans are kept because showing the failure is systematic across all six systems is itself the result.",
+   "date": "2026-10-25"
+  }
+ },
+ "chalcogen_neutral.json": {
+  "neutral": {
+   "checks": [
+    "chalcogen_barrier",
+    "exchange_well"
+   ],
+   "why": "GFN2-xTB gives this displacement no barrier at all and puts the symmetric arrangement 8.09 kcal/mol BELOW the reactant complex, so the hypervalent trisulfur anion comes out a bound species and the surface is a well instead of a barrier. Measured on ss, where thiolate-disulfide exchange is known to be second order with a real barrier, so the shape is wrong and not merely the number. Same over-stabilisation of a thiolate that Manuscript 2 found at the semiempirical level. Consequence: no saddle search can be seeded from this surface, and the DFT stage must start from a built symmetric guess. The scans are kept because showing the failure is systematic across all six systems is itself the result.",
+   "date": "2026-10-25"
+  }
  }
 }

@@ -149,8 +149,20 @@ def stage_scan(res):
         pt['rel'] = (pt['E'] - E0) * HARTREE_KCAL
 
     rel = [pt['rel'] for pt in prof]
+
+    # xi is POSITIVE at the reactant (nucleophile far, bond short) and negative at the
+    # product, so prof[0] is the product end. Measuring the barrier from prof[0] is
+    # harmless for an identity exchange, where the two ends are equal by symmetry, and
+    # wrong for se_s and s_se, where they are not.
+    r_end = int(np.argmin([abs(pt['xi'] - p['reactant']['xi']) for pt in prof]))
     top = int(np.argmax(rel))
-    barrier = rel[top] - prof[0]['rel']
+    bot = int(np.argmin(rel))
+    barrier = rel[top] - rel[r_end]
+    # how far the symmetric species sits BELOW the reactant complex. For a displacement
+    # this should be about zero: the symmetric arrangement IS the transition state. A
+    # deep well there means the method has made the hypervalent anion a bound species,
+    # so the surface has the wrong topology and not merely the wrong number.
+    well_depth = rel[r_end] - rel[bot]
 
     hysteresis = max(abs(f['E'] - b['E']) for f, b in
                      zip(fwd, bwd[::-1])) * HARTREE_KCAL
@@ -158,19 +170,22 @@ def stage_scan(res):
     res['scan'] = dict(
         profile=[{k: v for k, v in pt.items() if k != 'X'} for pt in prof],
         geometries={f"{pt['xi']:.2f}": pt['X'] for pt in prof},
-        barrier_xtb=barrier, top_xi=prof[top]['xi'], hysteresis=hysteresis,
-        seconds=time.time() - t0)
+        barrier_xtb=barrier, top_xi=prof[top]['xi'], well_depth=well_depth,
+        well_xi=prof[bot]['xi'], reactant_xi=prof[r_end]['xi'],
+        hysteresis=hysteresis, seconds=time.time() - t0)
 
     sanity.record(res, 'scan_drop', sanity.largest_drop(rel), label=f'{LAB} profile')
-    sanity.record(res, 'exchange_segments', len(sanity.monotonic_segments(rel)),
+    sanity.record(res, 'exchange_segments', sanity.monotonic_segments(rel),
                   label=f'{LAB} merged profile')
     sanity.record(res, 'chalcogen_barrier', barrier, label=f'{LAB} xTB')
+    sanity.record(res, 'exchange_well', well_depth, label=f'{LAB} symmetric species')
     sanity.record(res, 'scan_hysteresis', hysteresis, label=f'{LAB} fwd vs bwd')
     for pt in prof:
         sanity.record(res, 'chalcogen_attack_angle', pt['angle'],
                       label=f"{LAB} xi {pt['xi']:+.2f}")
 
     print(f'{LAB}: xTB barrier {barrier:+.2f} kcal/mol at xi {prof[top]["xi"]:+.2f}, '
+          f'well {well_depth:+.2f} deep at xi {prof[bot]["xi"]:+.2f}, '
           f'hysteresis {hysteresis:.2f}', flush=True)
 
 

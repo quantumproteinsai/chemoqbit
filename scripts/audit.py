@@ -183,9 +183,23 @@ def main():
                     sanity.check('circuit_error_mha', abs(float(e)), label=f'{key} {tag}', log=log)
                     n_ck += 1
         print(f'  circuit errors checked from the checkpoint: {n_ck}')
-    for f in ('ts_abstraction.json', 'prolyl.json', 'pocket_cftr.json', 'pocket_ache.json',
-              'zipper_tau.json', 'zipper_asyn47.json', 'zipper_nacore.json'):
+    # Every checkpoint that records violations, found by looking rather than by being
+    # listed. The list here used to be written out by hand and had silently gone stale:
+    # it was missing zipper_sod1 and zipper_sod1ct, the two ALS systems, and all six
+    # chalcogen systems, so those results were being produced and never audited. A
+    # hardcoded list of things to check is a list that stops matching what exists.
+    # Live checkpoints only. A superseded run is archived as <name>.<tag>_<date>.json
+    # and deliberately kept, because test_checks.py uses those as its labelled
+    # positives; auditing them would report every already-understood failure as an open
+    # fault. Live names carry one dot, archived ones two.
+    audited = sorted(
+        q.name for q in RES.glob('*.json')
+        if not q.name.startswith(('.', 'diagnoses')) and q.name.count('.') == 1)
+    for f in audited:
         if not have(f):
+            continue
+        d_probe = L(f)
+        if not isinstance(d_probe, dict) or '_sanity' not in d_probe:
             continue
         d_ = L(f)
         diag = {**d_.get('diagnosis', {}), **diagnoses(f)}
