@@ -1,0 +1,18 @@
+{
+ "question": "Can an external thiolate reach the Cys57-Cys146 disulfide in folded SOD1?",
+ "why": "Disulfide reduction is reported as the trigger for SOD1 fibril initiation in ALS. Reduction in vivo proceeds by thiol-disulfide exchange, an SN2 at sulfur, which requires backside approach to one of the two sulfurs. If the folded protein buries them, no barrier calculation on the folded state is meaningful: the reaction cannot start there at all.",
+ "structure": "PDB 2C9U chain A, 1.24 A, Cu/Zn human SOD1 (Strange et al. 2006)",
+ "method": "Shrake-Rupley solvent-accessible area, 1.4 A probe, 512 points, heavy atoms only",
+ "result": {
+  "Cys57_SG": 0.0,
+  "Cys146_SG": 0.0,
+  "Cys6_SG": 0.0,
+  "Cys111_SG": 4.02,
+  "fully_exposed_sulfur": 128.7,
+  "units": "A^2"
+ },
+ "conclusion": "Both disulfide sulfurs are completely buried: 0.00 A^2 of 128.7 for a free sulfur. Cys111, the solvent-exposed free cysteine, reaches only 4.02. So in the folded protein the disulfide is unreachable, and the destabilisation that ALS mutations cause is not merely a contributing factor to reduction -- it is a precondition for it. A thiol-disulfide exchange barrier computed on the folded structure would describe a reaction that cannot occur.",
+ "caveat": "Static accessibility from one crystal structure. Thermal breathing opens buried sites transiently, so 0.00 A^2 means inaccessible on average, not never. The structural note below matters for any follow-up.",
+ "structural_note": "2C9U chain A carries an SSBOND record for Cys57-Cys146 but models the S-S distance at 2.75 A, which is not a bonded disulfide (2.03-2.08 A is normal). Chain F has two conformers; its B/B pair is 2.00 A and is the one to use for an intact disulfide.",
+ "date": "2026-10-25"
+}
