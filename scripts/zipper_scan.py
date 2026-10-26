@@ -91,12 +91,20 @@ def interaction(sym, X, q, sheet):
 
 
 def residues(lab):
-    """(number, label) of each residue of the first sheet, in order."""
+    """(number, three-letter name) of each residue of the first sheet, in order.
+
+    It used to return the label with its number still attached ("GLY4"), which
+    broke two things at once: the display name came out "GLY44" because the number
+    was then appended again, and the Gly/Ala skip below compared "GLY4" against
+    "GLY" and never matched. SOD1 30-35 is KVWGSI, so its fourth residue is a
+    glycine, and mutating a glycine to alanine ADDS a methyl rather than removing
+    one. It ran anyway and gave ddE = -55.37 kcal/mol, which the audit caught.
+    """
     out = {}
     for l in lab:
         strand, res, _nm = l.split(':')
         n = int(''.join(c for c in res if c.isdigit()))
-        out[n] = res
+        out[n] = ''.join(c for c in res if not c.isdigit())
     return sorted(out.items())
 
 

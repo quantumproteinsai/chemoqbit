@@ -55,9 +55,11 @@ ALTLOC = ('', 'B')
 RESIDUES = (6, 7, 8, 9, 17, 18, 57, 116, 117, 118, 119, 145, 146, 147, 148, 149, 150)
 
 BACKBONE = ('N', 'CA', 'C', 'O')
-# residues whose backbone is held even in the `mobile` regime: the outer shell,
-# far enough from the axis that letting them drift would just be cluster collapse
-SHELL = (17, 18, 119, 150)
+# The four residues whose backbone sits ON the Cys6...Cys146 axis and therefore
+# has to move for the approach to happen at all: Gly147 N is 1.34 A off the line,
+# Leu117 O 1.78 A, and Cys146's own CA and CB 1.19 and 1.23 A. In the `mobile`
+# regime these four keep their backbone free and every other residue does not.
+AXIS_BACKBONE = (6, 117, 146, 147)
 
 FORMAL = {'LYS': 1, 'ARG': 1, 'ASP': -1, 'GLU': -1}
 
@@ -151,11 +153,29 @@ def build(pdb=PDB, chain=CHAIN, residues=RESIDUES, cys6_thiolate=True):
 
     idx = dict(S6=find(6, 'SG'), S146=find(146, 'SG'), S57=find(57, 'SG'))
 
-    rigid = [i for i, l in enumerate(label) if l.split(':')[1] in BACKBONE]
-    mobile = [i for i, l in enumerate(label)
-              if l.split(':')[1] in BACKBONE and int(''.join(ch for ch in l.split(':')[0]
-                                                            if ch.isdigit())) in SHELL]
+    rigid, mobile = frozen_sets(label)
     return sym, np.array(X), charge, idx, label, rigid, mobile
+
+
+def frozen_sets(label):
+    """The two constraint regimes, as atom indices to hold.
+
+    rigid   every backbone N, CA, C, O at its crystallographic position
+    mobile  the same, except on the four residues lying on the axis
+
+    Hydrogens are free in both. Their positions are not crystallographic -- they
+    were added here -- so holding them would freeze a guess."""
+    rigid, mobile = [], []
+    for i, l in enumerate(label):
+        if ':' not in l:
+            continue                       # an added hydrogen, never held
+        res, an = l.split(':')
+        if an not in BACKBONE:
+            continue
+        rigid.append(i)
+        if int(''.join(c for c in res if c.isdigit())) not in AXIS_BACKBONE:
+            mobile.append(i)
+    return rigid, mobile
 
 
 def separation(X, idx):

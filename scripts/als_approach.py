@@ -48,7 +48,7 @@ from chemoqbit.enzyme.frozen import optimise_frozen   # noqa: E402
 
 HARTREE_KCAL = 627.5094740631
 SOLVENT = 'water'
-STEP = 0.25
+STEP = 0.35
 TARGET = 3.2            # a reactive thiolate-disulfide encounter sits at 3.0-3.5 A
 OUT = ROOT / 'results' / 'als_approach.json'
 
@@ -63,10 +63,19 @@ def load():
     return json.loads(OUT.read_text()) if OUT.exists() else {}
 
 
+# The default maxiter of 3000 is what made the first attempt infeasible: one
+# relaxation of this cluster ran for TEN HOURS without converging, which put the
+# full two-regime scan at 439 hours. Each scan point is seeded from its neighbour,
+# so it starts close and does not need thousands of steps; the cost was the cap
+# being reached, not the number of degrees of freedom.
+MAXITER = 300
+GTOL = 1e-3
+
+
 def _relax(sym, X, charge, frozen, i, j, d0, k=20.0):
     cons = [('dist', i, j, d0)]
     return optimise_frozen(sym, X, charge=charge, frozen=frozen, constraints=cons,
-                           k=k, solvent=SOLVENT)
+                           k=k, solvent=SOLVENT, maxiter=MAXITER, gtol=GTOL)
 
 
 def stage_build(res):
