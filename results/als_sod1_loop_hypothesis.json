@@ -1,0 +1,22 @@
+{
+ "finding": "The residues that plug the backside attack site on Cys146 sit on the beta-strand that anchors the electrostatic loop, and Cys146 itself sits on that strand's hydrogen-bonded partner.",
+ "structure_facts": {
+  "strand_b7": "116-120, carries Thr116 and Val118 whose gamma-methyls occupy the attack site",
+  "strand_b8": "143-148, carries Cys146 itself",
+  "pairing": "b7 and b8 are hydrogen-bonded neighbours: the SHEET record pairs LEU144 N with VAL119 O, and pairs THR116 O with HIS48 N on the other side",
+  "electrostatic_loop": "121-142, i.e. the loop that CONNECTS b7 to b8",
+  "source": "SHEET records of PDB 2C9U chain F, read directly"
+ },
+ "why_it_matters": "Souza et al. (2019, J. Phys. Chem. Lett.) found an allosteric pathway linking the distant G93A mutation to the electrostatic loop, and their hybrid QM/MM showed that opening that loop lowers Zn(II) affinity. Our occlusion sits on the strand that loop is anchored to, and the atom being attacked sits on the paired strand across it. So the motion already established to be allosterically driven in ALS SOD1 is geometrically the same motion that would separate b7 from b8 and unplug the attack site.",
+ "hypothesis": "Opening of the electrostatic loop does not only lower metal affinity. It should also relieve the steric occlusion of the Cys146 backside attack site, and therefore permit the Cys6 attack that the folded protein forbids. That would make loop opening a common cause of two things currently treated as separate: metal loss and disulfide scrambling.",
+ "status": "HYPOTHESIS. Structural adjacency is established from the deposited record; the energetic consequence is not computed and the Souza paper has not been read in full.",
+ "how_to_test": "The occlusion is purely geometric. Recompute the free volume at the attack point on a structure with the electrostatic loop displaced -- an open-loop crystal form, a G93A model, or a frame from the published MD -- using the same analysis that produced the wild-type numbers. It needs no barrier, no destabilised ensemble and no new method.",
+ "wild_type_occupancy": {
+  "THR116_CG2": 1.92,
+  "VAL118_CG2": 2.14,
+  "LEU117_O": 2.47,
+  "units": "A from the ideal attack point, 3.0 A beyond S146 anti to S57",
+  "reference": "S...C van der Waals contact is about 3.5 A"
+ },
+ "date": "2026-10-26"
+}
