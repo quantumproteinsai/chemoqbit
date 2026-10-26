@@ -137,8 +137,14 @@ def stage_scan(res):
     names = dict(residues(res['geometry']['labels']))
     for n in nums:
         key = f'{names[n]}{n}'
-        if key in res['alanine'] or names[n] in ('GLY', 'ALA'):
-            if names[n] in ('GLY', 'ALA'):
+        # HOH has no side chain at all, and mutate_to_alanine on a water deletes
+        # atoms that are the whole molecule: it returned ddE -9.26 kcal/mol for
+        # HOH102, which is a water being removed from the interface and not an
+        # alanine substitution. Gly and Ala have no side chain beyond CB.
+        if key in res['alanine'] or names[n] in ('GLY', 'ALA', 'HOH'):
+            if names[n] == 'HOH':
+                res['alanine'].setdefault(key, dict(skipped='a water, not a residue'))
+            elif names[n] in ('GLY', 'ALA'):
                 res['alanine'].setdefault(key, dict(skipped='no side chain beyond CB'))
             continue
         t0 = time.time()
