@@ -55,9 +55,9 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/bartmercier/chemoqbit"
-Repository = "https://github.com/bartmercier/chemoqbit"
-Issues = "https://github.com/bartmercier/chemoqbit/issues"
+Homepage = "https://github.com/quantumproteinsai/chemoqbit"
+Repository = "https://github.com/quantumproteinsai/chemoqbit"
+Issues = "https://github.com/quantumproteinsai/chemoqbit/issues"
 
 [tool.setuptools.packages.find]
 include = ["chemoqbit*"]

@@ -2,10 +2,11 @@
 Description=chemoqbit: audit the results against their physical bounds, mail new violations
 
 [Service]
+EnvironmentFile=%h/.config/chemoqbit/notify.env
 Type=oneshot
 WorkingDirectory=/home/deploy/dev/chemoqbit
 Environment=OMP_NUM_THREADS=1
 MemoryMax=4G
-ExecStart=/home/deploy/dev/chemoqbit/.venv/bin/python -u /home/deploy/dev/chemoqbit/scripts/audit_watch.py --to bartmercier@gmail.com
+ExecStart=/home/deploy/dev/chemoqbit/.venv/bin/python -u /home/deploy/dev/chemoqbit/scripts/audit_watch.py --to ${CHEMOQBIT_NOTIFY_TO}
 StandardOutput=append:/home/deploy/dev/chemoqbit/results/service_audit.log
 StandardError=append:/home/deploy/dev/chemoqbit/results/service_audit.log

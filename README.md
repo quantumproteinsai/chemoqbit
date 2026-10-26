@@ -116,3 +116,17 @@ re-optimise.
 
 The qsim-pynq instruction set gains a `DIAG` opcode (phase by a diagonal cost
 table in block RAM) for QAOA; see `chemoqbit/isa.py`.
+
+## Crystal structures
+
+The PDB files are not in the repository: they are third-party data belonging to
+RCSB, so `data/` is gitignored and a fresh clone has none of them. The enzyme and
+folding pipelines will not run until they are fetched:
+
+```sh
+python scripts/fetch_structures.py
+```
+
+That pulls the nine entries the code references and puts each where the code
+expects it. `python scripts/fetch_structures.py 2C9U` fetches one.
+

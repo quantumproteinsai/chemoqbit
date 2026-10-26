@@ -2,11 +2,15 @@
 Description=chemoqbit: mail step completions of the running NUC jobs
 
 [Service]
+# The recipient comes from a file outside the repository, beside the SMTP
+# credentials, so a published unit carries no personal address:
+#   echo 'CHEMOQBIT_NOTIFY_TO=you@example.com' > ~/.config/chemoqbit/notify.env
+EnvironmentFile=%h/.config/chemoqbit/notify.env
 Type=simple
 WorkingDirectory=/home/deploy/dev/chemoqbit
 MemoryMax=1G
 TimeoutStartSec=infinity
-ExecStart=/home/deploy/dev/chemoqbit/.venv/bin/python -u /home/deploy/dev/chemoqbit/scripts/notify_watch.py --to bartmercier@gmail.com \
+ExecStart=/home/deploy/dev/chemoqbit/.venv/bin/python -u /home/deploy/dev/chemoqbit/scripts/notify_watch.py --to ${CHEMOQBIT_NOTIFY_TO} \
   --watch abstraction:results/service_abstraction.log:chemoqbit-abstraction \
   --watch prolyl:results/service_prolyl.log:chemoqbit-prolyl \
   --watch cftr:results/service_pocket_cftr.log:chemoqbit-cftr \
