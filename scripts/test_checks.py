@@ -33,7 +33,20 @@ def diagnosed(fname, subject):
 rows = []
 
 
-def record(name, kind, fired, expect, detail):
+# Archived runs are gitignored -- they are large and go to the Zenodo dataset --
+# so a fresh clone has the checker and not its labelled positives. Those cases
+# must be SKIPPED, not scored: a positive that cannot fire because its input is
+# absent is not a bound behaving wrongly. The first attempt at this printed a
+# notice and still counted them, which failed CI on six cases.
+MISSING = set()
+
+
+def record(name, kind, fired, expect, detail, needs=None):
+    if needs:
+        want = [needs] if isinstance(needs, str) else list(needs)
+        if any(w in MISSING for w in want):
+            rows.append((name, kind, fired, expect, None, 'archived input absent'))
+            return None
     ok = (fired == expect)
     rows.append((name, kind, fired, expect, ok, detail))
     return ok
@@ -41,7 +54,10 @@ def record(name, kind, fired, expect, detail):
 
 def load(f):
     p = RES / f
-    return json.loads(p.read_text()) if p.exists() else None
+    if not p.exists():
+        MISSING.add(f)
+        return None
+    return json.loads(p.read_text())
 
 
 def xtb_scan_drop(d):
@@ -70,7 +86,8 @@ d = load('ts_cluster_run.prebackfill_20261018.json')
 v = xtb_scan_drop(d)
 record('xTB scan before the backward pass', 'scan_drop',
        v is not None and not sanity.check('scan_drop', v, log=lambda m: None), True,
-       f'largest fall {v:.2f} kcal/mol' if v is not None else 'missing')
+       f'largest fall {v:.2f} kcal/mol' if v is not None else 'missing',
+       needs='ts_cluster_run.prebackfill_20261018.json')
 
 d = load('ts_abstraction.nobackward_20261023.json')
 worst = 0.0
@@ -79,7 +96,8 @@ for nm, a in (d or {}).get('acceptor', {}).items():
     worst = max(worst, sanity.largest_drop(e))
 record('approach scans before the backward pass', 'scan_drop',
        not sanity.check('scan_drop', worst, log=lambda m: None), True,
-       f'largest fall {worst:.2f} kcal/mol')
+       f'largest fall {worst:.2f} kcal/mol',
+       needs='ts_abstraction.nobackward_20261023.json')
 
 d = load('prolyl.softtorsion_20261023.json')
 bad = []
@@ -88,7 +106,8 @@ for m in (d or {}).get('scan', {}):
     if seq and not sanity.check('prolyl_barrier', max(seq) - seq[0], log=lambda m_: None):
         bad.append(m)
 record('prolyl with a restraint too soft to hold the saddle', 'prolyl_barrier',
-       bool(bad), True, f'barriers out of range for {len(bad)} models: {bad[:4]}')
+       bool(bad), True, f'barriers out of range for {len(bad)} models: {bad[:4]}',
+       needs='prolyl.softtorsion_20261023.json')
 
 worst_err = 0.0
 for m, s in (d or {}).get('scan', {}).items():
@@ -97,7 +116,8 @@ for m, s in (d or {}).get('scan', {}).items():
             worst_err = max(worst_err, abs(((p['omega'] - p['omega_target']) + 180) % 360 - 180))
 record('the same run, torsion tracking', 'torsion_error',
        not sanity.check('torsion_error', worst_err, log=lambda m_: None), True,
-       f'worst deviation {worst_err:.1f} deg from target')
+       f'worst deviation {worst_err:.1f} deg from target',
+       needs='prolyl.softtorsion_20261023.json')
 
 # That archive predates the e_free field, so take the reference from the current
 # correct run of the same molecule at the same level: a valid comparison, since
@@ -116,13 +136,15 @@ for m, sc_ in (d or {}).get('scan', {}).items():
         fired, which, val = True, m, gap
 record('prolyl wrenched 175 deg at the scan start', 'scan_vs_free_min', fired, True,
        f'{which}: the scan sat {-val:.0f} kcal/mol above a free minimisation'
-       if fired else 'no overlapping model trips the bound')
+       if fired else 'no overlapping model trips the bound',
+       needs=('prolyl.wrenched_20261023.json', 'prolyl.json'))
 
 d = load('prolyl.shoulder_20261024.json')
 n_bad = sum(1 for m, pts in (d or {}).get('points', {}).items()
             for tag, p in pts.items() if tag == 'saddle' and p.get('n_imaginary') == 0)
 record('saddle searches that stopped on a shoulder', 'imag_freq_ts',
-       n_bad > 0, True, f'{n_bad} "transition states" with no imaginary mode')
+       n_bad > 0, True, f'{n_bad} "transition states" with no imaginary mode',
+       needs='prolyl.shoulder_20261024.json')
 
 d = load('ts_cluster_run.N5adduct_20261017.json')
 sc = sorted((d or {}).get('scan', []), key=lambda q: q['xi'])
@@ -429,14 +451,22 @@ def main():
     w = max(len(r[0]) for r in rows)
     print(f'{"case":{w}}  {"check":18}  {"fires":5}  {"want":5}  verdict')
     print('-' * (w + 52))
-    bad = 0
+    bad = skipped = 0
     for name, kind, fired, expect, ok, detail in rows:
-        bad += (not ok)
+        if ok is None:
+            skipped += 1
+            verdict = 'SKIP'
+        else:
+            bad += (not ok)
+            verdict = 'ok' if ok else 'WRONG'
         print(f'{name:{w}}  {kind:18}  {str(fired):5}  {str(expect):5}  '
-              f'{"ok" if ok else "WRONG"}   {detail}')
+              f'{verdict:5}  {detail}')
     pos = sum(1 for r in rows if r[3])
     print(f'\n{len(rows)} cases: {pos} known failures that must fire, '
           f'{len(rows) - pos} verified-good that must stay silent')
+    if skipped:
+        print(f'{skipped} skipped: their archived input is gitignored and lives in '
+              f'the Zenodo dataset')
     print('all correct' if not bad else f'{bad} CASE(S) WRONG')
     return 1 if bad else 0
 
