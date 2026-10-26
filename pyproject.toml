@@ -60,7 +60,7 @@ Repository = "https://github.com/quantumproteinsai/chemoqbit"
 Issues = "https://github.com/quantumproteinsai/chemoqbit/issues"
 
 [tool.setuptools.packages.find]
-include = ["chemoqbit*"]
+include = ["chemoqbit*", "service*"]
 
 [tool.setuptools.package-data]
 "chemoqbit.fold" = ["data/*"]

@@ -57,7 +57,7 @@ jobs:
           PY
 
       - name: Run the test suite
-        run: pytest -v -ra --tb=long
+        run: python -m pytest -v -ra --tb=long
 
       - name: Check the physical sanity bounds against their known cases
         # every bound in chemoqbit/sanity.py is exercised in both directions:
