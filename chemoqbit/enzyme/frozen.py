@@ -36,6 +36,28 @@ def penalty(Y, constraints, k=20.0):
             g = 2 * k * (d - d0) * u / d
             G[i] += g
             G[j] -= g
+        elif c[0] == 'angle':
+            # harmonic on the angle i-j-k, j the vertex, target in degrees.
+            # Needed because a distance restraint alone cannot specify a reactive
+            # geometry: an S_N2 at sulfur wants the nucleophile collinear with the
+            # bond being broken, and driving the distance by itself just presses the
+            # two atoms together sideways.
+            _, i, j, k_, a0 = c
+            u = Y[i] - Y[j]
+            v = Y[k_] - Y[j]
+            lu, lv = np.linalg.norm(u), np.linalg.norm(v)
+            cs = float(np.dot(u, v) / (lu * lv))
+            cs = max(-1.0 + 1e-12, min(1.0 - 1e-12, cs))
+            th = np.arccos(cs)
+            sn = np.sqrt(1.0 - cs * cs)
+            dev = th - np.radians(a0)
+            E += k * dev ** 2
+            ff = 2 * k * dev / (-sn)
+            gi = ff * (v / (lu * lv) - cs * u / lu ** 2)
+            gk = ff * (u / (lu * lv) - cs * v / lv ** 2)
+            G[i] += gi
+            G[k_] += gk
+            G[j] -= gi + gk
         elif c[0] == 'relay':
             _, hops, x0 = c
             tot, terms = 0.0, []

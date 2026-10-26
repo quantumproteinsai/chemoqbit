@@ -253,3 +253,15 @@ def protonate(sym, X, charge, idx, label):
     XH = np.array([list(conf.GetAtomPosition(i)) for i in range(molH.GetNumAtoms())])
     labH = list(label) + [f'H{i}' for i in range(len(symH) - len(label))]
     return symH, XH, Chem.GetFormalCharge(molH), idx, labH
+
+
+def attack_angle(X, idx):
+    """The Cys6...Cys146-Cys57 angle in degrees. An S_N2 at sulfur wants this near
+    180: the nucleophile has to arrive behind the bond it is breaking. The crystal
+    structure gives 133.2 and the relaxed cluster 121.1, so a scan that drives only
+    the S...S distance reaches contact at the wrong angle and measures a compressed
+    contact pair instead of an approach."""
+    u = X[idx['S6']] - X[idx['S146']]
+    v = X[idx['S57']] - X[idx['S146']]
+    c = float(np.dot(u, v) / (np.linalg.norm(u) * np.linalg.norm(v)))
+    return float(np.degrees(np.arccos(np.clip(c, -1.0, 1.0))))

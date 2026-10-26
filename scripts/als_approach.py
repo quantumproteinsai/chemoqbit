@@ -72,8 +72,18 @@ MAXITER = 300
 GTOL = 1e-3
 
 
-def _relax(sym, X, charge, frozen, i, j, d0, k=20.0):
+# An S_N2 at sulfur needs the nucleophile collinear with the bond being broken, so
+# the distance alone does not define the target. Cys6 sits at 133 deg in the crystal
+# and 121 deg in the relaxed cluster, and driving only d(S6,S146) to contact at that
+# angle presses the two sulfurs together sideways: a contact pair, not a reactive
+# geometry. The angle is driven with the distance, from its starting value to 175 deg.
+ANGLE_END = 175.0
+
+
+def _relax(sym, X, charge, frozen, i, j, d0, k=20.0, a=None, a0=None):
     cons = [('dist', i, j, d0)]
+    if a0 is not None:
+        cons.append(('angle', i, j, a, a0))
     return optimise_frozen(sym, X, charge=charge, frozen=frozen, constraints=cons,
                            k=k, solvent=SOLVENT, maxiter=MAXITER, gtol=GTOL)
 
@@ -90,11 +100,13 @@ def stage_build(res):
     # cluster and not the raw crystal geometry; otherwise every later point
     # inherits whatever strain the truncation introduced
     Xr, Er = _relax(symH, XH, qH, mobile, idx['S6'], idx['S146'], d0)
+    a_start = A.attack_angle(Xr, idx)
 
     res['build'] = dict(symbols=symH, X=Xr.tolist(), charge=qH, idx=idx, labels=labH,
                         frozen_rigid=rigid, frozen_mobile=mobile,
                         n_atoms=len(symH), d_crystal=d0,
                         d_relaxed=A.separation(Xr, idx), E_ref=Er,
+                        angle_start=a_start, angle_end=ANGLE_END,
                         blocking=A.blocking(Xr, labH, idx, within=3.0),
                         seconds=time.time() - t0)
     print(f'cluster: {len(symH)} atoms, charge {qH:+d}, S6...S146 '
@@ -111,14 +123,20 @@ def _approach(res, regime):
     d_start = b['d_relaxed']
 
     grid = np.arange(d_start, TARGET - 0.5 * STEP, -STEP)
+    a_start = b.get('angle_start', 133.0)
+    angles = np.linspace(a_start, ANGLE_END, len(grid))
     pts = []
-    for d0 in grid:
-        X, E = _relax(sym, X, charge, frozen, idx['S6'], idx['S146'], d0)
-        d = A.separation(X, idx)
-        pts.append(dict(d_target=float(d0), d=d, E=E, X=X.tolist(),
+    for d0, a0 in zip(grid, angles):
+        X, E = _relax(sym, X, charge, frozen, idx['S6'], idx['S146'], d0,
+                      a=idx['S57'], a0=float(a0))
+        d, ang = A.separation(X, idx), A.attack_angle(X, idx)
+        pts.append(dict(d_target=float(d0), d=d, angle_target=float(a0), angle=ang,
+                        E=E, X=X.tolist(),
                         blocking=A.blocking(X, b['labels'], idx, within=2.5)[:3]))
-        print(f'  {regime} d {d0:.2f} -> {d:.2f} A   E {E:+.6f} Eh   '
+        print(f'  {regime} d {d0:.2f} -> {d:.2f} A  angle {a0:.0f} -> {ang:.0f}  '
               f'W {(E - pts[0]["E"]) * HARTREE_KCAL:+7.2f} kcal/mol', flush=True)
+        sanity.record(res, 'chalcogen_attack_angle', ang,
+                      label=f'{regime} d {d:.2f}')
     return pts
 
 
