@@ -1,0 +1,39 @@
+{
+ "question": "Can side-chain motion open the Cys146 backside attack site?",
+ "answer": "No. The obstruction is ultimately main chain.",
+ "method": "Rigid chi1 rotation of Thr116 and Val118 about CA-CB over a 5 degree grid, 5184 rotamer pairs, measuring the clearance at the attack point 3.0 A beyond Cys146 SG collinear with the Cys57-Cys146 bond. Clearance is purely geometric -- neither sulfur moves -- so no energy calculation is needed to answer it, which is why 5184 pairs cost milliseconds instead of the 130 minutes of xTB single points first planned.",
+ "ladder": [
+  {
+   "case": "crystal structure",
+   "clearance_heavy": 1.92,
+   "nearest": "THR116:CG2"
+  },
+  {
+   "case": "best of 5184 chi1 rotamer pairs",
+   "clearance": 1.64,
+   "chi1_thr": 35.0,
+   "chi1_val": 40.0,
+   "nearest": "an added hydrogen",
+   "note": "NO rotamer pair reaches even 2.5 A. Rotating the two side chains away simply exposes what is underneath them."
+  },
+  {
+   "case": "both side chains deleted entirely (the alanine-truncation limit)",
+   "clearance_heavy": 2.47,
+   "nearest": "LEU117:O",
+   "note": "Still blocked, and now by BACKBONE: the Leu117 carbonyl oxygen, with Cys146 own CB at 2.64 A behind it."
+  }
+ ],
+ "requirement": "about 3.3 A, a sulfur-carbon van der Waals contact",
+ "floor": [
+  "LEU117:O 2.47",
+  "CYS146:CB 2.64",
+  "LEU117:C 2.86",
+  "THR116:CB 3.16",
+  "VAL118:CB 3.25",
+  "VAL118:N 3.26"
+ ],
+ "conclusion": "The side chains are the first obstruction but not the last. Removing them entirely still leaves the site blocked at 2.47 A by the Leu117 backbone carbonyl. So no rotamer change, and no mutation that merely shrinks a side chain, can open this site: it requires the backbone to move. That is what the conformational-work scan allows, for residues 6, 117, 146 and 147, so that calculation is asking the right question rather than an expensive version of a cheap one.",
+ "sharpened_convergence": "The specific atom that blocks the site when everything else is cleared away is the carbonyl oxygen of Leu117 -- the one residue of eleven that Basith et al. 2022 identify by betweenness centrality as a top allosteric node of SOD1. The convergence is now at the level of a single atom rather than a residue.",
+ "caveat": "Rigid rotation: nothing relaxes, so a neighbouring group cannot yield to make room. That makes this a lower bound on what motion could achieve. But the deletion case has nothing left to yield and is still blocked, which is the stronger of the two results and does not depend on the rotation at all.",
+ "date": "2026-10-26"
+}
