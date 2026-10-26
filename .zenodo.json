@@ -1,17 +1,42 @@
 {
-  "title": "chemoqbit: active-space quantum circuits for 5-fluorouracil tautomerism and thymidylate synthase hydride transfer, with FPGA fixed-point emulation",
-  "version": "1.1.0",
+  "title": "chemoqbit: reaction energetics on qubits, from molecular integrals to the instruction stream of an FPGA state-vector simulator",
+  "version": "1.2.0",
   "upload_type": "software",
-  "description": "Code, results and tests for end-to-end studies of chemical reactions on qubits. (1) The lactam-lactim proton shift of 5-fluorouracil and formamide: PySCF active spaces, UCCSD and ADAPT-VQE with adjoint gradients, a 32-bit instruction set and bit-accurate 18-bit fixed-point emulation for the qsim-pynq FPGA simulator (PYNQ-Z2), composite CCSD(T) corrections and Eckart tunnelling. (2) New in 1.1.0: hydride transfer in thymidylate synthase, using a 96-atom active-site cluster built from PDB 1TLS. The pipeline runs a GFN2-xTB reaction scan with consistency guards and a backward pass, a frozen-atom-aware P-RFO saddle search, finite-difference Hessians, and H/D/T kinetic isotope effects with Wigner and Eckart tunnelling. It adds B3LYP-D3(BJ)/PCM single points, an electrostatically embedded active space with UCCSD- and ADAPT-VQE, ONIOM(CCSD(T):B3LYP) with a DF-MP2 basis-set correction, a functional-sensitivity check, and a PDF report generator. Includes a FastAPI module for an oncology research platform. Educational; not for clinical use.",
+  "description": "Code, results and tests for end-to-end studies of chemical reactions on qubits, from molecular integrals to the 32-bit instruction stream a hardware state-vector simulator executes.\n\nCircuits and electronic structure: PySCF active spaces from CCSD natural orbitals, optionally embedded in point charges, mapped to qubits by Jordan-Wigner; UCCSD-VQE and fermionic ADAPT-VQE with analytic adjoint gradients; compilation to Pauli exponentials, a peephole optimiser, a 32-bit instruction set, and bit-accurate 18-bit fixed-point emulation of the qsim-pynq FPGA datapath (PYNQ-Z2). Every circuit energy is checked against exact diagonalisation in the same space.\n\nReaction energetics: transition-state theory rates, Wigner and Eckart tunnelling, and composite levels combining CCSD(T) with the circuit result in the same active space.\n\nApplications. Proton-transfer tautomerism of formamide and 5-fluorouracil. Hydride transfer in thymidylate synthase from a 96-atom active-site cluster built from PDB 1TLS, with a GFN2-xTB reaction scan, a frozen-atom-aware P-RFO saddle search, finite-difference Hessians, H/D/T kinetic isotope effects, DFT single points and ONIOM layering. A lattice protein-folding benchmark on the diamond lattice with Miyazawa-Jernigan contact energies and the dense turn encoding.\n\nNew in 1.2.0. Prolyl cis/trans isomerisation of capped Xaa-Pro dipeptides, including the phosphorylation effect. Ligand-binding pocket clusters cut from crystal structures with in-silico alanine truncation, applied to CFTR with lumacaftor and acetylcholinesterase with donepezil. Amyloid steric-zipper interfaces as cluster models, for tau, alpha-synuclein and SOD1 segments, benchmarked against deposited structures. A six-system chalcogen S_N2 ladder separating nucleophile from electrophile effects in thiol-disulfide and selenium-sulfur exchange, with its numerical precision floor measured from closed thermodynamic constraints rather than asserted. Shrake-Rupley solvent accessibility, and geometric feasibility analyses of the buried Cys57-Cys146 disulfide of SOD1: solvent accessibility, backside attack geometry, side-chain rotamer scans and the displacement required to open the attack site. These are geometric and semiempirical analyses, not completed energetic determinations.\n\nValidation. A physical-bounds module carrying 35 checks, each with the reason it exists written into the code; an auditor that recomputes them from stored geometry and separates recorded dead ends from open faults; a stall detector deriving its unit list from systemd; and a 97-case self-test that exercises every bound in both directions, using archived real failures as labelled positives. Long runs are resumable systemd units with atomic checkpoints.\n\nA FastAPI module serves the cases and their instruction streams. A Dockerfile pins the exact versions the results were produced with. Crystal structures are fetched from RCSB rather than redistributed. Educational; not for clinical use.",
   "creators": [
-    {"name": "Mercier des Rochettes, Bertrand",
-     "affiliation": "Quantum Proteins AI, Cergy-Pontoise, France",
-     "orcid": "0000-0002-1145-1881"}
+    {
+      "name": "Mercier des Rochettes, Bertrand",
+      "affiliation": "Quantum Proteins AI, Cergy-Pontoise, France",
+      "orcid": "0000-0002-1145-1881"
+    }
   ],
   "license": "MIT",
-  "keywords": ["variational quantum eigensolver", "ADAPT-VQE", "FPGA", "fixed-point arithmetic",
-               "proton transfer", "tautomerism", "5-fluorouracil", "CCSD(T)", "tunnelling",
-               "thymidylate synthase", "hydride transfer", "kinetic isotope effect", "cluster model",
-               "GFN2-xTB", "ONIOM", "electrostatic embedding"],
+  "keywords": [
+    "variational quantum eigensolver",
+    "ADAPT-VQE",
+    "FPGA",
+    "fixed-point arithmetic",
+    "proton transfer",
+    "tautomerism",
+    "5-fluorouracil",
+    "CCSD(T)",
+    "tunnelling",
+    "thymidylate synthase",
+    "hydride transfer",
+    "kinetic isotope effect",
+    "cluster model",
+    "GFN2-xTB",
+    "ONIOM",
+    "electrostatic embedding",
+    "prolyl isomerisation",
+    "steric zipper",
+    "amyloid",
+    "SOD1",
+    "alanine scan",
+    "solvent accessibility",
+    "thiol-disulfide exchange",
+    "selenium",
+    "physical bounds"
+  ],
   "access_right": "open"
 }

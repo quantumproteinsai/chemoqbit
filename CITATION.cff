@@ -1,8 +1,8 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
-title: "chemoqbit: active-space quantum circuits for 5-fluorouracil tautomerism and thymidylate synthase hydride transfer, with FPGA fixed-point emulation"
-version: 1.1.0
-date-released: 2026-10-19
+title: "chemoqbit: reaction energetics on qubits, from molecular integrals to the instruction stream of an FPGA state-vector simulator"
+version: 1.2.0
+date-released: 2026-10-26
 license: MIT
 repository-code: "https://github.com/quantumproteinsai/chemoqbit"
 authors:
@@ -28,3 +28,12 @@ keywords:
   - GFN2-xTB
   - ONIOM
   - electrostatic embedding
+  - prolyl isomerisation
+  - steric zipper
+  - amyloid
+  - SOD1
+  - alanine scan
+  - solvent accessibility
+  - thiol-disulfide exchange
+  - selenium
+  - physical bounds
