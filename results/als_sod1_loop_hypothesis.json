@@ -1,22 +1,18 @@
 {
- "finding": "The residues that plug the backside attack site on Cys146 sit on the beta-strand that anchors the electrostatic loop, and Cys146 itself sits on that strand's hydrogen-bonded partner.",
- "structure_facts": {
-  "strand_b7": "116-120, carries Thr116 and Val118 whose gamma-methyls occupy the attack site",
-  "strand_b8": "143-148, carries Cys146 itself",
-  "pairing": "b7 and b8 are hydrogen-bonded neighbours: the SHEET record pairs LEU144 N with VAL119 O, and pairs THR116 O with HIS48 N on the other side",
-  "electrostatic_loop": "121-142, i.e. the loop that CONNECTS b7 to b8",
-  "source": "SHEET records of PDB 2C9U chain F, read directly"
+ "correction": "An earlier version of this file claimed that opening the electrostatic loop would separate strands b7 and b8 and so unplug the attack site. Reading Souza et al. 2019 in full shows that is wrong. b7 (116-120) and b8 (143-148) are hydrogen-bonded strands of the same beta-sheet (Leu144 N to Val119 O); the EL is the LOOP between them and it hinges at residues 122 and 141, swinging away while the strands stay paired. What EL opening exposes is the metal site to water, which is what that paper measured. It does not separate the strands.",
+ "what_survives": "Strand b7 carries, within six residues: Thr116 and Val118 whose gamma-methyls plug the Cys146 backside attack site, and His120 which is a copper ligand at 2.00 A, and then Glu121 leading straight into the EL hinge at 122. So the plug, a metal ligand and the loop hinge are on one strand. That is coupling along a strand, not strand separation, and it is a weaker but defensible claim.",
+ "supporting": {
+  "molnar_2009": "Souza ref 21: destabilisation of the electrostatic loop is reported as a property COMMON TO ALL studied ALS-associated SOD1 variants (J. Biol. Chem. 284:30965). That is what makes perturbation at the EL end of b7 relevant to ALS generally rather than to one mutation.",
+  "souza_qmmm": "Closed EL has a more favourable enthalpy of Zn(II) binding by -99 kJ/mol (-23.7 kcal/mol); -T.dS about +15 kJ/mol. QM subsystem 590 atoms at HF-3c, with GFN0-xTB also used -- so xTB inside a QM/MM on SOD1 is precedent.",
+  "allosteric_path": "G93A -> steric clash of A93 Cbeta with Leu38 backbone O -> T39, H43, K122, A123, A140, G141 -> the EL hinge. Mainly backbone-mediated."
  },
- "why_it_matters": "Souza et al. (2019, J. Phys. Chem. Lett.) found an allosteric pathway linking the distant G93A mutation to the electrostatic loop, and their hybrid QM/MM showed that opening that loop lowers Zn(II) affinity. Our occlusion sits on the strand that loop is anchored to, and the atom being attacked sits on the paired strand across it. So the motion already established to be allosterically driven in ALS SOD1 is geometrically the same motion that would separate b7 from b8 and unplug the attack site.",
- "hypothesis": "Opening of the electrostatic loop does not only lower metal affinity. It should also relieve the steric occlusion of the Cys146 backside attack site, and therefore permit the Cys6 attack that the folded protein forbids. That would make loop opening a common cause of two things currently treated as separate: metal loss and disulfide scrambling.",
- "status": "HYPOTHESIS. Structural adjacency is established from the deposited record; the energetic consequence is not computed and the Souza paper has not been read in full.",
- "how_to_test": "The occlusion is purely geometric. Recompute the free volume at the attack point on a structure with the electrostatic loop displaced -- an open-loop crystal form, a G93A model, or a frame from the published MD -- using the same analysis that produced the wild-type numbers. It needs no barrier, no destabilised ensemble and no new method.",
- "wild_type_occupancy": {
-  "THR116_CG2": 1.92,
-  "VAL118_CG2": 2.14,
-  "LEU117_O": 2.47,
-  "units": "A from the ideal attack point, 3.0 A beyond S146 anti to S57",
-  "reference": "S...C van der Waals contact is about 3.5 A"
+ "distances": {
+  "attack_point_to_Cu": 6.8,
+  "attack_point_to_Zn": 12.64,
+  "units": "A"
  },
+ "revised_hypothesis": "The cheapest route to unplugging the attack site is not backbone motion at all but a side-chain rotamer change of Thr116 and Val118. Their gamma-methyls sit 1.92 and 2.14 A from the attack point, and a chi1 rotation moves a gamma-methyl by several angstroms for a few kcal/mol. Whether b7 perturbation -- from EL destabilisation, from the copper site at His120, or from a mutation in the segment -- shifts those rotamers is the question worth asking.",
+ "how_to_test": "Scan chi1 of Thr116 and Val118 and compute the attack-site occupancy at each rotamer, together with the torsional cost. Pure geometry plus a torsion scan on two side chains: cheap, needs no destabilised model, and gives the price of opening the site directly.",
+ "status": "CORRECTED HYPOTHESIS. The structural facts are from the deposited record and from Souza et al. 2019 read in full. Nothing energetic is computed yet.",
  "date": "2026-10-26"
 }
