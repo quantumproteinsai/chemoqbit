@@ -92,5 +92,23 @@
   "observation": "The residues that occlude the backside attack site lie in mature 113-119, a stretch that carries several known ALS variants. Mature V118 (gene V119) is itself a variant site, reported as V119M. Mature R115 (gene R116) carries R116S/C/G, associated with rapid progression and a pure lower-motor-neuron phenotype. Mature I113 (gene I114) is I113T, common and highly variable in penetrance and course.",
   "status": "OBSERVATION, not a correlation. Reported phenotypes for V119M are inconsistent between the two patients described, and nothing here tests whether occlusion and severity are related.",
   "testable": "The occlusion is a purely geometric quantity and the mutants are single side-chain substitutions, so the free volume at the attack site can be computed for wild type and for each variant with the same machinery that produced the CFTR and AChE alanine scans. That asks whether these mutations open the site, and it needs no barrier and no destabilised model."
+ },
+ "convergence_with_network_analysis": {
+  "source": "Basith S., Manavalan B., Lee G. (2022) Comput. Biol. Med. 151:106319, read in full. Microsecond MD of SOD1 WT and the interface mutants A4V, T54R, I113T.",
+  "what_they_did": "Betweenness-centrality analysis of the residue interaction network, to find the nodes controlling allosteric signal flow. Done for an entirely different purpose from ours: they were studying dimerization.",
+  "result": "They report ELEVEN hotspot residues with C_B >= 0.05 across the whole dimer (Fig. 11): Phe20, Phe45, His46, His63, Leu84, Leu117. Exactly one of them sits at the Cys146 backside attack site, and it is Leu117 at 2.47 A. The next nearest hotspot is His46 at 5.28 A; the rest are 8.7 to 10.6 A away.",
+  "distances_from_attack_point": {
+   "LEU117": 2.47,
+   "HIS46": 5.28,
+   "PHE45": 8.66,
+   "HIS63": 9.2,
+   "PHE20": 9.97,
+   "LEU84": 10.58,
+   "units": "A"
+  },
+  "why_it_matters": "Two independent analyses, with different methods and different aims, pick out the same residue. Ours says Leu117 carbonyl occludes the site where a thiolate must arrive to attack the disulfide; theirs says Leu117 is a top allosteric node of the protein. A residue that both plugs the reaction site and carries allosteric signal is a candidate for coupling the two.",
+  "also": "The WT dimer interface is close: Phe50 at 6.11 A from the attack point, Val148 6.14, Arg115 6.31. And the two strands that bound the site run straight into it -- b7 (116-120) follows the interface residues I113/G114/R115, b8 (143-148) carries Cys146 and runs on into V148/I149/G150/I151. The attack site sits in a pocket walled by the dimerization interface.",
+  "caution": "Table 5 of that paper lists \"hydrogen bonds\" that are intra-residue atom pairs -- Leu42-CG to Leu42-CD1, His71-ND1 to His71-CE1, Ile104-HN to Ile104-HA. Those are bonded or 1-3 neighbours within one residue and cannot be hydrogen bonds. The table appears mislabelled, so nothing from it is used here, including its report of a Leu117 interaction appearing in A4V.",
+  "status": "CONVERGENCE, not proof. Their C_B values come from their MD ensemble; our distances come from one crystal structure. Neither computes the coupling the convergence suggests."
  }
 }
