@@ -1,0 +1,96 @@
+{
+ "question": "Where must the Cys6 thiolate arrive to attack Cys146, and what occupies that site?",
+ "why": "An S_N2 at sulfur requires backside attack: the nucleophile must arrive on the far side of Cys146 from Cys57, collinear with the S-S bond it is breaking. That defines a specific point in space. Asking what is AT that point is a different and sharper question than asking what is on the straight line between the two sulfurs.",
+ "structure": "PDB 2C9U chain F conformer B, 1.24 A, untouched crystal coordinates",
+ "disulfide_SS": 2.0048521142468347,
+ "d_S6_S146": 8.3655431981432,
+ "attack_angle_deg": 133.22778281752736,
+ "attack_sites": {
+  "3.0": {
+   "travel": 6.678691826116465,
+   "occupants": [
+    {
+     "atom": "THR116:CG2",
+     "d": 1.9225291343265787
+    },
+    {
+     "atom": "VAL118:CG2",
+     "d": 2.135553251136945
+    },
+    {
+     "atom": "LEU117:O",
+     "d": 2.474710694932604
+    },
+    {
+     "atom": "CYS146:CB",
+     "d": 2.6398003558464858
+    },
+    {
+     "atom": "LEU117:C",
+     "d": 2.8620301362912666
+    },
+    {
+     "atom": "THR116:CB",
+     "d": 3.161960155149156
+    },
+    {
+     "atom": "VAL118:CB",
+     "d": 3.2466472756943876
+    }
+   ]
+  },
+  "3.5": {
+   "travel": 6.490405207659022,
+   "occupants": [
+    {
+     "atom": "THR116:CG2",
+     "d": 1.7465421507625445
+    },
+    {
+     "atom": "VAL118:CG2",
+     "d": 2.2592844301935897
+    },
+    {
+     "atom": "LEU117:O",
+     "d": 2.402223212127211
+    },
+    {
+     "atom": "LEU117:C",
+     "d": 2.644236673322942
+    },
+    {
+     "atom": "THR116:CB",
+     "d": 2.8452159601471423
+    },
+    {
+     "atom": "THR116:C",
+     "d": 2.9481667375650926
+    },
+    {
+     "atom": "CYS146:CB",
+     "d": 3.061054623031377
+    }
+   ]
+  }
+ },
+ "conclusion": "The backside attack site on Cys146 is not merely hard to reach, it is OCCUPIED, and by side chains rather than backbone: the gamma-methyls of Thr116 and Val118 sit in it, with the Leu117 carbonyl alongside. This is a different obstruction from the one on the direct path, which is main chain (Gly147). So the reaction is blocked twice over and by two different kinds of group, and the destination block is the side-chain one -- which is the cheaper of the two to relieve.",
+ "caveat": "Computed on untouched crystal coordinates. The same analysis on our relaxed cluster gives 121.1 deg rather than 133.2, so the truncated model shifts the attack angle by 12 deg on relaxation; that is a caveat on every number taken from the cluster.",
+ "date": "2026-10-26",
+ "numbering": {
+  "convention": "PDB 2C9U uses MATURE numbering (initiator Met removed); verified residue by residue against the canonical 153-residue human SOD1 sequence.",
+  "gene_offset": 1,
+  "warning": "Much of the clinical literature uses gene numbering, which is mature + 1. The \"R116\" of the rapid-progression papers is mature R115, NOT our Thr116. Getting this wrong would attach our result to the wrong variant.",
+  "map": {
+   "mature T116": "gene T117",
+   "mature L117": "gene L118",
+   "mature V118": "gene V119",
+   "mature R115": "gene R116",
+   "mature I113": "gene I114"
+  }
+ },
+ "als_variants_in_the_occluding_segment": {
+  "observation": "The residues that occlude the backside attack site lie in mature 113-119, a stretch that carries several known ALS variants. Mature V118 (gene V119) is itself a variant site, reported as V119M. Mature R115 (gene R116) carries R116S/C/G, associated with rapid progression and a pure lower-motor-neuron phenotype. Mature I113 (gene I114) is I113T, common and highly variable in penetrance and course.",
+  "status": "OBSERVATION, not a correlation. Reported phenotypes for V119M are inconsistent between the two patients described, and nothing here tests whether occlusion and severity are related.",
+  "testable": "The occlusion is a purely geometric quantity and the mutants are single side-chain substitutions, so the free volume at the attack site can be computed for wild type and for each variant with the same machinery that produced the CFTR and AChE alanine scans. That asks whether these mutations open the site, and it needs no barrier and no destabilised model."
+ }
+}
