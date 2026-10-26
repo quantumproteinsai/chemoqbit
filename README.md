@@ -1,5 +1,7 @@
 # chemoqbit
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23665343.svg)](https://doi.org/10.5281/zenodo.23665343)
+
 Quantum chemistry of chemotherapy-relevant reactions on qubits — end to end,
 from PySCF integrals to the 32-bit instruction stream of the **qsim-pynq**
 FPGA state-vector simulator (PYNQ-Z2).

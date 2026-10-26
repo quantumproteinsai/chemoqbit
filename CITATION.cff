@@ -4,6 +4,7 @@ title: "chemoqbit: reaction energetics on qubits, from molecular integrals to th
 version: 1.2.0
 date-released: 2026-10-26
 license: MIT
+doi: "10.5281/zenodo.23665343"
 repository-code: "https://github.com/quantumproteinsai/chemoqbit"
 authors:
   - family-names: "Mercier des Rochettes"
