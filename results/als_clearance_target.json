@@ -1,0 +1,36 @@
+{
+ "question": "How far must the protein move for the Cys146 backside attack site to clear?",
+ "method": "Rigid displacement of groups of residues away from the attack point, measuring the clearance at each step. Purely geometric, so it costs nothing and needs no model of how the motion happens.",
+ "two_corrections": "An earlier pass got this wrong twice. It kept the attack point fixed while displacing the residue that DEFINES it, Cys146, so moving that residue appeared not to help. And it counted Cys146 own C-beta as an obstruction, when a thiolate attacking a disulfide is necessarily about 3 A from the C-beta of the residue it attacks -- that is the reaction geometry, not a blockage. The attack point is now recomputed from the current Cys57 and Cys146 positions, and the reaction centre is excluded from the clearance test.",
+ "crystal": {
+  "clearance": 1.92,
+  "nearest": "THR116:CG2",
+  "need": 3.3,
+  "units": "A"
+ },
+ "displacement_required": [
+  {
+   "group": "Leu117 alone",
+   "result": "still blocked at 3.0 A of displacement"
+  },
+  {
+   "group": "residues 116-117",
+   "result": "still blocked at 3.0 A (Val118 CG2 takes over)"
+  },
+  {
+   "group": "residues 116-118",
+   "clears_at": 2.62,
+   "then_nearest": "THR116:CG2 at 3.31 A"
+  },
+  {
+   "group": "strand b7, 116-120",
+   "clears_at": 2.62,
+   "note": "same as 116-118, so residues 119 and 120 contribute nothing"
+  }
+ ],
+ "result": "About 2.62 A of rigid displacement of residues 116-118 together.",
+ "context": "Basith et al. 2022 report SOD1 backbone RMSF of under 1.5 A for interfacial residues and about 4.5 A for the electrostatic loop. So 2.62 A is roughly twice what this beta-strand does by thermal fluctuation in the native fold, and well inside what a destabilised loop reaches.",
+ "why_it_matters": "This is the target the conformational-work scan is pricing. The scan asks what that motion costs; this says how much motion is needed and which residues have to make it. Neither number means much without the other.",
+ "caveat": "Rigid translation. A coordinated deformation could plausibly do better, so this is not a lower bound on the motion; and rigid translation ignores the bonds that resist it, so it is not an upper bound on the cost either. It is a scale.",
+ "date": "2026-10-26"
+}
