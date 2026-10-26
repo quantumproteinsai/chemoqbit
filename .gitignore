@@ -31,3 +31,9 @@ results/ts_kie_temperature.json
 results/ts_qmsize*.json
 results/ts_o4h_diagnostic.json
 data/rcsb_*/
+
+# Reference PDFs supplied by the author. Copyrighted publisher material -- book
+# chapters from CRC Press and Elsevier -- so they must never be committed to a
+# public repository. They were untracked but not ignored, so a `git add -A`
+# before a push would have published them.
+*.pdf

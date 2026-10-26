@@ -409,6 +409,23 @@ record('a "bond" at 3.40 A', 'chalcogen_bond',
 
 
 def main():
+    # The archived runs that supply the labelled positives are gitignored: they go to
+    # the Zenodo dataset (scripts/make_dataset.py), not into git, because they are
+    # large. So a fresh clone has the checker but not its data, and CI must say that
+    # rather than report it as a bound being wrong. The constructed cases -- every
+    # bound exercised against literal values -- run either way and are what CI
+    # actually validates.
+    needed = ('prolyl.shoulder_20261024.json', 'ts_abstraction.nobackward_20261023.json',
+              'ts_active_20261019.json')
+    archived = [f for f in needed if (RES / f).exists()]
+    if not archived:
+        print('NOTE: none of the archived runs is present, so the labelled positives '
+              'taken from real failures are not being tested.')
+        print('      They are gitignored and live in the Zenodo dataset; fetch it to '
+              'run the full set.')
+        print('      The constructed cases below exercise every bound against literal '
+              'values and do run.\n')
+
     w = max(len(r[0]) for r in rows)
     print(f'{"case":{w}}  {"check":18}  {"fires":5}  {"want":5}  verdict')
     print('-' * (w + 52))

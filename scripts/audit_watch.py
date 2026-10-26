@@ -18,7 +18,11 @@ STATE = ROOT / 'results' / '.audit_seen.json'
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--to', default='bartmercier@gmail.com')
+    # no default: a personal address hardcoded here would be published with the
+    # repository. The systemd unit passes it, and the notifier's credentials
+    # already live outside the repo in ~/.config/chemoqbit/smtp.ini.
+    ap.add_argument('--to', required=True,
+                    help='recipient for violation mail')
     ap.add_argument('--quiet', action='store_true')
     a = ap.parse_args()
     # the checks are themselves under test: if a known failure stops firing, or a
