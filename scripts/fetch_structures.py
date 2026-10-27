@@ -38,12 +38,25 @@ STRUCTURES = {
             'Note 1.40 and not the 1.45 some secondary sources give -- read from '
             'REMARK 2 of this file',
     '7SVD': 'CFTR NBD1 with lumacaftor (VX-809); the cftr pocket alanine scan',
+    '1HL5': 'human SOD1 holo dimer at 1.8 A; the NATIVE half of the epitope map -- '
+            'accessibility is measured on chain A with chain B present, because a '
+            'monomer would report the dimer interface as exposed when it is not',
+    '7VZF': 'cryo-EM fibril of full-length wild-type human SOD1 (Wang et al., Nat '
+            'Commun 2022); the AGGREGATE half of the epitope map. Chains A, B and C '
+            'are three stacked layers and the middle one is the one measured',
+    '8IHV': 'SOD1 H46R fibril (Wang et al., Sci Adv 2024); core 85-153 only',
+    '8IHU': 'SOD1 G85R fibril (Wang et al., Sci Adv 2024); core 82-153 only',
 }
 
 FLAT = {'1TLS'}          # the one entry the code expects directly under data/
+# the fibrils live together rather than one directory each, which is where the
+# epitope map looks for them
+FOLDER = {'7VZF': 'sod1_fibrils', '8IHV': 'sod1_fibrils', '8IHU': 'sod1_fibrils'}
 
 
 def destination(pdb_id):
+    if pdb_id in FOLDER:
+        return DATA / FOLDER[pdb_id] / f'{pdb_id}.pdb'
     if pdb_id in FLAT:
         return DATA / f'{pdb_id}.pdb'
     return DATA / f'rcsb_{pdb_id.lower()}' / f'{pdb_id}.pdb'

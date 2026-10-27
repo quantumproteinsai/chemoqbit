@@ -154,6 +154,12 @@ BOUNDS = {
                        'a formed S-S bond is 2.03-2.08, Se-S about 2.19 and Se-Se about 2.33. '
                        'Outside this the species at the end of the scan is not the '
                        'dichalcogenide the reaction is supposed to make'),
+    'residue_sasa': (0.0, 300.0, 'A^2',
+                     'solvent-accessible area of one amino acid residue by Shrake-Rupley. '
+                     'It cannot be negative, and the largest residue fully exposed in a '
+                     'Gly-X-Gly tripeptide reaches about 250. A value above 300 means the '
+                     'atom selection is wrong -- a residue number colliding between chains, '
+                     'or alternate conformers summed together rather than one being chosen'),
     'circuit_error_mha': (0.0, 1.6, 'mHa',
                           'chemical accuracy against exact CASCI in the same active space'),
 }

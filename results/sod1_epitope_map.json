@@ -1,0 +1,252 @@
+{
+ "question": "A conformation-specific antibody against misfolded SOD1 needs an epitope accessible on the aggregate and BURIED on the healthy native dimer. An epitope exposed on both binds normal protein in every cell that makes SOD1. Which surface satisfies that?",
+ "method": "Per-residue Shrake-Rupley accessibility of chain A inside the physiological dimer (1HL5, holo, both chains present) against the same residues in the middle layer of a three-layer stack of the wild-type fibril (7VZF), where that chain has neighbours above and below as inside a filament.",
+ "thresholds": {
+  "buried_native": 10.0,
+  "exposed_fibril": 30.0,
+  "unit": "A^2"
+ },
+ "n_comparable": 121,
+ "candidates": [
+  {
+   "residue": "ILE112",
+   "number": 112,
+   "native": 0.0,
+   "fibril": 56.6
+  },
+  {
+   "residue": "HIS120",
+   "number": 120,
+   "native": 6.1,
+   "fibril": 57.7
+  },
+  {
+   "residue": "HIS43",
+   "number": 43,
+   "native": 1.4,
+   "fibril": 52.5
+  },
+  {
+   "residue": "VAL29",
+   "number": 29,
+   "native": 0.0,
+   "fibril": 45.2
+  },
+  {
+   "residue": "HIS48",
+   "number": 48,
+   "native": 2.8,
+   "fibril": 47.1
+  },
+  {
+   "residue": "VAL118",
+   "number": 118,
+   "native": 0.0,
+   "fibril": 43.4
+  },
+  {
+   "residue": "HIS46",
+   "number": 46,
+   "native": 0.0,
+   "fibril": 36.8
+  },
+  {
+   "residue": "PHE20",
+   "number": 20,
+   "native": 1.7,
+   "fibril": 35.8
+  },
+  {
+   "residue": "PHE45",
+   "number": 45,
+   "native": 0.0,
+   "fibril": 32.5
+  },
+  {
+   "residue": "THR116",
+   "number": 116,
+   "native": 4.0,
+   "fibril": 33.4
+  },
+  {
+   "residue": "ASP124",
+   "number": 124,
+   "native": 7.2,
+   "fibril": 32.7
+  }
+ ],
+ "unusable_exposed_on_both": [
+  3,
+  9,
+  11,
+  19,
+  21,
+  23,
+  24,
+  25,
+  26,
+  28,
+  30,
+  32,
+  34,
+  39,
+  40,
+  49,
+  52,
+  54,
+  55,
+  86,
+  88,
+  90,
+  91,
+  96,
+  103,
+  109,
+  110,
+  115,
+  122,
+  126,
+  128,
+  132,
+  136,
+  139,
+  142,
+  143
+ ],
+ "corkscrew_28_38": {
+  "reference": "Sangwan et al., bioRxiv 2025.05.05.652290, monoclonal CSAb raised against residues 28-38",
+  "their_rationale": "Val29, Val31, Gly33 and Ile35 are buried in native folded SOD1 and become solvent-exposed on misfolding",
+  "rows": [
+   {
+    "number": 28,
+    "residue": "PRO28",
+    "native": 63.8,
+    "fibril": 54.7,
+    "named_by_sangwan": false,
+    "opens": false
+   },
+   {
+    "number": 29,
+    "residue": "VAL29",
+    "native": 0.0,
+    "fibril": 45.2,
+    "named_by_sangwan": true,
+    "opens": true
+   },
+   {
+    "number": 30,
+    "residue": "LYS30",
+    "native": 99.7,
+    "fibril": 64.9,
+    "named_by_sangwan": false,
+    "opens": false
+   },
+   {
+    "number": 31,
+    "residue": "VAL31",
+    "native": 0.0,
+    "fibril": 4.7,
+    "named_by_sangwan": true,
+    "opens": false
+   },
+   {
+    "number": 32,
+    "residue": "TRP32",
+    "native": 99.7,
+    "fibril": 78.1,
+    "named_by_sangwan": false,
+    "opens": false
+   },
+   {
+    "number": 33,
+    "residue": "GLY33",
+    "native": 15.8,
+    "fibril": 24.8,
+    "named_by_sangwan": true,
+    "opens": false
+   },
+   {
+    "number": 34,
+    "residue": "SER34",
+    "native": 47.9,
+    "fibril": 41.3,
+    "named_by_sangwan": false,
+    "opens": false
+   },
+   {
+    "number": 35,
+    "residue": "ILE35",
+    "native": 0.0,
+    "fibril": 18.7,
+    "named_by_sangwan": true,
+    "opens": false
+   },
+   {
+    "number": 36,
+    "residue": "LYS36",
+    "native": 110.0,
+    "fibril": 19.3,
+    "named_by_sangwan": false,
+    "opens": false
+   },
+   {
+    "number": 37,
+    "residue": "GLY37",
+    "native": 38.5,
+    "fibril": 12.7,
+    "named_by_sangwan": false,
+    "opens": false
+   },
+   {
+    "number": 38,
+    "residue": "LEU38",
+    "native": 12.3,
+    "fibril": 24.0,
+    "named_by_sangwan": false,
+    "opens": false
+   }
+  ],
+  "native_burial_confirmed": [
+   "VAL29",
+   "VAL31",
+   "ILE35"
+  ],
+  "opens_on_the_fibril": [
+   "VAL29"
+  ],
+  "segment_mean_native": 44.3,
+  "segment_mean_fibril": 35.3,
+  "reading": "Their native-burial claim holds. On the FIBRIL only Val29 opens, and the segment is on average less accessible than natively. This is consistent with their own central result rather than against it: CSAb detects oligomers and not fibrils, and the corkscrew is an out-of-register oligomer conformation, not the fibril fold. A fibril accessibility map is therefore a structural negative control for that specificity. Testing it properly needs an oligomer coordinate model, which we do not have."
+ },
+ "disordered_in_the_fibril": {
+  "residues": [
+   1,
+   85
+  ],
+  "count": 32,
+  "mean_native_sasa": 47.6,
+  "buried_natively": [
+   "ALA60",
+   "PHE64",
+   "HIS71",
+   "GLY72",
+   "GLY73",
+   "VAL81",
+   "GLY82",
+   "ASP83",
+   "LEU84",
+   "GLY85"
+  ],
+  "reading": "Residues missing from the fibril model are flexible in the aggregate and look like an attractive target. They are not: most are already exposed on the healthy dimer, so they cannot be selective however accessible they become, and the few that are buried are glycine-rich and small, which makes poor epitopes."
+ },
+ "two_convergences": [
+  "Thr116, Val118 and His120 are the three residues that occlude the Cys146 backside attack trajectory in the folded protein. All three are buried natively and exposed on the fibril. The surface that blocks the chemistry in the native state is the surface that appears when the protein aggregates, and those are the same measurement made twice for unrelated reasons.",
+  "His46 and His120 are both copper ligands and both become exposed, so the aggregate surface reports the apo state. An antibody raised against it selects for metal-free protein, which is the species the maturation argument identifies as vulnerable."
+ ],
+ "limitations": [
+  "These are in-vitro fibrils. The authors state that their structures may not be identical to those in patients and that they intend to collect patient material.",
+  "The H46R and G85R fibril cores comprise only residues 85-153 and 82-153, so their maps differ from the wild-type one. If SOD1 strains are real -- and prion-like transmission of two distinct strains has been reported -- one conformation-specific antibody may not cover them.",
+  "Accessibility is necessary and not sufficient. An antibody recognises a conformational surface, not solvent-accessible area, and nothing here models a paratope.",
+  "A three-layer stack approximates the lateral surface of a filament; a real one is longer and may bundle."
+ ]
+}
