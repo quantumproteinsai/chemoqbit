@@ -14,18 +14,60 @@ set -euo pipefail
 
 SRC="${1:-}"
 REPO="${CHEMOQBIT_REPO:-https://github.com/quantumproteinsai/chemoqbit.git}"
-DEST="${CHEMOQBIT_DIR:-$HOME/chemoqbit}"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# run from inside a checkout -> set it up in place; otherwise clone/copy
+if [ -f "$HERE/scripts/ts_cluster_nuc.py" ]; then
+    DEST="${CHEMOQBIT_DIR:-$HERE}"
+    IN_PLACE=1
+else
+    DEST="${CHEMOQBIT_DIR:-$HOME/chemoqbit}"
+    IN_PLACE=0
+fi
 
 echo "== system packages"
-if command -v apt-get >/dev/null; then
+NEED="python3 python3-venv python3-dev build-essential git curl ca-certificates tmux"
+missing() {
+    python3 -c 'import venv, ensurepip' 2>/dev/null || return 0
+    command -v git >/dev/null || return 0
+    command -v cc  >/dev/null || return 0
+    # without these, the clone and every RCSB fetch fail on certificate
+    # verification, which reads as a network fault rather than a missing package
+    [ -s /etc/ssl/certs/ca-certificates.crt ] || return 0
+    python3 -c 'import sysconfig,os,sys; sys.exit(0 if os.path.exists(sysconfig.get_paths()["include"]+"/Python.h") else 1)' 2>/dev/null || return 0
+    return 1
+}
+if ! missing; then
+    echo "   already present, nothing to install"
+elif [ "$(id -u)" = 0 ]; then
     export DEBIAN_FRONTEND=noninteractive
-    apt-get update -qq
-    apt-get install -y -qq python3 python3-venv python3-dev build-essential \
-        git curl ca-certificates tmux
+    apt-get update -qq && apt-get install -y -qq $NEED
+elif command -v sudo >/dev/null && sudo -n true 2>/dev/null; then
+    echo "   using sudo"
+    sudo DEBIAN_FRONTEND=noninteractive apt-get update -qq
+    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq $NEED
+else
+    cat <<MSG
+
+Cannot install system packages as $(whoami).
+
+Run this once as root -- from inside the container:
+
+    su -c 'apt-get update && apt-get install -y $NEED'
+
+or from the Proxmox host (replace NNN with the container id):
+
+    pct exec NNN -- apt-get update
+    pct exec NNN -- apt-get install -y $NEED
+
+then run this script again. It does nothing else that needs privileges.
+MSG
+    exit 1
 fi
 
 echo "== source"
-if [ -n "$SRC" ]; then
+if [ "$IN_PLACE" = 1 ] && [ -z "$SRC" ]; then
+    echo "   using this checkout: $DEST"
+elif [ -n "$SRC" ]; then
     [ "$(readlink -f "$SRC")" = "$(readlink -f "$DEST")" ] || cp -r "$SRC" "$DEST"
 else
     [ -d "$DEST/.git" ] && git -C "$DEST" pull --ff-only || git clone "$REPO" "$DEST"
