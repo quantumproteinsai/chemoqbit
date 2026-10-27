@@ -37,3 +37,4 @@ data/rcsb_*/
 # public repository. They were untracked but not ignored, so a `git add -A`
 # before a push would have published them.
 *.pdf
+paper/figures/
