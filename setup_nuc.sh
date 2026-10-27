@@ -13,7 +13,7 @@
 set -euo pipefail
 
 SRC="${1:-}"
-REPO="${CHEMOQBIT_REPO:-https://github.com/bartmercier/chemoqbit.git}"
+REPO="${CHEMOQBIT_REPO:-https://github.com/quantumproteinsai/chemoqbit.git}"
 DEST="${CHEMOQBIT_DIR:-$HOME/chemoqbit}"
 
 echo "== system packages"
