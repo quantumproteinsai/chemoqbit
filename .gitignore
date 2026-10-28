@@ -38,3 +38,6 @@ data/rcsb_*/
 # before a push would have published them.
 *.pdf
 paper/figures/
+
+# the auditor remembers which violations it has already shown; local state, not a result
+results/.audit_seen.json

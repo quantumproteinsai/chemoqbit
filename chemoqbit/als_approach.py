@@ -255,6 +255,53 @@ def protonate(sym, X, charge, idx, label):
     return symH, XH, Chem.GetFormalCharge(molH), idx, labH
 
 
+# Covalent radii, enough for the elements these clusters contain. The 1.25 factor
+# is the usual slack for calling a distance a bond; it is deliberately generous,
+# because the list is built once from a RELAXED geometry and the point is to
+# notice a bond leaving, not to argue about where one begins.
+RCOV = {'H': 0.31, 'C': 0.76, 'N': 0.71, 'O': 0.66, 'S': 1.05}
+
+
+def covalent_bonds(sym, X, slack=1.25):
+    """[(i, j, length)] for every pair bonded in this geometry.
+
+    Built once from the relaxed reference so that later geometries are judged
+    against it rather than against a fresh guess: re-deriving the list at every
+    scan point would silently accept a broken bond as simply absent.
+    """
+    X = np.asarray(X, float)
+    out = []
+    for i in range(len(sym)):
+        d = np.linalg.norm(X[i + 1:] - X[i], axis=1)
+        for k, dk in enumerate(d):
+            j = i + 1 + k
+            if dk < slack * (RCOV[sym[i]] + RCOV[sym[j]]):
+                out.append((i, j, float(dk)))
+    return out
+
+
+def worst_stretch(bonds, X):
+    """(ratio, i, j) for the bond of `bonds` most stretched in geometry X."""
+    X = np.asarray(X, float)
+    return max((float(np.linalg.norm(X[i] - X[j]) / r0), i, j) for i, j, r0 in bonds)
+
+
+def new_bonds(sym, X, bonds, slack=1.25):
+    """Pairs bonded in X that are not in `bonds`. A rupture usually comes with
+    one of these, and it is the more legible half of the diagnosis: the Cys146
+    sulfur that left its own beta carbon bonded the Gly147 carbonyl oxygen."""
+    X = np.asarray(X, float)
+    had = {(i, j) for i, j, _ in bonds}
+    out = []
+    for i in range(len(sym)):
+        d = np.linalg.norm(X[i + 1:] - X[i], axis=1)
+        for k, dk in enumerate(d):
+            j = i + 1 + k
+            if (i, j) not in had and dk < slack * (RCOV[sym[i]] + RCOV[sym[j]]):
+                out.append((i, j, float(dk)))
+    return out
+
+
 def attack_angle(X, idx):
     """The Cys6...Cys146-Cys57 angle in degrees. An S_N2 at sulfur wants this near
     180: the nucleophile has to arrive behind the bond it is breaking. The crystal

@@ -429,6 +429,25 @@ record('a "bond" at 3.40 A', 'chalcogen_bond',
        not sanity.check('chalcogen_bond', 3.40, log=_q), True,
        'the approach distance: nothing has formed')
 
+# covalent_stretch: the three values are measured, not invented. The good one and
+# both failures are the Cys6 approach to the SOD1 disulfide, archived in
+# als_approach.json, als_approach.ssbroken_20261027.json and
+# als_approach.csbroken_20261028.json respectively.
+record('the attacked disulfide lengthening to 2.24 A', 'covalent_stretch',
+       not sanity.check('covalent_stretch', 1.107, log=_q), False,
+       'measured on mobile at contact: the worst bond in the cluster, and it is strain')
+record('a cluster that strained by a sixth', 'covalent_stretch',
+       not sanity.check('covalent_stretch', 1.167, log=_q), False,
+       'uncomfortable and still bonded; the bound is not there to forbid strain')
+record('the Cys57-Cys146 disulfide at x2.14', 'covalent_stretch',
+       not sanity.check('covalent_stretch', 2.14, log=_q), True,
+       'rigid, backbone-only: the bond under attack ruptured at 5.92 A with the '
+       'nucleophile 5.9 A away')
+record('the Cys57 CB-SG bond at x2.96', 'covalent_stretch',
+       not sanity.check('covalent_stretch', 2.96, log=_q), True,
+       'rigid with the disulfide pinned: a sulfur leaving its own beta carbon, which '
+       'is what pinning the S-S bond bought')
+
 
 def main():
     # The archived runs that supply the labelled positives are gitignored: they go to

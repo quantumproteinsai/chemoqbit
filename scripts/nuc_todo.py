@@ -89,11 +89,15 @@ def pocket(system, stages=('wt', 'scan', 'dft')):
 
 
 def zipper(system):
+    # 'core', not 'dft': the full sheet pair needs 168-392 GiB of density-fitting
+    # integrals depending on the system, against a 99 GiB disk, so stage_dft can
+    # never complete here. Asking for it left zip-sod1 restarting on the same
+    # Errno 28 seven times and held the rest of the zipper queue behind it.
     p = RES / f'zipper_{system}.json'
     if not p.exists():
         return True
     done = json.loads(p.read_text()).get('_stages_done', [])
-    return not all(x in done for x in ('wt', 'scan', 'dft'))
+    return not all(x in done for x in ('wt', 'scan', 'core'))
 
 
 if __name__ == '__main__':

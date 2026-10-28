@@ -119,5 +119,31 @@
    "why": "NOT a method failure, as first recorded here in error. GFN2-xTB puts the symmetric trichalcogen arrangement 7.85 (ss) to 9.30 (se_s) kcal/mol below the encounter complex, and the literature says that may well be right: the trisulfur anion is very close in energy to the SN2-like transition structure, CCSD is needed to tell an intermediate from a saddle, DFT on a peptide-substituted model puts the intermediate 10.7 kcal/mol below isolated reactants, and gas-phase direct dynamics find a shallow well with the mechanism addition-elimination rather than direct substitution. Decisive point for us: solvation is reported to convert the hypervalent anion from a bound complex into a transition state. So the topology is environment-dependent and the open question is which regime applies, not whether the code is broken. The bound species appears in exactly the two thermoneutral systems (ss, se_s) and in none of the four where thermodynamics dominates, which is the regime SOD1 scrambling sits in, since all three sulfurs there are cysteines. These checks stay recorded because the barrier and well-depth bounds were written on the assumption of a concerted saddle, which is the assumption now in question. scan_drop and exchange_segments follow from the same shape. scan_hysteresis is deliberately NOT covered: that was our bug and it is fixed.",
    "date": "2026-10-25"
   }
+ },
+ "als_approach.json": {
+  "rigid": {
+   "checks": [
+    "conformational_work",
+    "chalcogen_bond"
+   ],
+   "why": "No upper bound exists for this cluster. The rigid regime freezes every backbone N, CA, C and O, and driven to contact it does not yield elastically but breaks a covalent bond. Restraining the backbone alone, the Cys57-Cys146 disulfide ruptured between 6.27 and 5.92 A, 2.18 -> 4.33 A in one step, with Cys6 still 5.9 A away and taking no part in it; the remaining nine points priced a dissociated protein whose fragments could not escape, and the reported +198.73 kcal/mol was neither a bound on the intended quantity nor the maximum of its own path (+238.64 at 3.47 A). Archived as als_approach.ssbroken_20261027.json. Restraining d(S57,S146) to its relaxed 2.02 A as well moved the failure instead of removing it: the bond length held to 2.021-2.023 A across all sixteen points, but the Cys57 CB-SG bond ruptured at the same step (2.11 -> 5.45 A), the Cys146 CB-SG bond followed between 4.52 and 4.17 A, and at the endpoint five bonds were present that are absent from the reference, including Cys146 SG to the Gly147 backbone carbonyl oxygen at 1.785 A. conformational_work caught that one at +208.23 against its 200 ceiling, whose stated reason -- the cluster has broken rather than compressed -- was literally the case. Archived as als_approach.csbroken_20261028.json. No third restraint set was tried: each one relocates the rupture, and constraints chosen until the curve behaves are chosen for their effect on the result. The two attempts do agree on where the rigid fold runs out -- both absorb strain smoothly to 6.27 A, 86.00 and 83.39 kcal/mol, and both break a bond at 5.92 A -- and that agreement is reported qualitatively in section 3.5. No energetic weight is placed on the rupture itself: it is bond breaking at sulfur, where the chalcogen series found GFN2-xTB unreliable. The exclusion rests on the mobile lower bound, which needs no upper bound and whose every covalent bond was verified intact at every point.",
+   "date": "2026-10-28"
+  },
+  "mobile": {
+   "checks": [
+    "chalcogen_attack_angle"
+   ],
+   "why": "Nine false positives, one per scan point out to 5.57 A. The approach drives the attack angle from the 121 deg of the relaxed cluster up to 175 deg at contact, so for the first nine points it is legitimately below the 150 deg floor: that is the coordinate doing what it is designed to do, not a geometry fault. The bound exists to reject a saddle that was reached by pressing two sulfurs together sideways, and the geometry it should be asked about is the one the displacement is attempted in, which is the last point. It reaches 174.98 deg there and passes. The scan now records the check at contact only; these entries predate that change and remain in the checkpoint because the mobile stage is not being recomputed to erase them.",
+   "date": "2026-10-28"
+  }
+ },
+ "als_attack_site_crossval.json": {
+  "2C9U": {
+   "checks": [
+    "chalcogen_bond"
+   ],
+   "why": "Three entries, and they are deposited geometries rather than computed ones: the bound is reporting the crystal faithfully. 2C9U chain A carries the Cys57-Cys146 SSBOND record in both alternate conformers while modelling the two sulfurs 2.75 A apart, and chain F conformer A puts them at 2.58 A -- both too far to be bonded. Chain F conformer B is the one that models the bond at a bonded length, which is why scripts/fetch_structures.py directs the reader there and why the replication keeps every (chain, altloc) as its own set of atoms instead of resolving by occupancy: averaging these conformers together would have hidden the discrepancy rather than reported it. The attack geometry is measured on the thirty-four chains across the three crystals that model a formed disulfide.",
+   "date": "2026-10-28"
+  }
  }
 }

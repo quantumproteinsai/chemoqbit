@@ -1,0 +1,22 @@
+{
+ "question": "Is TDP-43 amyloid conversion a memoryless barrier crossing, or progressive condensate maturation?",
+ "source": "Choi, Kang, Cho, Jeong, Jung, Pack, Jeong & Song, bioRxiv 2026.10.15.759291 (posted 16 October 2026, NOT peer reviewed). Percentages read from the text of that preprint, not from its underlying data.",
+ "why_it_discriminates": "Ageing requires the per-unit-time conversion probability to RISE with the age of a structure: the cumulative curve is sigmoidal with a lag. Memoryless barrier crossing holds that probability constant, giving 1 - exp(-lambda.t) with no lag. The two are distinguishable from a time course alone.",
+ "result_3RE": {
+  "points": [[12, 5.4], [24, 11.3], [48, 19.5]],
+  "lambda_from_zero_per_hour": [0.00463, 0.00500, 0.00452],
+  "spread": "4.3 % of the mean across a four-fold range of time",
+  "interval_hazards": {"12-24h": 0.00537, "24-48h": 0.00404, "ratio": 0.75},
+  "constant_hazard_fit": "lambda = 0.00471 /h predicts 5.5, 10.7 and 20.2 % against 5.4, 11.3 and 19.5 % observed"
+ },
+ "across_constructs": "lambda is linear in PAM net charge, R2 = 0.82 over 13 (construct, time) points, each unit of negative charge raising the crossing rate by about 80 %. Their own fitted slope of percent-against-charge doubles from 12 h to 24 h (-0.93 to -1.85, ratio 1.99) and then turns over, which is the shape -b.t.exp(-lambda.t) has.",
+ "the_honest_reading": "No construct shows a RISING hazard. 3R-E is flat to within 4 % over 12-48 h; 3R-A falls from 0.00224 to 0.00161 between the 0-48 h and 48-72 h windows, ratio 0.72. Flat-to-falling is what memoryless crossing within a finite susceptible subpopulation gives. Rising is what condensate ageing requires, and nothing shows it.",
+ "why_this_matters_here": "The preprint argues the same thing qualitatively and from different evidence -- FRAP of puncta at 12 h is indistinguishable from 4 h, the least mobile condensates never convert, and conversion is local to individual structures. This reanalysis puts a rate constant on that argument and shows the time course has the functional form a threshold model predicts. The authors do not perform it.",
+ "limitations": [
+  "Numbers read from prose, not from the authors' data.",
+  "The 24-construct time course is stated to be a single experiment with pooled proportions and no replicate statistics, so no confidence intervals are available.",
+  "Yeast and U2OS overexpression of NLS-deficient TDP-43, with no endogenous protein and therefore no autoregulation. The autoregulatory half of the model is absent from this system -- which makes it a CLEANER test of the crossing half.",
+  "Cell-level scoring of fibril-bearing cells, not a molecular rate constant. This is not the elongation rate constant the model still lacks."
+ ],
+ "date": "2026-10-26"
+}

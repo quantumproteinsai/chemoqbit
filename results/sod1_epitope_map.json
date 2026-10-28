@@ -240,7 +240,7 @@
   "reading": "Residues missing from the fibril model are flexible in the aggregate and look like an attractive target. They are not: most are already exposed on the healthy dimer, so they cannot be selective however accessible they become, and the few that are buried are glycine-rich and small, which makes poor epitopes."
  },
  "two_convergences": [
-  "Thr116, Val118 and His120 are the three residues that occlude the Cys146 backside attack trajectory in the folded protein. All three are buried natively and exposed on the fibril. The surface that blocks the chemistry in the native state is the surface that appears when the protein aggregates, and those are the same measurement made twice for unrelated reasons.",
+  "Thr116 and Val118, which occupy the Cys146 backside attack site in the 2C9U conformer used for that measurement, are both buried natively and exposed on the fibril. Part of the surface that blocks the chemistry natively is surface that appears on aggregation. CORRECTED 27 Oct 2026: this previously named His120 as a third occluder. It is not one -- it appears in no occupancy list of the attack site, on 2C9U or across the 37 chains of sod1_attack_site_crossval.py -- although it is buried natively and exposed on the fibril. The occluder identity is also conformer-specific: Thr116 occupies the site in 12/37 chains, Val118 in 1/37.",
   "His46 and His120 are both copper ligands and both become exposed, so the aggregate surface reports the apo state. An antibody raised against it selects for metal-free protein, which is the species the maturation argument identifies as vulnerable."
  ],
  "limitations": [

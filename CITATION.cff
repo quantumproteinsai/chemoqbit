@@ -1,8 +1,8 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 title: "chemoqbit: reaction energetics on qubits, from molecular integrals to the instruction stream of an FPGA state-vector simulator"
-version: 1.3.0
-date-released: 2026-10-27
+version: 1.4.1
+date-released: 2026-10-28
 license: MIT
 doi: "10.5281/zenodo.23665343"
 repository-code: "https://github.com/quantumproteinsai/chemoqbit"
@@ -38,3 +38,15 @@ keywords:
   - thiol-disulfide exchange
   - selenium
   - physical bounds
+  - transition state theory
+  - conformational strain
+  - Cu/Zn superoxide dismutase
+  - amyotrophic lateral sclerosis
+  - protein misfolding
+  - disulfide scrambling
+  - TDP-43
+  - bistability
+  - proteostasis
+  - protein clearance
+  - aggregation threshold
+  - stochastic nucleation

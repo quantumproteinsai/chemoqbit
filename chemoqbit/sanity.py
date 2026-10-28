@@ -127,6 +127,20 @@ BOUNDS = {
                           'does not follow its coordinate never samples what it claims to: a '
                           'soft torsion restraint drifted 21 deg off target in the prolyl work '
                           'and the barriers came out at 80-120 kcal/mol'),
+    'covalent_stretch': (0.0, 1.25, 'ratio',
+                         'the longest covalent bond of a restrained geometry divided by its '
+                         'length in the relaxed reference. A cluster is allowed to strain and '
+                         'not to come apart, and a restrained scan that cannot reach its '
+                         'target any other way will tear a bond to get there: holding the '
+                         'SOD1 backbone frozen and the Cys57-Cys146 distance fixed drove the '
+                         'Cys57 CB-SG bond from 1.84 to 5.45 A, which is a sulfur leaving its '
+                         'own beta carbon and not a conformational change. The cost of that '
+                         'run was that conformational_work caught it only at the endpoint, by '
+                         'the accident of 208 exceeding 200; checked per point it stops at the '
+                         'rupture. The legitimate ceiling is low: over the same approach with '
+                         'the backbone free, the worst stretch is 1.107, and that is the '
+                         'attacked disulfide lengthening from 2.02 to 2.24 A as the '
+                         'nucleophile closes'),
     'conformational_work': (0.0, 200.0, 'kcal/mol',
                             'the work to compress two buried side chains together against the '
                             'packing of the fold. It must be positive, because the crystal '

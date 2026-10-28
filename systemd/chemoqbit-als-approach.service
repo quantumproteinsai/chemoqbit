@@ -17,6 +17,9 @@ ExecStart=/home/deploy/dev/chemoqbit/.venv/bin/python -u /home/deploy/dev/chemoq
 StandardOutput=append:/home/deploy/dev/chemoqbit/results/service_als_approach.log
 StandardError=append:/home/deploy/dev/chemoqbit/results/service_als_approach.log
 Restart=on-failure
+# exit 3 is a physical-bounds stop, not a crash: the disulfide being displaced has
+# ruptured, so restarting would recompute the same point and stop at the same place
+RestartPreventExitStatus=3
 RestartSec=120
 
 [Install]

@@ -1,0 +1,197 @@
+{
+ "model": "Is the TDP-43 autoregulatory loop bistable, and if so what sets the threshold?",
+ "parameters": {
+  "p0": 0.6,
+  "K": 1.0,
+  "h": 2.0,
+  "kin0": 6.0,
+  "KA": 0.4,
+  "m": 2.0,
+  "kout": 1.0,
+  "dN": 0.05,
+  "dC": 0.05,
+  "dA": 0.02,
+  "kn": 0.0001,
+  "kg": 0.04
+ },
+ "bistable": true,
+ "healthy_state": {
+  "N": 2.015965049502958,
+  "C": 0.352803737837072,
+  "A": 0.0021140223875744327
+ },
+ "collapsed_state": {
+  "N": 0.000552985436583328,
+  "C": 0.49997826174866306,
+  "A": 28.748662708252898
+ },
+ "separatrix_A": 0.28999328613281244,
+ "transient": [
+  {
+   "push_hours": 6,
+   "N_after_push": 0.8922144007243328,
+   "A_after_push": 0.0017282970313892267,
+   "N_final": 2.015965049502961,
+   "A_final": 0.0021140223875645487,
+   "verdict": "RECOVERS"
+  },
+  {
+   "push_hours": 12,
+   "N_after_push": 1.1150422019910675,
+   "A_after_push": 0.007062440609035307,
+   "N_final": 2.01596504950296,
+   "A_final": 0.002114022387572171,
+   "verdict": "RECOVERS"
+  },
+  {
+   "push_hours": 24,
+   "N_after_push": 1.2531442374258777,
+   "A_after_push": 0.03916828397924373,
+   "N_final": 2.0159650495029595,
+   "A_final": 0.002114022387569443,
+   "verdict": "RECOVERS"
+  },
+  {
+   "push_hours": 48,
+   "N_after_push": 0.44235158065064073,
+   "A_after_push": 0.7450429257734361,
+   "N_final": 0.0005529854365833275,
+   "A_final": 28.74866270825291,
+   "verdict": "collapses"
+  },
+  {
+   "push_hours": 96,
+   "N_after_push": 0.0001622736402550752,
+   "A_after_push": 18.178481130897588,
+   "N_final": 0.0005529854365833281,
+   "A_final": 28.748662708252894,
+   "verdict": "collapses"
+  },
+  {
+   "push_hours": 168,
+   "N_after_push": 5.482344772226452e-05,
+   "A_after_push": 26.146512963428524,
+   "N_final": 0.000552985436583328,
+   "A_final": 28.748662708252898,
+   "verdict": "collapses"
+  }
+ ],
+ "margin_scan": {
+  "aggregate clearance": [
+   {
+    "factor": 0.6,
+    "value": 0.012,
+    "threshold": null
+   },
+   {
+    "factor": 0.8,
+    "value": 0.016,
+    "threshold": 0.15869140625001882
+   },
+   {
+    "factor": 1.0,
+    "value": 0.02,
+    "threshold": 0.28999328613281244
+   },
+   {
+    "factor": 1.3,
+    "value": 0.026000000000000002,
+    "threshold": 0.42640686035155395
+   },
+   {
+    "factor": 1.8,
+    "value": 0.036000000000000004,
+    "threshold": 0.6136322021484473
+   }
+  ],
+  "transport impairment KA": [
+   {
+    "factor": 0.7,
+    "value": 0.27999999999999997,
+    "threshold": 0.2005767822266016
+   },
+   {
+    "factor": 0.85,
+    "value": 0.34,
+    "threshold": 0.24513244628905562
+   },
+   {
+    "factor": 1.0,
+    "value": 0.4,
+    "threshold": 0.28999328613281244
+   },
+   {
+    "factor": 1.2,
+    "value": 0.48,
+    "threshold": 0.3501892089843759
+   },
+   {
+    "factor": 1.5,
+    "value": 0.6000000000000001,
+    "threshold": 0.4419708251953124
+   }
+  ],
+  "templated growth": [
+   {
+    "factor": 0.7,
+    "value": 0.027999999999999997,
+    "threshold": 0.4624176025390626
+   },
+   {
+    "factor": 0.85,
+    "value": 0.034,
+    "threshold": 0.3691864013671875
+   },
+   {
+    "factor": 1.0,
+    "value": 0.04,
+    "threshold": 0.28999328613281244
+   },
+   {
+    "factor": 1.2,
+    "value": 0.048,
+    "threshold": 0.18981933593504213
+   },
+   {
+    "factor": 1.5,
+    "value": 0.06,
+    "threshold": null
+   }
+  ],
+  "autoregulation strength p0": [
+   {
+    "factor": 0.85,
+    "value": 0.51,
+    "threshold": 0.3221893310546874
+   },
+   {
+    "factor": 0.95,
+    "value": 0.57,
+    "threshold": 0.30014038085937444
+   },
+   {
+    "factor": 1.0,
+    "value": 0.6,
+    "threshold": 0.28999328613281244
+   },
+   {
+    "factor": 1.1,
+    "value": 0.66,
+    "threshold": 0.27076721191403474
+   },
+   {
+    "factor": 1.25,
+    "value": 0.75,
+    "threshold": 0.24467468261718953
+   }
+  ]
+ },
+ "interpretation": {
+  "result": "The loop IS bistable for this parameter set. Two stable states separated by a separatrix at A* = 0.290: a healthy one with 85 % of TDP-43 nuclear and essentially no aggregate, and a collapsed one with nuclear TDP-43 at 0 % of healthy. Nothing drives the system between them except crossing the threshold.",
+  "irreversibility": "A transient export bias of 24 h or less is survived and fully reversed. One of 48 h or more is not: the system continues to collapse after the push is removed. That is the signature, and it is the experiment that would discriminate bistability from a graded decline.",
+  "what_sets_the_margin": "Aggregate clearance dominates. Reducing it by 40 % abolishes the healthy state entirely -- the system has nowhere stable to sit. Raising it by 80 % doubles the threshold. Templated growth is the other strong lever, in the opposite direction: raising it 50 % also abolishes the healthy state. Transport impairment is moderate. Autoregulation strength is weak AND INVERTED: making the cell better at producing TDP-43 LOWERS the threshold, because more protein is more substrate for aggregation.",
+  "the_striking_part": "Clearance capacity being the dominant lever was not built in and was not expected. It matches the ALS genetics from the other direction: OPTN, TBK1, SQSTM1, UBQLN2 and VCP are all autophagy and protein-clearance genes. A model written only from TDP-43 autoregulation, transport and templating says the thing most likely to destroy the healthy state is loss of clearance -- which is what that whole class of ALS mutations does.",
+  "what_this_is_not": "This shows bistability is POSSIBLE in this class of model and identifies which parameters control the threshold. It does not show that ALS is bistable. The parameters are illustrative, chosen for order of magnitude and for a healthy state with 85 % nuclear TDP-43; they are not fitted to anything. The 24-to-48-hour switch is a property of those numbers, not a prediction about a motor neuron. What is robust is the STRUCTURE: which levers matter, in which direction, and that an irreversibility experiment can tell bistability from gradual decline.",
+  "first_attempt_failed": "The first parameter set had no healthy state at all: kg.C = 0.090 x 0.111 = 0.0100 against dA = 0.0100, sitting exactly on the bifurcation. Everything collapsed from every start. That was a parameter error, not a result, and the arithmetic that fixed it is the mechanism itself -- clearance must beat templated growth while the cytoplasmic pool is small, and bistability exists because blocked import raises that pool until it does not."
+ }
+}

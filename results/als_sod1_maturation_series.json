@@ -1,0 +1,36 @@
+{
+ "question": "Does losing the metals open the Cys146 attack site? I.e. is metal loss the \"something\" that must destabilise SOD1 before scrambling can start?",
+ "method": "The same geometric occlusion analysis used on 2C9U, applied across the maturation series: nearest heavy atom to the point 3.0 A beyond Cys146 SG anti to Cys57, excluding the three cysteines themselves.",
+ "results": [
+  {
+   "pdb": "1HL5",
+   "state": "holo, Cu and Zn bound",
+   "d_S6_S146": 7.81,
+   "d_SS": 2.13,
+   "occlusion": 2.56,
+   "nearest": "GLY147:N"
+  },
+  {
+   "pdb": "1HL4",
+   "state": "apo-Cu, Zn still bound",
+   "d_S6_S146": 7.76,
+   "d_SS": 2.03,
+   "occlusion": 2.43,
+   "nearest": "GLY147:N"
+  },
+  {
+   "pdb": "3ECU",
+   "state": "APO, no metals at all",
+   "d_S6_S146": 7.52,
+   "d_SS": 2.04,
+   "occlusion": 2.36,
+   "nearest": "GLY147:N"
+  }
+ ],
+ "requirement": "about 3.3 A for a thiolate to reach the attack point",
+ "answer": "No. Stripping both metals changes the Cys6-Cys146 separation by 0.3 A (7.81 to 7.52) and the occlusion by 0.2 A (2.56 to 2.36). Both stay far short of what a thiolate needs. The blocking atom is Gly147 N in every one of them, the same backbone nitrogen found on the axis in 2C9U. Metal loss destabilises SOD1 -- that is well established -- but it does not open this site.",
+ "what_it_means": "Every structure here is a FOLDED protein that could be crystallised or solved by NMR. Across all of them the site stays shut. The literature says the aggregation-prone species is apo AND disulfide-reduced -- the immature form, where the disulfide was never made rather than broken, since CCS catalyses its formation during maturation. That state is partially disordered and is precisely what no crystal structure captures. So the opening, if it happens, happens in the disordered ensemble, and it cannot be read off a structure.",
+ "consequence": "This weakens the premise of the conformational-work calculation rather than supporting it. That calculation prices moving Cys6 into range within a folded cluster. If the relevant species is the immature, disulfide-free, partly disordered one, then there is no disulfide to attack and the reaction being priced is not the one that matters. The calculation still answers its own question -- can scrambling start in the folded protein -- and the answer is looking like no, emphatically.",
+ "caveat": "The 2C9U row was dropped from this table. The quick reader used here takes whichever altloc appears first, giving 7.81 A, where the careful analysis on chain F conformer B gives 8.37 A. The four structures compared above are internally consistent; mixing in a differently-read 2C9U would not be.",
+ "date": "2026-10-26"
+}

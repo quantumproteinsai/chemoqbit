@@ -98,20 +98,20 @@ encoding and QAOA, and the web service.
 
 # AI usage disclosure
 
-**[To be completed and confirmed by the author before submission.]** Parts of
-the code, documentation and this paper were written with the assistance of
-Claude (Anthropic) through Claude Code; the sessions of October 2026 used
+Parts of the code, documentation and this paper were written with the
+assistance of Claude (Anthropic) through Claude Code, using Claude Opus 5 and
 Claude Opus 5.5. The assistance included implementing and debugging the
 thymidylate synthase cluster pipeline (`chemoqbit/enzyme`, `scripts/ts_*`), the
-embedding and ONIOM stages, the report, dataset and notification scripts, and
-drafting this paper. *[Add: which other parts of the package were AI-assisted,
-and with which tools and versions.]* The author reviewed and validated all
-AI-assisted outputs, ran and checked the tests and results, and made the core
-design and scientific decisions.
+embedding and ONIOM stages, the report, dataset and notification scripts; the
+prolyl isomerisation, chalcogen-ladder, ligand-pocket and steric-zipper
+applications; the SOD1 accessibility, attack-geometry and conformational-work
+pipelines; the physical-bounds module, its auditor and its self-test; the
+resumable systemd units and their checkpointing; and drafting this paper. The
+author reviewed and validated all AI-assisted outputs, ran and checked the tests
+and results, and made the core design and scientific decisions.
 
 # Acknowledgements
 
-*[Funding, if any; otherwise state that the work was carried out without
-external funding.]*
+This work was carried out without external funding.
 
 # References

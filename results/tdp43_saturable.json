@@ -1,0 +1,66 @@
+{
+ "model": "TDP-43 autoregulatory loop with SATURABLE aggregate clearance",
+ "why_saturable": "The first model cleared aggregates first order. Requiring that to beat templated growth capped the elongation rate constant at roughly 1 to 35 per molar per second for any plausible cytoplasmic concentration and autophagy half-life. Medin, an amyloid whose kinetics have been fitted, elongates at 5e7. Six to eight orders of magnitude is a structural error, not a parameter one: first-order clearance scales without limit, and autophagy is capacity-limited. Replacing it with Vmax.A/(Km+A) is the fix, and it was forced by a conflict with measurement rather than chosen.",
+ "measured_inputs": {
+  "TDP43_half_life_primary_neurons": "about 18 h (range 4-34 across cell types); turnover set to ln2/18 = 0.039 /h accordingly",
+  "not_published": [
+   "TDP-43 elongation rate constant k+",
+   "aggregate clearance rate or capacity in neurons",
+   "cytoplasmic TDP-43 concentration at the needed precision"
+  ]
+ },
+ "results": {
+  "clinical_test_now_passes": "A heterozygous clearance loss at 50 % capacity gives BISTABLE, not COLLAPSED. The first model predicted disease from birth for OPTN, TBK1, SQSTM1, UBQLN2 and VCP carriers, who in fact get late-onset disease with incomplete penetrance.",
+  "spontaneous_onset": "Nucleation flux at the healthy state is 1.47e-5 against a capacity of 4.5e-2, a margin of 3054x. Spontaneous onset is effectively impossible in this model: the disease needs a SEED. That is what prion-like behaviour means, and what sporadic ALS requiring an initiating event would look like.",
+  "critical_seed": [
+   {
+    "Vmax_fraction": 1.5,
+    "A_star": 0.9611,
+    "relative": 1.28
+   },
+   {
+    "Vmax_fraction": 1.25,
+    "A_star": 0.8586,
+    "relative": 1.15
+   },
+   {
+    "Vmax_fraction": 1.0,
+    "A_star": 0.7482,
+    "relative": 1.0
+   },
+   {
+    "Vmax_fraction": 0.8,
+    "A_star": 0.6509,
+    "relative": 0.87
+   },
+   {
+    "Vmax_fraction": 0.6,
+    "A_star": 0.5403,
+    "relative": 0.72
+   },
+   {
+    "Vmax_fraction": 0.5,
+    "A_star": 0.4768,
+    "relative": 0.64
+   },
+   {
+    "Vmax_fraction": 0.4,
+    "A_star": 0.4045,
+    "relative": 0.54
+   },
+   {
+    "Vmax_fraction": 0.3,
+    "A_star": 0.3174,
+    "relative": 0.42
+   },
+   {
+    "Vmax_fraction": 0.2,
+    "A_star": 0.2005,
+    "relative": 0.27
+   }
+  ]
+ },
+ "prediction": "Clearance capacity sets the CRITICAL SEED SIZE, roughly linearly. Halving capacity, which is what a heterozygous loss-of-function allele does, lowers the seed needed for self-sustaining aggregation by about 36 %. That is measurable with assays that already exist: seed neurons with graded doses of TDP-43 fibril and find the dose above which aggregation becomes self-sustaining, in wild type against a clearance-gene knockdown. The model says the threshold should fall by about a third for a 50 % capacity loss. A null result would falsify it.",
+ "limitations": "The collapsed branch is not a steady state: with saturable clearance and no conservation of total protein, aggregate accumulates without bound once influx exceeds capacity. That is why outcomes here are judged by whether a seed exceeds a pathological load within three years rather than by an end state. Parameters remain illustrative, and the seed sizes are in model units, so the 36 % is the transferable number and 0.75 is not.",
+ "date": "2026-10-26"
+}

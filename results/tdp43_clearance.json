@@ -1,0 +1,239 @@
+{
+ "model": "Does losing protein clearance put a cell over the TDP-43 threshold?",
+ "base": {
+  "p0": 0.6,
+  "K": 1.0,
+  "h": 2.0,
+  "kin0": 6.0,
+  "KA": 0.4,
+  "m": 2.0,
+  "kout": 1.0,
+  "dN": 0.05,
+  "dC": 0.05,
+  "dA": 0.02,
+  "kn": 0.0001,
+  "kg": 0.04
+ },
+ "clearance_scan": [
+  {
+   "fraction": 1.0,
+   "dA": 0.02,
+   "state": "BISTABLE",
+   "threshold": 0.28999328613281244,
+   "push_hours": 39.72783088684082
+  },
+  {
+   "fraction": 0.9,
+   "dA": 0.018000000000000002,
+   "state": "BISTABLE",
+   "threshold": 0.23254394531248784,
+   "push_hours": 37.52875328063965
+  },
+  {
+   "fraction": 0.8,
+   "dA": 0.016,
+   "state": "BISTABLE",
+   "threshold": 0.15869140625001882,
+   "push_hours": 33.97641181945801
+  },
+  {
+   "fraction": 0.7,
+   "dA": 0.013999999999999999,
+   "state": "COLLAPSED",
+   "threshold": null,
+   "push_hours": null
+  },
+  {
+   "fraction": 0.65,
+   "dA": 0.013000000000000001,
+   "state": "COLLAPSED",
+   "threshold": null,
+   "push_hours": null
+  },
+  {
+   "fraction": 0.6,
+   "dA": 0.012,
+   "state": "COLLAPSED",
+   "threshold": null,
+   "push_hours": null
+  },
+  {
+   "fraction": 0.55,
+   "dA": 0.011000000000000001,
+   "state": "COLLAPSED",
+   "threshold": null,
+   "push_hours": null
+  },
+  {
+   "fraction": 0.5,
+   "dA": 0.01,
+   "state": "COLLAPSED",
+   "threshold": null,
+   "push_hours": null
+  },
+  {
+   "fraction": 0.4,
+   "dA": 0.008,
+   "state": "COLLAPSED",
+   "threshold": null,
+   "push_hours": null
+  }
+ ],
+ "clearance_cliff": 0.7,
+ "phase_diagram": {
+  "clearance_factors": [
+   1.3,
+   1.15,
+   1.0,
+   0.85,
+   0.7,
+   0.55,
+   0.4
+  ],
+  "templating_factors": [
+   0.7,
+   0.85,
+   1.0,
+   1.15,
+   1.3,
+   1.5
+  ],
+  "grid": [
+   {
+    "clearance": 1.3,
+    "states": [
+     "BISTABLE",
+     "BISTABLE",
+     "BISTABLE",
+     "BISTABLE",
+     "BISTABLE",
+     "BISTABLE"
+    ]
+   },
+   {
+    "clearance": 1.15,
+    "states": [
+     "BISTABLE",
+     "BISTABLE",
+     "BISTABLE",
+     "BISTABLE",
+     "BISTABLE",
+     "BISTABLE"
+    ]
+   },
+   {
+    "clearance": 1.0,
+    "states": [
+     "BISTABLE",
+     "BISTABLE",
+     "BISTABLE",
+     "BISTABLE",
+     "BISTABLE",
+     "COLLAPSED"
+    ]
+   },
+   {
+    "clearance": 0.85,
+    "states": [
+     "BISTABLE",
+     "BISTABLE",
+     "BISTABLE",
+     "BISTABLE",
+     "COLLAPSED",
+     "COLLAPSED"
+    ]
+   },
+   {
+    "clearance": 0.7,
+    "states": [
+     "BISTABLE",
+     "BISTABLE",
+     "COLLAPSED",
+     "COLLAPSED",
+     "COLLAPSED",
+     "COLLAPSED"
+    ]
+   },
+   {
+    "clearance": 0.55,
+    "states": [
+     "BISTABLE",
+     "COLLAPSED",
+     "COLLAPSED",
+     "COLLAPSED",
+     "COLLAPSED",
+     "COLLAPSED"
+    ]
+   },
+   {
+    "clearance": 0.4,
+    "states": [
+     "COLLAPSED",
+     "COLLAPSED",
+     "COLLAPSED",
+     "COLLAPSED",
+     "COLLAPSED",
+     "COLLAPSED"
+    ]
+   }
+  ]
+ },
+ "genotypes": [
+  {
+   "name": "wild type",
+   "clearance": 1.0,
+   "templating": 1.0,
+   "state": "BISTABLE",
+   "threshold": 0.28999328613281244,
+   "push_hours": 39.72783088684082
+  },
+  {
+   "name": "heterozygous clearance LoF (OPTN/TBK1/SQSTM1/UBQLN2/VCP)",
+   "clearance": 0.5,
+   "templating": 1.0,
+   "state": "COLLAPSED",
+   "threshold": null,
+   "push_hours": null
+  },
+  {
+   "name": "mild clearance loss, e.g. ageing",
+   "clearance": 0.8,
+   "templating": 1.0,
+   "state": "BISTABLE",
+   "threshold": 0.15869140625001882,
+   "push_hours": 33.97641181945801
+  },
+  {
+   "name": "aggregation-prone TARDBP/FUS variant",
+   "clearance": 1.0,
+   "templating": 1.25,
+   "state": "BISTABLE",
+   "threshold": 0.16258239741119135,
+   "push_hours": 30.11174201965332
+  },
+  {
+   "name": "ageing plus an aggregation-prone variant",
+   "clearance": 0.8,
+   "templating": 1.25,
+   "state": "COLLAPSED",
+   "threshold": null,
+   "push_hours": null
+  },
+  {
+   "name": "heterozygous clearance LoF plus ageing",
+   "clearance": 0.4,
+   "templating": 1.0,
+   "state": "COLLAPSED",
+   "threshold": null,
+   "push_hours": null
+  }
+ ],
+ "interpretation": {
+  "shape": "Clearance has a CLIFF, not a slope. At the wild-type parameters the healthy state survives a 20 % loss of clearance and is gone by 30 %. The phase diagram over clearance and templating shows the boundary running diagonally: losing clearance and gaining aggregation propensity are interchangeable, which is why two quite different gene classes -- the autophagy genes and the RNA-binding-protein genes -- reach the same endpoint.",
+  "the_model_fails_a_clinical_test": "At these parameters a heterozygous clearance loss-of-function, modelled as half capacity, gives COLLAPSED: no healthy state at any seed. That predicts disease from birth. But OPTN, TBK1, SQSTM1, UBQLN2 and VCP carriers get LATE-onset disease with incomplete penetrance. So the parameterisation is wrong, and wrong in a specific, measurable way: the wild-type margin is too small.",
+  "what_that_buys": "Inverting it is the useful move. Scanning the wild-type margin, defined as dA/(kg.C_healthy), against whether a heterozygote retains a healthy state: at 1.42 and 1.84 the heterozygote collapses; from 2.27 upward it survives as bistable. So the clinical genetics CONSTRAINS the biophysics -- a motor neuron must run its clearance at more than about twice the rate templated growth would consume, or half-dosage carriers would be born ill. That is a quantitative statement about a cell, derived from patient phenotypes through a model, and it is checkable against measured autophagic flux and aggregation kinetics.",
+  "no_healthy_only_region": "Every point in the diagram is BISTABLE or COLLAPSED; nowhere is unconditionally healthy, even at 30 % above wild-type clearance. That follows from the templating term: a large enough seed always propagates, because blocked import raises the cytoplasmic pool until growth beats clearance. It may be right -- it is what prion-like behaviour means, and it would say every motor neuron is vulnerable GIVEN a sufficient seed, with genotype setting the seed size rather than the possibility. It may equally be an artefact of using a seed of A = 3.0 as the test. That ambiguity is not resolved here.",
+  "prediction": "Within the bistable region the push needed to make collapse permanent shortens as clearance falls: 40 h at wild type, 34 h at 80 % clearance, 30 h with an aggregation-prone variant. A genotype should therefore change how long an insult has to last, not merely whether disease occurs -- which is measurable with the export-biased construct and is a sharper test than onset age.",
+  "status": "ILLUSTRATIVE. The gene-to-parameter mapping is a hypothesis, half capacity for a heterozygote is the usual first assumption and may be wrong either way, and no parameter here is fitted to data. What the model supplies is the shape of the dependence and one inequality the clinical genetics imposes on it."
+ }
+}

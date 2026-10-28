@@ -1,0 +1,2790 @@
+{
+ "question": "The backside attack site on Cys146 was measured in one chain of one SOD1 crystal. Does the geometry that excludes the reaction hold across every chain of every wild-type crystal available, or is it a property of that chain?",
+ "method": "Per chain and per alternate conformer: the S6...S146-S57 angle, and the occupants within 3.3 A of the point 3.3 A beyond S146 along the direction away from S57. Alternate conformers are kept separate rather than resolved by occupancy, because the occupant depends on which is taken.",
+ "backside_floor_deg": 150.0,
+ "reach": 3.3,
+ "structures": [
+  {
+   "pdb": "2C9U",
+   "resolution": 1.24,
+   "note": "Strange et al., JMB 2006; the structure the single-chain measurement was made on, chain F conformer B",
+   "n_chains_measured": 4,
+   "chains": [
+    {
+     "disulfide_SS": 2.75,
+     "d_S6_S146": 7.74,
+     "d_S6_S111": 13.37,
+     "attack_angle": 134.3,
+     "travel": 5.93,
+     "occupants": [
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.52,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.7,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:C",
+       "residue": "GLY147",
+       "d": 2.71,
+       "backbone": true
+      },
+      {
+       "atom": "VAL148:N",
+       "residue": "VAL148",
+       "d": 3.12,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 3.19,
+       "backbone": true
+      }
+     ],
+     "chain": "A",
+     "altloc": "A",
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 7.74,
+       "angle": 134.3
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.86,
+       "angle": 34.2
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.1,
+       "angle": 143.9
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.39,
+       "angle": 31.5
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.75,
+     "d_S6_S146": 7.74,
+     "d_S6_S111": 13.37,
+     "attack_angle": 134.3,
+     "travel": 5.93,
+     "occupants": [
+      {
+       "atom": "ASN53:ND2",
+       "residue": "ASN53",
+       "d": 1.48,
+       "backbone": false
+      },
+      {
+       "atom": "ASN53:CG",
+       "residue": "ASN53",
+       "d": 2.51,
+       "backbone": false
+      },
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.52,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.7,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:C",
+       "residue": "GLY147",
+       "d": 2.71,
+       "backbone": true
+      },
+      {
+       "atom": "ASN53:OD1",
+       "residue": "ASN53",
+       "d": 2.89,
+       "backbone": false
+      },
+      {
+       "atom": "VAL148:N",
+       "residue": "VAL148",
+       "d": 3.12,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 3.19,
+       "backbone": true
+      }
+     ],
+     "chain": "A",
+     "altloc": "B",
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 7.74,
+       "angle": 134.3
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.86,
+       "angle": 34.2
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.1,
+       "angle": 143.9
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.39,
+       "angle": 31.5
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.58,
+     "d_S6_S146": 7.81,
+     "d_S6_S111": 13.37,
+     "attack_angle": 135.0,
+     "travel": 5.95,
+     "occupants": [
+      {
+       "atom": "ASN53:ND2",
+       "residue": "ASN53",
+       "d": 1.34,
+       "backbone": false
+      },
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.48,
+       "backbone": true
+      },
+      {
+       "atom": "ASN53:CG",
+       "residue": "ASN53",
+       "d": 2.49,
+       "backbone": false
+      },
+      {
+       "atom": "GLY147:C",
+       "residue": "GLY147",
+       "d": 2.68,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.69,
+       "backbone": true
+      },
+      {
+       "atom": "ASN53:OD1",
+       "residue": "ASN53",
+       "d": 3.0,
+       "backbone": false
+      },
+      {
+       "atom": "VAL148:N",
+       "residue": "VAL148",
+       "d": 3.13,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 3.2,
+       "backbone": true
+      }
+     ],
+     "chain": "F",
+     "altloc": "A",
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 7.81,
+       "angle": 135.0
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.81,
+       "angle": 34.2
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.2,
+       "angle": 143.7
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.34,
+       "angle": 32.0
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.0,
+     "d_S6_S146": 8.37,
+     "d_S6_S111": 13.37,
+     "attack_angle": 133.2,
+     "travel": 6.56,
+     "occupants": [
+      {
+       "atom": "THR116:CG2",
+       "residue": "THR116",
+       "d": 1.8,
+       "backbone": false
+      },
+      {
+       "atom": "VAL118:CG2",
+       "residue": "VAL118",
+       "d": 2.2,
+       "backbone": false
+      },
+      {
+       "atom": "LEU117:O",
+       "residue": "LEU117",
+       "d": 2.42,
+       "backbone": true
+      },
+      {
+       "atom": "LEU117:C",
+       "residue": "LEU117",
+       "d": 2.72,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:CB",
+       "residue": "CYS146",
+       "d": 2.89,
+       "backbone": false
+      },
+      {
+       "atom": "THR116:CB",
+       "residue": "THR116",
+       "d": 2.97,
+       "backbone": false
+      },
+      {
+       "atom": "THR116:C",
+       "residue": "THR116",
+       "d": 3.15,
+       "backbone": true
+      },
+      {
+       "atom": "VAL118:N",
+       "residue": "VAL118",
+       "d": 3.17,
+       "backbone": true
+      },
+      {
+       "atom": "LEU117:N",
+       "residue": "LEU117",
+       "d": 3.25,
+       "backbone": true
+      }
+     ],
+     "chain": "F",
+     "altloc": "B",
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 8.37,
+       "angle": 133.2
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.85,
+       "angle": 38.2
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.36,
+       "angle": 167.8
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.33,
+       "angle": 11.0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "pdb": "1HL5",
+   "resolution": 1.8,
+   "note": "Strange et al., JMB 2003; eighteen chains, and the S-S distances vary from 2.04 to 2.21 A rather than sitting at one restrained value, so the disulfide geometry here is refined per chain and not imposed",
+   "n_chains_measured": 18,
+   "chains": [
+    {
+     "disulfide_SS": 2.13,
+     "d_S6_S146": 7.81,
+     "d_S6_S111": 13.54,
+     "attack_angle": 138.0,
+     "travel": 5.8,
+     "occupants": [
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.56,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.6,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:C",
+       "residue": "GLY147",
+       "d": 2.62,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:O",
+       "residue": "GLY147",
+       "d": 3.06,
+       "backbone": true
+      },
+      {
+       "atom": "THR116:CG2",
+       "residue": "THR116",
+       "d": 3.17,
+       "backbone": false
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 3.18,
+       "backbone": true
+      },
+      {
+       "atom": "VAL148:N",
+       "residue": "VAL148",
+       "d": 3.21,
+       "backbone": true
+      }
+     ],
+     "chain": "A",
+     "altloc": null,
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 7.81,
+       "angle": 138.0
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.5,
+       "angle": 33.4
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.35,
+       "angle": 151.1
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.24,
+       "angle": 25.9
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.21,
+     "d_S6_S146": 7.72,
+     "d_S6_S111": 13.64,
+     "attack_angle": 138.5,
+     "travel": 5.69,
+     "occupants": [
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.36,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.48,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:C",
+       "residue": "GLY147",
+       "d": 2.53,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:O",
+       "residue": "GLY147",
+       "d": 2.99,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 3.03,
+       "backbone": true
+      },
+      {
+       "atom": "VAL148:N",
+       "residue": "VAL148",
+       "d": 3.15,
+       "backbone": true
+      }
+     ],
+     "chain": "B",
+     "altloc": null,
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 7.72,
+       "angle": 138.5
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.49,
+       "angle": 32.6
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.37,
+       "angle": 148.6
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.29,
+       "angle": 28.1
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.21,
+     "d_S6_S146": 7.75,
+     "d_S6_S111": 13.63,
+     "attack_angle": 137.7,
+     "travel": 5.75,
+     "occupants": [
+      {
+       "atom": "ASN53:ND2",
+       "residue": "ASN53",
+       "d": 2.17,
+       "backbone": false
+      },
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.38,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.55,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:C",
+       "residue": "GLY147",
+       "d": 2.57,
+       "backbone": true
+      },
+      {
+       "atom": "ASN53:OD1",
+       "residue": "ASN53",
+       "d": 2.74,
+       "backbone": false
+      },
+      {
+       "atom": "ASN53:CG",
+       "residue": "ASN53",
+       "d": 2.81,
+       "backbone": false
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 3.1,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:O",
+       "residue": "GLY147",
+       "d": 3.11,
+       "backbone": true
+      },
+      {
+       "atom": "VAL148:N",
+       "residue": "VAL148",
+       "d": 3.11,
+       "backbone": true
+      }
+     ],
+     "chain": "C",
+     "altloc": null,
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 7.75,
+       "angle": 137.7
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.5,
+       "angle": 33.3
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.4,
+       "angle": 146.2
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.27,
+       "angle": 30.3
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.16,
+     "d_S6_S146": 7.8,
+     "d_S6_S111": 13.4,
+     "attack_angle": 137.2,
+     "travel": 5.83,
+     "occupants": [
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.42,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.61,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:C",
+       "residue": "GLY147",
+       "d": 2.67,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 3.09,
+       "backbone": true
+      },
+      {
+       "atom": "VAL148:N",
+       "residue": "VAL148",
+       "d": 3.14,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:O",
+       "residue": "GLY147",
+       "d": 3.25,
+       "backbone": true
+      }
+     ],
+     "chain": "D",
+     "altloc": null,
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 7.8,
+       "angle": 137.2
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.5,
+       "angle": 33.9
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.28,
+       "angle": 146.2
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.11,
+       "angle": 30.4
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.17,
+     "d_S6_S146": 7.78,
+     "d_S6_S111": 13.7,
+     "attack_angle": 140.5,
+     "travel": 5.64,
+     "occupants": [
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.25,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.35,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:C",
+       "residue": "GLY147",
+       "d": 2.56,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 2.88,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:O",
+       "residue": "GLY147",
+       "d": 3.13,
+       "backbone": true
+      },
+      {
+       "atom": "VAL148:N",
+       "residue": "VAL148",
+       "d": 3.13,
+       "backbone": true
+      }
+     ],
+     "chain": "E",
+     "altloc": null,
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 7.78,
+       "angle": 140.5
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.56,
+       "angle": 31.2
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.52,
+       "angle": 147.4
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.38,
+       "angle": 29.3
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.16,
+     "d_S6_S146": 7.73,
+     "d_S6_S111": 13.64,
+     "attack_angle": 138.8,
+     "travel": 5.68,
+     "occupants": [
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.34,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.36,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:C",
+       "residue": "GLY147",
+       "d": 2.62,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 2.94,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:O",
+       "residue": "GLY147",
+       "d": 3.15,
+       "backbone": true
+      },
+      {
+       "atom": "VAL148:N",
+       "residue": "VAL148",
+       "d": 3.15,
+       "backbone": true
+      }
+     ],
+     "chain": "F",
+     "altloc": null,
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 7.73,
+       "angle": 138.8
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.47,
+       "angle": 32.5
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.38,
+       "angle": 144.7
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.18,
+       "angle": 31.7
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.12,
+     "d_S6_S146": 7.88,
+     "d_S6_S111": 13.84,
+     "attack_angle": 137.6,
+     "travel": 5.88,
+     "occupants": [
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.45,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.53,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:C",
+       "residue": "GLY147",
+       "d": 2.72,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 2.99,
+       "backbone": true
+      },
+      {
+       "atom": "VAL148:N",
+       "residue": "VAL148",
+       "d": 3.23,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:O",
+       "residue": "GLY147",
+       "d": 3.26,
+       "backbone": true
+      }
+     ],
+     "chain": "G",
+     "altloc": null,
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 7.88,
+       "angle": 137.6
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.55,
+       "angle": 33.8
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.78,
+       "angle": 144.2
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.53,
+       "angle": 32.3
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.11,
+     "d_S6_S146": 7.79,
+     "d_S6_S111": 13.55,
+     "attack_angle": 138.2,
+     "travel": 5.77,
+     "occupants": [
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.34,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.51,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:C",
+       "residue": "GLY147",
+       "d": 2.64,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 2.96,
+       "backbone": true
+      },
+      {
+       "atom": "VAL148:N",
+       "residue": "VAL148",
+       "d": 3.14,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:O",
+       "residue": "GLY147",
+       "d": 3.23,
+       "backbone": true
+      }
+     ],
+     "chain": "H",
+     "altloc": null,
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 7.79,
+       "angle": 138.2
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.48,
+       "angle": 33.2
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.42,
+       "angle": 144.7
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.18,
+       "angle": 31.8
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.17,
+     "d_S6_S146": 7.81,
+     "d_S6_S111": 13.65,
+     "attack_angle": 139.8,
+     "travel": 5.7,
+     "occupants": [
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.34,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.42,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:C",
+       "residue": "GLY147",
+       "d": 2.62,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 2.92,
+       "backbone": true
+      },
+      {
+       "atom": "VAL148:N",
+       "residue": "VAL148",
+       "d": 3.16,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:O",
+       "residue": "GLY147",
+       "d": 3.17,
+       "backbone": true
+      }
+     ],
+     "chain": "I",
+     "altloc": null,
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 7.81,
+       "angle": 139.8
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.57,
+       "angle": 31.8
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.47,
+       "angle": 145.2
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.29,
+       "angle": 31.3
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.17,
+     "d_S6_S146": 7.67,
+     "d_S6_S111": 13.56,
+     "attack_angle": 140.0,
+     "travel": 5.56,
+     "occupants": [
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.28,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.38,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:C",
+       "residue": "GLY147",
+       "d": 2.46,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:O",
+       "residue": "GLY147",
+       "d": 2.94,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 2.96,
+       "backbone": true
+      },
+      {
+       "atom": "VAL148:N",
+       "residue": "VAL148",
+       "d": 3.1,
+       "backbone": true
+      },
+      {
+       "atom": "THR116:CG2",
+       "residue": "THR116",
+       "d": 3.2,
+       "backbone": false
+      }
+     ],
+     "chain": "J",
+     "altloc": null,
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 7.67,
+       "angle": 140.0
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.44,
+       "angle": 31.5
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.3,
+       "angle": 150.0
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.21,
+       "angle": 26.9
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.18,
+     "d_S6_S146": 7.83,
+     "d_S6_S111": 13.5,
+     "attack_angle": 138.6,
+     "travel": 5.78,
+     "occupants": [
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.46,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.47,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:C",
+       "residue": "GLY147",
+       "d": 2.61,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 3.03,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:O",
+       "residue": "GLY147",
+       "d": 3.05,
+       "backbone": true
+      },
+      {
+       "atom": "THR116:CG2",
+       "residue": "THR116",
+       "d": 3.18,
+       "backbone": false
+      },
+      {
+       "atom": "VAL148:N",
+       "residue": "VAL148",
+       "d": 3.21,
+       "backbone": true
+      }
+     ],
+     "chain": "K",
+     "altloc": null,
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 7.83,
+       "angle": 138.6
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.57,
+       "angle": 32.7
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.34,
+       "angle": 148.9
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.24,
+       "angle": 27.9
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.14,
+     "d_S6_S146": 7.82,
+     "d_S6_S111": 13.63,
+     "attack_angle": 139.3,
+     "travel": 5.74,
+     "occupants": [
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.38,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.48,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:C",
+       "residue": "GLY147",
+       "d": 2.63,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 2.99,
+       "backbone": true
+      },
+      {
+       "atom": "VAL148:N",
+       "residue": "VAL148",
+       "d": 3.16,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:O",
+       "residue": "GLY147",
+       "d": 3.18,
+       "backbone": true
+      }
+     ],
+     "chain": "L",
+     "altloc": null,
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 7.82,
+       "angle": 139.3
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.55,
+       "angle": 32.3
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.53,
+       "angle": 146.8
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.36,
+       "angle": 29.9
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.15,
+     "d_S6_S146": 7.83,
+     "d_S6_S111": 13.63,
+     "attack_angle": 139.5,
+     "travel": 5.74,
+     "occupants": [
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.49,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.5,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:C",
+       "residue": "GLY147",
+       "d": 2.61,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:O",
+       "residue": "GLY147",
+       "d": 3.02,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 3.05,
+       "backbone": true
+      },
+      {
+       "atom": "THR116:CG2",
+       "residue": "THR116",
+       "d": 3.1,
+       "backbone": false
+      },
+      {
+       "atom": "VAL148:N",
+       "residue": "VAL148",
+       "d": 3.21,
+       "backbone": true
+      }
+     ],
+     "chain": "M",
+     "altloc": null,
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 7.83,
+       "angle": 139.5
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.57,
+       "angle": 32.1
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.37,
+       "angle": 149.1
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.24,
+       "angle": 27.7
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.15,
+     "d_S6_S146": 7.78,
+     "d_S6_S111": 13.66,
+     "attack_angle": 139.9,
+     "travel": 5.67,
+     "occupants": [
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.39,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.44,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:C",
+       "residue": "GLY147",
+       "d": 2.62,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 2.93,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:O",
+       "residue": "GLY147",
+       "d": 3.06,
+       "backbone": true
+      },
+      {
+       "atom": "VAL148:N",
+       "residue": "VAL148",
+       "d": 3.2,
+       "backbone": true
+      },
+      {
+       "atom": "THR116:CG2",
+       "residue": "THR116",
+       "d": 3.26,
+       "backbone": false
+      }
+     ],
+     "chain": "N",
+     "altloc": null,
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 7.78,
+       "angle": 139.9
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.53,
+       "angle": 31.7
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.49,
+       "angle": 149.0
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.37,
+       "angle": 27.8
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.11,
+     "d_S6_S146": 7.96,
+     "d_S6_S111": 13.44,
+     "attack_angle": 136.9,
+     "travel": 5.99,
+     "occupants": [
+      {
+       "atom": "ASN53:OD1",
+       "residue": "ASN53",
+       "d": 2.09,
+       "backbone": false
+      },
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.53,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.63,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:C",
+       "residue": "GLY147",
+       "d": 2.74,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 3.12,
+       "backbone": true
+      },
+      {
+       "atom": "ASN53:CG",
+       "residue": "ASN53",
+       "d": 3.22,
+       "backbone": false
+      },
+      {
+       "atom": "VAL148:N",
+       "residue": "VAL148",
+       "d": 3.24,
+       "backbone": true
+      }
+     ],
+     "chain": "O",
+     "altloc": null,
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 7.96,
+       "angle": 136.9
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.61,
+       "angle": 34.5
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.38,
+       "angle": 147.2
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.19,
+       "angle": 29.6
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.04,
+     "d_S6_S146": 7.92,
+     "d_S6_S111": 13.9,
+     "attack_angle": 141.8,
+     "travel": 5.71,
+     "occupants": [
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.39,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.5,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:C",
+       "residue": "GLY147",
+       "d": 2.73,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 2.78,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:O",
+       "residue": "GLY147",
+       "d": 3.09,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:O",
+       "residue": "CYS146",
+       "d": 3.21,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:CB",
+       "residue": "CYS146",
+       "d": 3.24,
+       "backbone": false
+      },
+      {
+       "atom": "THR116:CG2",
+       "residue": "THR116",
+       "d": 3.25,
+       "backbone": false
+      }
+     ],
+     "chain": "P",
+     "altloc": null,
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 7.92,
+       "angle": 141.8
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.6,
+       "angle": 30.7
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.97,
+       "angle": 147.7
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.72,
+       "angle": 29.3
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.13,
+     "d_S6_S146": 7.78,
+     "d_S6_S111": 13.72,
+     "attack_angle": 138.3,
+     "travel": 5.75,
+     "occupants": [
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.52,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.54,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:C",
+       "residue": "GLY147",
+       "d": 2.63,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 3.04,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:O",
+       "residue": "GLY147",
+       "d": 3.08,
+       "backbone": true
+      },
+      {
+       "atom": "VAL148:N",
+       "residue": "VAL148",
+       "d": 3.14,
+       "backbone": true
+      }
+     ],
+     "chain": "Q",
+     "altloc": null,
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 7.78,
+       "angle": 138.3
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.48,
+       "angle": 33.1
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.39,
+       "angle": 148.1
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.23,
+       "angle": 28.7
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.06,
+     "d_S6_S146": 7.98,
+     "d_S6_S111": 13.7,
+     "attack_angle": 139.2,
+     "travel": 5.89,
+     "occupants": [
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.22,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.27,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 2.77,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:C",
+       "residue": "GLY147",
+       "d": 2.79,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:O",
+       "residue": "CYS146",
+       "d": 3.24,
+       "backbone": true
+      }
+     ],
+     "chain": "S",
+     "altloc": null,
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 7.98,
+       "angle": 139.2
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.63,
+       "angle": 32.7
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.7,
+       "angle": 143.5
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.39,
+       "angle": 33.0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "pdb": "7FB9",
+   "resolution": 2.7,
+   "note": "Baek et al., Commun Biol 2022; P3_2, an independent crystal form",
+   "n_chains_measured": 15,
+   "chains": [
+    {
+     "disulfide_SS": 2.03,
+     "d_S6_S146": 8.29,
+     "d_S6_S111": 13.29,
+     "attack_angle": 142.2,
+     "travel": 6.04,
+     "occupants": [
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.17,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.28,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 2.73,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:C",
+       "residue": "GLY147",
+       "d": 2.88,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:O",
+       "residue": "CYS146",
+       "d": 3.22,
+       "backbone": true
+      }
+     ],
+     "chain": "A",
+     "altloc": "A",
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 8.29,
+       "angle": 142.2
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.98,
+       "angle": 30.6
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.72,
+       "angle": 144.1
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.4,
+       "angle": 32.5
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.03,
+     "d_S6_S146": 8.29,
+     "d_S6_S111": 13.29,
+     "attack_angle": 142.2,
+     "travel": 6.04,
+     "occupants": [
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.17,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.28,
+       "backbone": true
+      },
+      {
+       "atom": "ASN53:ND2",
+       "residue": "ASN53",
+       "d": 2.39,
+       "backbone": false
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 2.73,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:C",
+       "residue": "GLY147",
+       "d": 2.88,
+       "backbone": true
+      },
+      {
+       "atom": "ASN53:OD1",
+       "residue": "ASN53",
+       "d": 2.91,
+       "backbone": false
+      },
+      {
+       "atom": "ASN53:CG",
+       "residue": "ASN53",
+       "d": 2.96,
+       "backbone": false
+      },
+      {
+       "atom": "CYS146:O",
+       "residue": "CYS146",
+       "d": 3.22,
+       "backbone": true
+      }
+     ],
+     "chain": "A",
+     "altloc": "B",
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 8.29,
+       "angle": 142.2
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.98,
+       "angle": 30.6
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.72,
+       "angle": 144.1
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.4,
+       "angle": 32.5
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.03,
+     "d_S6_S146": 8.57,
+     "d_S6_S111": 12.4,
+     "attack_angle": 140.1,
+     "travel": 6.39,
+     "occupants": [
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.42,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.55,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 2.7,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:O",
+       "residue": "CYS146",
+       "d": 3.01,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:C",
+       "residue": "GLY147",
+       "d": 3.24,
+       "backbone": true
+      }
+     ],
+     "chain": "B",
+     "altloc": null,
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 8.57,
+       "angle": 140.1
+      },
+      "Cys6_to_Cys57": {
+       "d": 10.21,
+       "angle": 32.6
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.4,
+       "angle": 139.6
+      },
+      "Cys111_to_Cys57": {
+       "d": 19.99,
+       "angle": 36.7
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.03,
+     "d_S6_S146": 8.08,
+     "d_S6_S111": 13.2,
+     "attack_angle": 139.4,
+     "travel": 5.97,
+     "occupants": [
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.33,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.48,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:C",
+       "residue": "GLY147",
+       "d": 2.87,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 2.88,
+       "backbone": true
+      },
+      {
+       "atom": "THR116:CG2",
+       "residue": "THR116",
+       "d": 3.04,
+       "backbone": false
+      }
+     ],
+     "chain": "C",
+     "altloc": null,
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 8.08,
+       "angle": 139.4
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.71,
+       "angle": 32.8
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.33,
+       "angle": 149.6
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.11,
+       "angle": 27.4
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.03,
+     "d_S6_S146": 8.04,
+     "d_S6_S111": 13.66,
+     "attack_angle": 139.9,
+     "travel": 5.91,
+     "occupants": [
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.28,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.41,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 2.72,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:C",
+       "residue": "GLY147",
+       "d": 2.9,
+       "backbone": true
+      },
+      {
+       "atom": "THR116:CG2",
+       "residue": "THR116",
+       "d": 3.15,
+       "backbone": false
+      },
+      {
+       "atom": "CYS146:O",
+       "residue": "CYS146",
+       "d": 3.15,
+       "backbone": true
+      }
+     ],
+     "chain": "D",
+     "altloc": null,
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 8.04,
+       "angle": 139.9
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.68,
+       "angle": 32.3
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.57,
+       "angle": 147.7
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.31,
+       "angle": 29.3
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.03,
+     "d_S6_S146": 8.42,
+     "d_S6_S111": 13.15,
+     "attack_angle": 137.2,
+     "travel": 6.41,
+     "occupants": [
+      {
+       "atom": "ASN53:ND2",
+       "residue": "ASN53",
+       "d": 2.3,
+       "backbone": false
+      },
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.6,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.74,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 2.85,
+       "backbone": true
+      },
+      {
+       "atom": "ASN53:OD1",
+       "residue": "ASN53",
+       "d": 2.86,
+       "backbone": false
+      },
+      {
+       "atom": "ASN53:CG",
+       "residue": "ASN53",
+       "d": 2.91,
+       "backbone": false
+      },
+      {
+       "atom": "CYS146:O",
+       "residue": "CYS146",
+       "d": 3.16,
+       "backbone": true
+      }
+     ],
+     "chain": "E",
+     "altloc": null,
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 8.42,
+       "angle": 137.2
+      },
+      "Cys6_to_Cys57": {
+       "d": 10.01,
+       "angle": 34.9
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.78,
+       "angle": 143.2
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.44,
+       "angle": 33.4
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.03,
+     "d_S6_S146": 8.24,
+     "d_S6_S111": 13.48,
+     "attack_angle": 138.0,
+     "travel": 6.2,
+     "occupants": [
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.45,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.54,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 2.6,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:O",
+       "residue": "CYS146",
+       "d": 2.79,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:C",
+       "residue": "GLY147",
+       "d": 3.25,
+       "backbone": true
+      }
+     ],
+     "chain": "F",
+     "altloc": null,
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 8.24,
+       "angle": 138.0
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.85,
+       "angle": 34.1
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.64,
+       "angle": 140.3
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.25,
+       "angle": 36.1
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.03,
+     "d_S6_S146": 7.91,
+     "d_S6_S111": 12.88,
+     "attack_angle": 146.8,
+     "travel": 5.46,
+     "occupants": [
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 1.93,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.05,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:C",
+       "residue": "GLY147",
+       "d": 2.34,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:O",
+       "residue": "GLY147",
+       "d": 2.53,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 2.73,
+       "backbone": true
+      },
+      {
+       "atom": "ASN53:ND2",
+       "residue": "ASN53",
+       "d": 2.98,
+       "backbone": false
+      }
+     ],
+     "chain": "G",
+     "altloc": null,
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 7.91,
+       "angle": 146.8
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.68,
+       "angle": 26.6
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.34,
+       "angle": 150.2
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.12,
+       "angle": 26.9
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.03,
+     "d_S6_S146": 8.38,
+     "d_S6_S111": 13.36,
+     "attack_angle": 137.8,
+     "travel": 6.33,
+     "occupants": [
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.48,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 2.54,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.59,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:O",
+       "residue": "CYS146",
+       "d": 2.66,
+       "backbone": true
+      }
+     ],
+     "chain": "H",
+     "altloc": null,
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 8.38,
+       "angle": 137.8
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.98,
+       "angle": 34.3
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.87,
+       "angle": 136.7
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.4,
+       "angle": 39.4
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.03,
+     "d_S6_S146": 8.44,
+     "d_S6_S111": 13.56,
+     "attack_angle": 131.9,
+     "travel": 6.71,
+     "occupants": [
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.84,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 2.95,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 3.01,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:O",
+       "residue": "CYS146",
+       "d": 3.16,
+       "backbone": true
+      }
+     ],
+     "chain": "I",
+     "altloc": null,
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 8.44,
+       "angle": 131.9
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.91,
+       "angle": 39.3
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.91,
+       "angle": 140.7
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.52,
+       "angle": 35.7
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.03,
+     "d_S6_S146": 8.5,
+     "d_S6_S111": 12.98,
+     "attack_angle": 138.8,
+     "travel": 6.4,
+     "occupants": [
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.43,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.54,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 2.62,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:O",
+       "residue": "CYS146",
+       "d": 2.85,
+       "backbone": true
+      },
+      {
+       "atom": "ASN53:ND2",
+       "residue": "ASN53",
+       "d": 2.91,
+       "backbone": false
+      }
+     ],
+     "chain": "J",
+     "altloc": "A",
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 8.5,
+       "angle": 138.8
+      },
+      "Cys6_to_Cys57": {
+       "d": 10.12,
+       "angle": 33.6
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.85,
+       "angle": 139.7
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.44,
+       "angle": 36.6
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.03,
+     "d_S6_S146": 8.5,
+     "d_S6_S111": 12.98,
+     "attack_angle": 138.8,
+     "travel": 6.4,
+     "occupants": [
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.43,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.54,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 2.62,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:O",
+       "residue": "CYS146",
+       "d": 2.85,
+       "backbone": true
+      },
+      {
+       "atom": "ASN53:ND2",
+       "residue": "ASN53",
+       "d": 2.91,
+       "backbone": false
+      }
+     ],
+     "chain": "J",
+     "altloc": "B",
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 8.5,
+       "angle": 138.8
+      },
+      "Cys6_to_Cys57": {
+       "d": 10.12,
+       "angle": 33.6
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.85,
+       "angle": 139.7
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.44,
+       "angle": 36.6
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.03,
+     "d_S6_S146": 7.78,
+     "d_S6_S111": 12.74,
+     "attack_angle": 139.6,
+     "travel": 5.69,
+     "occupants": [
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.28,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.52,
+       "backbone": true
+      },
+      {
+       "atom": "THR116:CG2",
+       "residue": "THR116",
+       "d": 2.56,
+       "backbone": false
+      },
+      {
+       "atom": "GLY147:C",
+       "residue": "GLY147",
+       "d": 2.61,
+       "backbone": true
+      },
+      {
+       "atom": "THR116:OG1",
+       "residue": "THR116",
+       "d": 2.87,
+       "backbone": false
+      },
+      {
+       "atom": "GLY147:O",
+       "residue": "GLY147",
+       "d": 2.91,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 3.15,
+       "backbone": true
+      },
+      {
+       "atom": "THR116:CB",
+       "residue": "THR116",
+       "d": 3.22,
+       "backbone": false
+      },
+      {
+       "atom": "VAL148:N",
+       "residue": "VAL148",
+       "d": 3.29,
+       "backbone": true
+      }
+     ],
+     "chain": "K",
+     "altloc": null,
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 7.78,
+       "angle": 139.6
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.42,
+       "angle": 32.4
+      },
+      "Cys111_to_Cys146": {
+       "d": 17.71,
+       "angle": 157.7
+      },
+      "Cys111_to_Cys57": {
+       "d": 19.61,
+       "angle": 20.0
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.03,
+     "d_S6_S146": 8.15,
+     "d_S6_S111": 13.51,
+     "attack_angle": 139.0,
+     "travel": 6.06,
+     "occupants": [
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.42,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.56,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:C",
+       "residue": "GLY147",
+       "d": 2.9,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 2.91,
+       "backbone": true
+      },
+      {
+       "atom": "THR116:CG2",
+       "residue": "THR116",
+       "d": 3.01,
+       "backbone": false
+      }
+     ],
+     "chain": "L",
+     "altloc": "A",
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 8.15,
+       "angle": 139.0
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.77,
+       "angle": 33.2
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.68,
+       "angle": 151.2
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.49,
+       "angle": 26.0
+      }
+     }
+    },
+    {
+     "disulfide_SS": 2.03,
+     "d_S6_S146": 8.15,
+     "d_S6_S111": 13.51,
+     "attack_angle": 139.0,
+     "travel": 6.06,
+     "occupants": [
+      {
+       "atom": "GLY147:N",
+       "residue": "GLY147",
+       "d": 2.42,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:CA",
+       "residue": "GLY147",
+       "d": 2.56,
+       "backbone": true
+      },
+      {
+       "atom": "GLY147:C",
+       "residue": "GLY147",
+       "d": 2.9,
+       "backbone": true
+      },
+      {
+       "atom": "CYS146:C",
+       "residue": "CYS146",
+       "d": 2.91,
+       "backbone": true
+      },
+      {
+       "atom": "THR116:CG2",
+       "residue": "THR116",
+       "d": 3.01,
+       "backbone": false
+      }
+     ],
+     "chain": "L",
+     "altloc": "B",
+     "approaches": {
+      "Cys6_to_Cys146": {
+       "d": 8.15,
+       "angle": 139.0
+      },
+      "Cys6_to_Cys57": {
+       "d": 9.77,
+       "angle": 33.2
+      },
+      "Cys111_to_Cys146": {
+       "d": 18.68,
+       "angle": 151.2
+      },
+      "Cys111_to_Cys57": {
+       "d": 20.49,
+       "angle": 26.0
+      }
+     }
+    }
+   ]
+  }
+ ],
+ "_sanity": [
+  {
+   "check": "chalcogen_bond",
+   "value": 2.75,
+   "label": "2C9U A/A Cys57-Cys146",
+   "low": 1.95,
+   "high": 2.45,
+   "unit": "A",
+   "why": "a formed S-S bond is 2.03-2.08, Se-S about 2.19 and Se-Se about 2.33. Outside this the species at the end of the scan is not the dichalcogenide the reaction is supposed to make"
+  },
+  {
+   "check": "chalcogen_bond",
+   "value": 2.75,
+   "label": "2C9U A/B Cys57-Cys146",
+   "low": 1.95,
+   "high": 2.45,
+   "unit": "A",
+   "why": "a formed S-S bond is 2.03-2.08, Se-S about 2.19 and Se-Se about 2.33. Outside this the species at the end of the scan is not the dichalcogenide the reaction is supposed to make"
+  },
+  {
+   "check": "chalcogen_bond",
+   "value": 2.58,
+   "label": "2C9U F/A Cys57-Cys146",
+   "low": 1.95,
+   "high": 2.45,
+   "unit": "A",
+   "why": "a formed S-S bond is 2.03-2.08, Se-S about 2.19 and Se-Se about 2.33. Outside this the species at the end of the scan is not the dichalcogenide the reaction is supposed to make"
+  }
+ ],
+ "summary": {
+  "n_chains": 37,
+  "n_chains_with_a_formed_disulfide": 34,
+  "chains_with_a_formed_disulfide": [
+   "2C9U F/B",
+   "1HL5 A",
+   "1HL5 B",
+   "1HL5 C",
+   "1HL5 D",
+   "1HL5 E",
+   "1HL5 F",
+   "1HL5 G",
+   "1HL5 H",
+   "1HL5 I",
+   "1HL5 J",
+   "1HL5 K",
+   "1HL5 L",
+   "1HL5 M",
+   "1HL5 N",
+   "1HL5 O",
+   "1HL5 P",
+   "1HL5 Q",
+   "1HL5 S",
+   "7FB9 A/A",
+   "7FB9 A/B",
+   "7FB9 B",
+   "7FB9 C",
+   "7FB9 D",
+   "7FB9 E",
+   "7FB9 F",
+   "7FB9 G",
+   "7FB9 H",
+   "7FB9 I",
+   "7FB9 J/A",
+   "7FB9 J/B",
+   "7FB9 K",
+   "7FB9 L/A",
+   "7FB9 L/B"
+  ],
+  "attack_angle": {
+   "mean": 138.6,
+   "min": 131.9,
+   "max": 146.8
+  },
+  "chains_reaching_backside_floor": [],
+  "chains_with_a_clear_attack_site": [],
+  "chains_with_backbone_at_the_site": 37,
+  "occupancy_by_residue": {
+   "CYS146": [
+    "1HL5 A",
+    "1HL5 B",
+    "1HL5 C",
+    "1HL5 D",
+    "1HL5 E",
+    "1HL5 F",
+    "1HL5 G",
+    "1HL5 H",
+    "1HL5 I",
+    "1HL5 J",
+    "1HL5 K",
+    "1HL5 L",
+    "1HL5 M",
+    "1HL5 N",
+    "1HL5 O",
+    "1HL5 P",
+    "1HL5 Q",
+    "1HL5 S",
+    "2C9U A/A",
+    "2C9U A/B",
+    "2C9U F/A",
+    "2C9U F/B",
+    "7FB9 A/A",
+    "7FB9 A/B",
+    "7FB9 B",
+    "7FB9 C",
+    "7FB9 D",
+    "7FB9 E",
+    "7FB9 F",
+    "7FB9 G",
+    "7FB9 H",
+    "7FB9 I",
+    "7FB9 J/A",
+    "7FB9 J/B",
+    "7FB9 K",
+    "7FB9 L/A",
+    "7FB9 L/B"
+   ],
+   "GLY147": [
+    "1HL5 A",
+    "1HL5 B",
+    "1HL5 C",
+    "1HL5 D",
+    "1HL5 E",
+    "1HL5 F",
+    "1HL5 G",
+    "1HL5 H",
+    "1HL5 I",
+    "1HL5 J",
+    "1HL5 K",
+    "1HL5 L",
+    "1HL5 M",
+    "1HL5 N",
+    "1HL5 O",
+    "1HL5 P",
+    "1HL5 Q",
+    "1HL5 S",
+    "2C9U A/A",
+    "2C9U A/B",
+    "2C9U F/A",
+    "7FB9 A/A",
+    "7FB9 A/B",
+    "7FB9 B",
+    "7FB9 C",
+    "7FB9 D",
+    "7FB9 E",
+    "7FB9 F",
+    "7FB9 G",
+    "7FB9 H",
+    "7FB9 I",
+    "7FB9 J/A",
+    "7FB9 J/B",
+    "7FB9 K",
+    "7FB9 L/A",
+    "7FB9 L/B"
+   ],
+   "VAL148": [
+    "1HL5 A",
+    "1HL5 B",
+    "1HL5 C",
+    "1HL5 D",
+    "1HL5 E",
+    "1HL5 F",
+    "1HL5 G",
+    "1HL5 H",
+    "1HL5 I",
+    "1HL5 J",
+    "1HL5 K",
+    "1HL5 L",
+    "1HL5 M",
+    "1HL5 N",
+    "1HL5 O",
+    "1HL5 Q",
+    "2C9U A/A",
+    "2C9U A/B",
+    "2C9U F/A",
+    "7FB9 K"
+   ],
+   "THR116": [
+    "1HL5 A",
+    "1HL5 J",
+    "1HL5 K",
+    "1HL5 M",
+    "1HL5 N",
+    "1HL5 P",
+    "2C9U F/B",
+    "7FB9 C",
+    "7FB9 D",
+    "7FB9 K",
+    "7FB9 L/A",
+    "7FB9 L/B"
+   ],
+   "ASN53": [
+    "1HL5 C",
+    "1HL5 O",
+    "2C9U A/B",
+    "2C9U F/A",
+    "7FB9 A/B",
+    "7FB9 E",
+    "7FB9 G",
+    "7FB9 J/A",
+    "7FB9 J/B"
+   ],
+   "VAL118": [
+    "2C9U F/B"
+   ],
+   "LEU117": [
+    "2C9U F/B"
+   ]
+  }
+ },
+ "reading": "Across 37 chains (34 of them with a physically formed disulfide) the attack angle spans 131.9-146.8 deg and reaches the 150 deg backside floor in none of them, the attack site is occupied in all of them, and backbone is among the occupants in 37. What does NOT replicate is which residue occupies the site: it is the Thr116 and Val118 side chains in the 2C9U conformer the single-chain measurement used, and Gly147 backbone in most chains of 7FB9 and in the other 2C9U conformer. The occupancy is a property of the fold and the occupant is a property of the conformer, so a claim about the obstruction should rest on the first. 7FB9 is 2.70 A with its S-S distances refinement-restrained, which makes it strong evidence on the angle and the backbone and weak evidence on side-chain identity.",
+ "cys6_approaches": {
+  "distances": {
+   "to_Cys146": {
+    "2C9U": {
+     "mean": 7.91,
+     "min": 7.74,
+     "max": 8.37,
+     "n": 4
+    },
+    "1HL5": {
+     "mean": 7.81,
+     "min": 7.67,
+     "max": 7.98,
+     "n": 18
+    },
+    "7FB9": {
+     "mean": 8.25,
+     "min": 7.78,
+     "max": 8.57,
+     "n": 15
+    }
+   },
+   "to_Cys111": {
+    "2C9U": {
+     "mean": 13.37,
+     "min": 13.37,
+     "max": 13.37,
+     "n": 4
+    },
+    "1HL5": {
+     "mean": 13.63,
+     "min": 13.4,
+     "max": 13.9,
+     "n": 18
+    },
+    "7FB9": {
+     "mean": 13.2,
+     "min": 12.4,
+     "max": 13.66,
+     "n": 15
+    }
+   }
+  },
+  "reading": "Cys6 is FURTHER from Cys111 than from Cys146 in every structure, and the displacement on Cys111 is the one that has been demonstrated (Anzai et al. 2020, on the sulfenylated residue) while the approach to Cys146 has not. Separation does not rank these two reactions correctly, so it is not what decides them."
+ },
+ "intramolecular_routes": {
+  "n_chains": 34,
+  "routes": {
+   "Cys6_to_Cys146": {
+    "d_mean": 8.02,
+    "d_min": 7.67,
+    "d_max": 8.57,
+    "angle_mean": 138.9,
+    "angle_min": 131.9,
+    "angle_max": 146.8
+   },
+   "Cys6_to_Cys57": {
+    "d_mean": 9.7,
+    "d_min": 9.42,
+    "d_max": 10.21,
+    "angle_mean": 32.9,
+    "angle_min": 26.6,
+    "angle_max": 39.3
+   },
+   "Cys111_to_Cys146": {
+    "d_mean": 18.52,
+    "d_min": 17.71,
+    "d_max": 18.97,
+    "angle_mean": 146.8,
+    "angle_min": 136.7,
+    "angle_max": 167.8
+   },
+   "Cys111_to_Cys57": {
+    "d_mean": 20.3,
+    "d_min": 19.61,
+    "d_max": 20.72,
+    "angle_mean": 29.9,
+    "angle_min": 11.0,
+    "angle_max": 39.4
+   }
+  },
+  "reading": "SOD1 has four cysteines and two of them are the bond, so Cys6 and Cys111 are the only possible attackers and there is no third cysteine left to act as the relay that reaches the buried disulfide in pI258 arsenate reductase (Messens et al., JMB 2004). Both ends are tested because a relay may attack either sulfur. All four routes fail, for two different reasons: the approaches to Cys57 are far and nowhere near collinear, and the approaches to Cys146 are either close and misaligned (Cys6) or well aligned and twice as far (Cys111)."
+ }
+}

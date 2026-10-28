@@ -1,0 +1,233 @@
+{
+ "interface": {
+  "buried": 389.51215684489057,
+  "side_fraction": 0.5221513044707891,
+  "interfacial_waters": 2,
+  "op": 4,
+  "cell": [
+   0,
+   -1,
+   0
+  ]
+ },
+ "wt": {
+  "atoms": 246,
+  "charge": 0,
+  "neighbours": 0,
+  "E_int": -3.4342800993418012,
+  "residues": [
+   "GLY1",
+   "VAL2",
+   "ILE3",
+   "GLY4",
+   "ILE5",
+   "ALA6",
+   "GLN7",
+   "HOH101",
+   "HOH102",
+   "HOH103"
+  ],
+  "seconds": 5109.004456043243,
+  "E_both": -342.47450168088943,
+  "E_sheet0": -171.26318761563965,
+  "E_sheet1": -171.20584119154566
+ },
+ "geometry": {
+  "labels": [
+   "A0+0:ALA6:N",
+   "A0+0:ALA6:CA",
+   "A0+0:ALA6:C",
+   "A0+0:ALA6:O",
+   "A0+0:ALA6:CB",
+   "A0+0:GLN7:N",
+   "A0+0:GLN7:CA",
+   "A0+0:GLN7:C",
+   "A0+0:GLN7:O",
+   "A0+0:GLN7:CB",
+   "A0+0:GLN7:CG",
+   "A0+0:GLN7:CD",
+   "A0+0:GLN7:OE1",
+   "A0+0:GLN7:NE2",
+   "A0+0:GLN7:OXT",
+   "A0+0:GLY1:N",
+   "A0+0:GLY1:CA",
+   "A0+0:GLY1:C",
+   "A0+0:GLY1:O",
+   "A0+0:GLY4:N",
+   "A0+0:GLY4:CA",
+   "A0+0:GLY4:C",
+   "A0+0:GLY4:O",
+   "A0+0:HOH101:O",
+   "A0+0:HOH102:O",
+   "A0+0:HOH103:O",
+   "A0+0:ILE3:N",
+   "A0+0:ILE3:CA",
+   "A0+0:ILE3:C",
+   "A0+0:ILE3:O",
+   "A0+0:ILE3:CB",
+   "A0+0:ILE3:CG1",
+   "A0+0:ILE3:CG2",
+   "A0+0:ILE3:CD1",
+   "A0+0:ILE5:N",
+   "A0+0:ILE5:CA",
+   "A0+0:ILE5:C",
+   "A0+0:ILE5:O",
+   "A0+0:ILE5:CB",
+   "A0+0:ILE5:CG1",
+   "A0+0:ILE5:CG2",
+   "A0+0:ILE5:CD1",
+   "A0+0:VAL2:N",
+   "A0+0:VAL2:CA",
+   "A0+0:VAL2:C",
+   "A0+0:VAL2:O",
+   "A0+0:VAL2:CB",
+   "A0+0:VAL2:CG1",
+   "A0+0:VAL2:CG2",
+   "A1+0:ALA6:N",
+   "A1+0:ALA6:CA",
+   "A1+0:ALA6:C",
+   "A1+0:ALA6:O",
+   "A1+0:ALA6:CB",
+   "A1+0:GLN7:N",
+   "A1+0:GLN7:CA",
+   "A1+0:GLN7:C",
+   "A1+0:GLN7:O",
+   "A1+0:GLN7:CB",
+   "A1+0:GLN7:CG",
+   "A1+0:GLN7:CD",
+   "A1+0:GLN7:OE1",
+   "A1+0:GLN7:NE2",
+   "A1+0:GLN7:OXT",
+   "A1+0:GLY1:N",
+   "A1+0:GLY1:CA",
+   "A1+0:GLY1:C",
+   "A1+0:GLY1:O",
+   "A1+0:GLY4:N",
+   "A1+0:GLY4:CA",
+   "A1+0:GLY4:C",
+   "A1+0:GLY4:O",
+   "A1+0:HOH101:O",
+   "A1+0:HOH102:O",
+   "A1+0:HOH103:O",
+   "A1+0:ILE3:N",
+   "A1+0:ILE3:CA",
+   "A1+0:ILE3:C",
+   "A1+0:ILE3:O",
+   "A1+0:ILE3:CB",
+   "A1+0:ILE3:CG1",
+   "A1+0:ILE3:CG2",
+   "A1+0:ILE3:CD1",
+   "A1+0:ILE5:N",
+   "A1+0:ILE5:CA",
+   "A1+0:ILE5:C",
+   "A1+0:ILE5:O",
+   "A1+0:ILE5:CB",
+   "A1+0:ILE5:CG1",
+   "A1+0:ILE5:CG2",
+   "A1+0:ILE5:CD1",
+   "A1+0:VAL2:N",
+   "A1+0:VAL2:CA",
+   "A1+0:VAL2:C",
+   "A1+0:VAL2:O",
+   "A1+0:VAL2:CB",
+   "A1+0:VAL2:CG1",
+   "A1+0:VAL2:CG2"
+  ]
+ },
+ "_stages_done": [
+  "scan",
+  "wt"
+ ],
+ "alanine": {
+  "GLY1": {
+   "skipped": "no side chain beyond CB"
+  },
+  "VAL2": {
+   "E_int": -34.70325890302719,
+   "ddE": -31.26897880368539,
+   "charge": 0,
+   "atoms": 234,
+   "seconds": 4643.852108001709,
+   "E_both": -332.03118303252137,
+   "E_sheet0": -166.04330500917698,
+   "E_sheet1": -165.93257486006016
+  },
+  "ILE3": {
+   "E_int": -2.075801630881651,
+   "ddE": 1.35847846846015,
+   "charge": 0,
+   "atoms": 228,
+   "seconds": 6510.698326349258,
+   "E_both": -325.8314824649838,
+   "E_sheet0": -162.9102135378887,
+   "E_sheet1": -162.91796092663157
+  },
+  "GLY4": {
+   "skipped": "no side chain beyond CB"
+  },
+  "ILE5": {
+   "E_int": 0.4635350971892114,
+   "ddE": 3.8978151965310124,
+   "charge": 0,
+   "atoms": 228,
+   "seconds": 3514.6613705158234,
+   "E_both": -323.48474979986685,
+   "E_sheet0": -161.77459892178706,
+   "E_sheet1": -161.71088956827714
+  },
+  "ALA6": {
+   "skipped": "no side chain beyond CB"
+  },
+  "GLN7": {
+   "E_int": -31.530735022068022,
+   "ddE": -28.09645492272622,
+   "charge": 0,
+   "atoms": 228,
+   "seconds": 5861.385110139847,
+   "E_both": -316.9201674238103,
+   "E_sheet0": -158.5103646627875,
+   "E_sheet1": -158.35955533635672
+  },
+  "HOH101": {
+   "skipped": "a water, not a residue",
+   "superseded": {
+    "reason": "computed before the HOH guard; mutate_to_alanine on a water deletes the whole molecule, so this was a water removed from the interface and not an alanine substitution",
+    "ddE": 3.8564386839468057e-07
+   }
+  },
+  "HOH102": {
+   "skipped": "a water, not a residue",
+   "superseded": {
+    "reason": "computed before the HOH guard; mutate_to_alanine on a water deletes the whole molecule, so this was a water removed from the interface and not an alanine substitution",
+    "ddE": 22.384435832792956
+   }
+  },
+  "HOH103": {
+   "skipped": "a water, not a residue",
+   "superseded": {
+    "reason": "computed before the HOH guard; mutate_to_alanine on a water deletes the whole molecule, so this was a water removed from the interface and not an alanine substitution",
+    "ddE": 26.412003329206993
+   }
+  }
+ },
+ "_sanity": [
+  {
+   "check": "alanine_ddE",
+   "value": -31.26897880368539,
+   "label": "VAL2 -> Ala",
+   "low": -20.0,
+   "high": 60.0,
+   "unit": "kcal/mol",
+   "why": "removing one side chain cannot change a contact by more than this"
+  },
+  {
+   "check": "alanine_ddE",
+   "value": -28.09645492272622,
+   "label": "GLN7 -> Ala",
+   "low": -20.0,
+   "high": 60.0,
+   "unit": "kcal/mol",
+   "why": "removing one side chain cannot change a contact by more than this"
+  }
+ ]
+}

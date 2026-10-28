@@ -1,0 +1,127 @@
+{
+ "question": "What multiple of the conversion rate does each step of motif net charge buy, once the published percentages are converted to rates?",
+ "source": "Choi, Kang, Cho, Jeong, Jung, Pack, Jeong & Song, bioRxiv 2026.10.15.759291 (NOT peer reviewed). Percentages read from the text of that preprint, a single experiment with pooled proportions and no replicate statistics.",
+ "why_rates": "Percentage saturates as 1 - exp(-lambda.t); the rate does not. A relationship that is linear in one cannot be linear in the other.",
+ "observed_bins": {
+  "+2": {
+   "n": 2,
+   "constructs": {
+    "WT": 0.6,
+    "S266A/S273A": 0.9
+   },
+   "mean_lambda_per_hour": 0.00015686267685116763
+  },
+  "+0": {
+   "n": 5,
+   "constructs": {
+    "R268E": 4.8,
+    "R272E": 8.5,
+    "R275E": 5.8,
+    "S266D/S273D": 5.5,
+    "S266E/S273E": 5.8
+   },
+   "mean_lambda_per_hour": 0.0013087159091555414
+  },
+  "-2": {
+   "n": 3,
+   "constructs": {
+    "R268E/R272E": 13.7,
+    "R272E/R275E": 11.6,
+    "R268E/R275E": 8.6
+   },
+   "mean_lambda_per_hour": 0.002503913276188818
+  },
+  "-4": {
+   "n": 2,
+   "constructs": {
+    "3R-E": 19.5,
+    "3R-E_S266A/S273A": 19.2
+   },
+   "mean_lambda_per_hour": 0.0044802731460897435
+  },
+  "-6": {
+   "n": 3,
+   "constructs": {
+    "K263E/3R-E": 19.8,
+    "3R-E_S266D/S273D": 24.6,
+    "3R-E_S266E/S273E": 23.5
+   },
+   "mean_lambda_per_hour": 0.005353396022537533
+  }
+ },
+ "steps": [
+  {
+   "step": "+2 -> +0",
+   "constructs": "2 -> 5",
+   "rate_increase_observed": 8.34,
+   "rate_increase_fitted_line": 3.47
+  },
+  {
+   "step": "+0 -> -2",
+   "constructs": "5 -> 3",
+   "rate_increase_observed": 1.91,
+   "rate_increase_fitted_line": 1.75
+  },
+  {
+   "step": "-2 -> -4",
+   "constructs": "3 -> 2",
+   "rate_increase_observed": 1.79,
+   "rate_increase_fitted_line": 1.45
+  },
+  {
+   "step": "-4 -> -6",
+   "constructs": "2 -> 3",
+   "rate_increase_observed": 1.19,
+   "rate_increase_fitted_line": 1.33
+  }
+ ],
+ "ordering": {
+  "steepest_step": "+2 -> +0",
+  "margin_over_next_observed": 4.36,
+  "margin_over_next_fitted": 1.98,
+  "claim": "The +2 -> 0 step is the steepest under BOTH conventions, by a factor of two or more over the next. The ordering is the claim; the ratio for the first step is convention-dependent because the wild-type percentage is small and the series is sparse there."
+ },
+ "phosphomimetic": {
+  "why": "Phosphorylating the two motif serines moves the charge from +2 to 0, the steepest segment. The alanine double substitution is the controlled comparison: same two positions, same substitution burden, no charge.",
+  "S266D/S273D_over_WT": 9.4,
+  "S266E/S273E_over_WT": 9.93,
+  "S266D/S273D_over_alanine_control": 6.26,
+  "alanine_control_over_WT": 1.5,
+  "caveat": "The alanine control is not quite inert. The authors score both it and wild type as flat, and neither rose between 48 and 72 h."
+ },
+ "constant_hazard_3RE": {
+  "points_hours_percent": [
+   [
+    12,
+    5.4
+   ],
+   [
+    24,
+    11.3
+   ],
+   [
+    48,
+    19.5
+   ]
+  ],
+  "lambda_per_hour": [
+   0.00463,
+   0.005,
+   0.00452
+  ],
+  "mean_lambda_per_hour": 0.00471,
+  "spread_cv_percent": 4.3,
+  "spread_range_over_mean_percent": 10.1,
+  "spread_max_deviation_percent": 6.0,
+  "predicted_from_mean": [
+   5.5,
+   10.7,
+   20.2
+  ],
+  "observed": [
+   5.4,
+   11.3,
+   19.5
+  ]
+ }
+}

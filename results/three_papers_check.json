@@ -1,0 +1,32 @@
+{
+ "sources": [
+  "Steffke et al., Ann Neurol 2025;98:1318-1334, targeted proteomics on tofersen",
+  "Moens et al., Lancet Neurol 2025;24:166-78, FUS-ALS",
+  "Benatar, Robertson & Andersen, Lancet Neurol 2025;24:77-86, SOD1-ALS"
+ ],
+ "tested_and_failed": {
+  "hypothesis": "Benatar et al. state that pathogenic SOD1 variants act either by reducing stability or by 'increasing the aggregation propensity of the monomer (eg, by reducing its negative surface charge)'. Choi et al. find TDP-43 conversion rate scaling with motif net charge. If one physical principle were at work in two unrelated ALS proteins, SOD1 variants that make the surface less negative should sit among the fast-progressing ones.",
+  "test": "Charge change of every variant in their Figure 3 survival classes, first by net charge, then restricted to solvent-exposed positions by Shrake-Rupley on 1HL5 chain A, since the claim is about SURFACE charge.",
+  "net_charge": "short n=22 mean +0.182, long n=17 mean +0.171, Mann-Whitney P = 0.44. No signal.",
+  "surface_only": "short n=8 mean +0.013, long n=7 mean +0.571, P = 0.885 for the predicted direction. The three charge-increasing surface variants -- Glu22Gly, Asp77Val, Glu101Lys -- are ALL in the LONG survival group, which is the opposite of the prediction.",
+  "verdict": "The charge principle does not transfer. Survival is a crude proxy for aggregation propensity; the review itself says charge is one mechanism among several, so a mixed list should not separate; and SOD1 is a folded barrel where a charge change also perturbs fold stability, where the TDP-43 motif is a disordered flanking segment outside the amyloid core. n is also 8 against 7."
+ },
+ "corrections_i_owe": [
+  {
+   "what_i_said": "SOD1 and FUS cases largely lack TDP-43 pathology.",
+   "what_is_true": "Benatar et al. report rare TDP-43 inclusions AND nuclear depletion of TDP-43 in motor neurons in SOD1-ALS autopsies, and cryptic exons in both Sod1 transgenic mice and SOD1-ALS patients, with cryptic HDGFL2 peptides in a subset. They call nuclear depletion in SOD1-ALS under-investigated and warranted. The separation I drew is cleaner than the evidence.",
+   "why_it_matters": "It was the basis for calling SOD1 the atypical corner that sits outside the TDP-43 story. That framing is weaker than I presented it."
+  },
+  {
+   "what_i_said": "Neurofilament is the response marker that bears on clinical benefit.",
+   "what_is_true": "Steffke et al. find that at 12 months on tofersen, NfL does NOT significantly correlate with clinical progression (r = -0.38, P = 0.064) and NfH does not either (r = -0.31, P = 0.136), while the neuropentraxins do: NPTX1 r = -0.54 P = 0.005, NPTX2 r = -0.64 P = 0.0006, NPTXR r = -0.53 P = 0.006. They also find a biphasic pattern -- UCHL1, NPY, GOT1 and amyloid-beta respond at 3 to 6 months and return to baseline by 12 -- attributed to the proinflammatory CSF profile that develops on the drug.",
+   "why_it_matters": "I presented the NfL endpoint without that caveat. A marker that responds to the drug is not the same as a marker that tracks the benefit."
+  }
+ ],
+ "what_strengthens_the_model": {
+  "finding": "FUS autoregulates its own protein level by regulating the splicing of its own mRNA, producing untranslatable transcripts when FUS becomes too high. Overwhelming that autoregulation by overexpression in mouse neurons is sufficient to cause early mortality with motor neuron loss. Conversely, introducing a wild-type FUS bacterial artificial chromosome, which restores autoregulation, RESCUES the disease phenotype in a FUS-ALS mouse.",
+  "why_it_matters": "The autoregulatory half of the compartment model was untestable in the Choi system, which uses NLS-deficient TDP-43 in yeast with no endogenous protein and therefore no feedback. FUS carries the same loop by the same mechanism, and the FUS literature demonstrates it causally in both directions: overwhelm the loop and disease follows, restore it and disease is rescued. That is independent support for the half of the model that had none."
+ },
+ "one_more_signature": "Moens et al. report monozygotic twins both carrying FUS Pro525Leu who developed symptoms FOURTEEN YEARS APART, at 11 and 25, and an Arg495* family with onset between 14 and 44 while others were unaffected at 57 and 61. They attribute it to genetic, environmental or STOCHASTIC processes. Identical genotype, identical dose, outcomes separated by more than a decade is the same signature as incomplete penetrance at fixed transgene copy number and as genetically identical yeast splitting into converted and unconverted.",
+ "date": "2026-10-26"
+}

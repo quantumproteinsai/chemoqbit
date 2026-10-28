@@ -147,7 +147,8 @@ def interface_of(pdb, chain, Y):
     return dict(buried=float(tot), side_fraction=float(pa[side].sum() / max(pa.sum(), 1e-9)))
 
 
-def build(pdb, chain='A', mate=None, neighbours=0, to_alanine=(), substitutions=None):
+def build(pdb, chain='A', mate=None, neighbours=0, to_alanine=(), substitutions=None,
+          keep_residues=None):
     """Heavy atoms of the two mating sheets.
 
     mate:        (R, t) of the symmetry image forming the interface; found
@@ -156,6 +157,19 @@ def build(pdb, chain='A', mate=None, neighbours=0, to_alanine=(), substitutions=
     to_alanine:  residue numbers truncated to CB, in the central strand of both
                  sheets. substitutions: {resnum: 'ALA'} style relabelling is NOT
                  done here -- only truncation, which needs no new atoms.
+    keep_residues: residue numbers to keep, dropping the rest whole. Waters have
+                 their own numbers and must be listed to survive. The charge
+                 below is n_strands.(NTERM + CTERM) + n_lys, which assumes a free
+                 amine at the lowest kept residue and a free carboxylate at the
+                 highest; protonate() puts NH3+ on the lowest number it is given,
+                 so the amine end takes care of itself, but OXT exists only where
+                 the deposited peptide ended. A window that stops short of the
+                 deposited C-terminus therefore has no carboxylate, the CTERM
+                 term in the charge is then wrong, and the cut carbonyl would be
+                 capped by rdkit as an aldehyde. Callers must end the window at
+                 the deposited C-terminus; cut_c_terminus below says whether they
+                 did, so the caller can refuse rather than compute a model whose
+                 charge is a guess.
     """
     V, _sg = cell(pdb)
     axis, _ai = stacking_axis(V)
@@ -175,6 +189,11 @@ def build(pdb, chain='A', mate=None, neighbours=0, to_alanine=(), substitutions=
     for s_, (R, t, ch) in enumerate(sheets):
         a_ch = _read(pdb, ch)
         rs = sorted({(rn, num) for rn, num, _ in a_ch if rn not in ADDITIVES})
+        if keep_residues is not None:
+            rs = [(rn, num) for rn, num in rs if num in set(keep_residues)]
+            if not rs:
+                raise ValueError(f'keep_residues {sorted(keep_residues)} kept no residue '
+                                 f'of chain {ch}')
         for k in range(-neighbours, neighbours + 1):
             for rn, num in rs:
                 keep = None if num not in to_alanine else ['N', 'CA', 'C', 'O', 'CB', 'OXT']
@@ -189,8 +208,11 @@ def build(pdb, chain='A', mate=None, neighbours=0, to_alanine=(), substitutions=
                     sheet.append(s_)
     n_strands = len(sheets) * (2 * neighbours + 1)
     charge = n_strands * (NTERM + CTERM) + n_lys
+    cut_c = (None if keep_residues is None
+             else not any(l.rsplit(':', 1)[1] == 'OXT' for l in label))
     return dict(symbols=sym, X=np.array(X), labels=label, charge=charge,
-                sheet=np.array(sheet), n_residues=len(res), n_strands=n_strands)
+                sheet=np.array(sheet), n_residues=len(res), n_strands=n_strands,
+                cut_c_terminus=cut_c)
 
 
 def protonate(c):

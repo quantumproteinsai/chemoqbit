@@ -1,0 +1,24 @@
+{
+ "what_was_fetched": "Supplementary figures of Choi et al., bioRxiv 2026.10.15.759291, media-1.pdf, 22 pages, downloaded from bioRxiv and read as page images. Done because the preceding analysis rested on numbers read from the main text's prose, and the rule learned the hard way today is that inferring from a fragment is the moment to go and get the whole thing.",
+ "findings": [
+  {
+   "id": "expression is matched across the charge series",
+   "evidence": "Figure S5E shows anti-GFP blots for K263E, PAM 3R-E, K263E/3R-E, K263A, PAM 3R-A, K263A/3R-A and 2E-K against WT and dPAM, with Tub1 loading control. Figure S5F does the same for the single and paired arginine substitutions. Band intensities are broadly comparable across each panel.",
+   "why_it_matters": "This rules out the obvious confound. If conversion rose with negative charge simply because those constructs were expressed more, the charge interpretation would collapse. It does not appear to. The rate analysis therefore stands on the charge axis rather than on a dosage axis.",
+   "limit": "Qualitative. No densitometry is shown and none can be read reliably off a published blot image."
+  },
+  {
+   "id": "the serine phosphomimetics have no expression blot",
+   "evidence": "The S5 caption says 'related to Figures 1, 2, 6 and 7' and lists panel E as the PAM charge substitutions and panel F as the arginine substitutions. Neither includes S266D, S266E, S273D, S273E, S266D/S273D, S266E/S273E, S266A/S273A, nor the 3R-E_S266X combinations.",
+   "why_it_matters": "Those constructs carry the paper's most biologically interesting claim -- that phosphorylation could set this charge physiologically -- and give the 9.4-fold rate increase over wild type. They are the one series without a shown loading control, so the dosage confound that panels E and F exclude for the arginines is not excluded for them.",
+   "how_to_put_it": "As a question before review, not as a criticism. It is a blot they almost certainly have."
+  },
+  {
+   "id": "where the replicates are, and are not",
+   "evidence": "Figure S3B: U2OS puncta proportions come from at least 50 cells per construct across FOUR independent experiments (n = 4). Figure S1F: FRAP mobile fractions have per-structure n of 18, 22, 18, 23 and 14. But the 24-construct conversion time course is stated in the main text to be a single experiment with pooled proportions and no replicate-based statistics.",
+   "why_it_matters": "The one dataset my entire rate analysis rests on is the one without replicates. Other panels in the same paper have them. So the absence is a choice about that experiment, not a convention of the paper, and a repeat would be in keeping with the rest of it."
+  }
+ ],
+ "what_is_still_not_available": "The source numbers behind Figure 7C-E -- 24 constructs at four time points. Reading them off a multi-series plot would manufacture precision, so they remain a request to the authors rather than something recoverable.",
+ "date": "2026-10-26"
+}

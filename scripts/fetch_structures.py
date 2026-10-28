@@ -46,6 +46,10 @@ STRUCTURES = {
             'are three stacked layers and the middle one is the one measured',
     '8IHV': 'SOD1 H46R fibril (Wang et al., Sci Adv 2024); core 85-153 only',
     '8IHU': 'SOD1 G85R fibril (Wang et al., Sci Adv 2024); core 82-153 only',
+    '7FB9': 'wild-type human SOD1 at 2.70 A in P3_2 with thirteen disulfide-bonded '
+            'chains (Baek et al., Commun Biol 2022); the independent crystal form '
+            'the Cys6 attack geometry is replicated against, so the exclusion does '
+            'not rest on one structure',
 }
 
 FLAT = {'1TLS'}          # the one entry the code expects directly under data/

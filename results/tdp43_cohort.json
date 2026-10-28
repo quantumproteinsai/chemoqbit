@@ -1,0 +1,16 @@
+{
+ "attempt": "Stochastic cohort, to test whether the threshold model reproduces the SOD1-G93A copy-number series (25 copies fully penetrant at 4.3 months, 8-10 copies fully penetrant at 5.5-7.8 months, 4 copies with ~20 % of animals symptom-free past 24 months).",
+ "outcome": "IT DOES NOT, and the reason is worth more than the fit would have been.",
+ "why": "Dose mapped to production gives a cytoplasmic pool that rises only 3x for a 25x increase in production: 0.384 to 1.185. Templated growth kg.C reaches 0.047 against a clearance slope Vmax/Km of 0.150, so there is no runaway at any dose tested. Autoregulation absorbs the dose -- which is the loop doing exactly what it exists to do.",
+ "two_honest_reasons": [
+  "The G93A transgene is NOT autoregulated. It is a foreign gene carrying no TDP-43 feedback, so the buffering this model applies to dose does not apply to it. Simulating a transgene would need an unregulated second species, not a larger p0.",
+  "The mouse is a SOD1 model and this is a TDP-43 model. The copy-number series tests dosage of a different protein with a different aggregation mechanism. The structural claim -- that incomplete penetrance at a fixed dose is a threshold signature -- still stands, but it is generic to bistable systems and this simulation does not demonstrate it for these data."
+ ],
+ "what_was_learned": "TDP-43 autoregulation is protective against its own overdosage. A 25-fold increase in production buys a 3-fold increase in the cytoplasmic pool and does not approach the threshold. That is a testable prediction in its own right and it matches something known: TARDBP duplication is not a common cause of ALS, and TDP-43 overexpression models are notoriously hard to interpret because the toxicity tracks the overexpression rather than the disease. A protein that regulates its own level is hard to make pathogenic by raising its level. SOD1, which has no such loop, is easy -- which is why the mouse field runs on SOD1.",
+ "two_numerical_failures_recorded": [
+  "First integration used one timestep for the whole system. Rate constants of 6 per hour against a 2 h step made Euler unstable; everything overflowed and every animal crossed at t=0. Fixed by separating timescales: transport and turnover equilibrate in hours and are slaved to the aggregate, which moves over months.",
+  "Second attempt mapped dose to the nucleation constant. Nothing crossed at any dose up to 40x, correctly -- multiplying nucleation raises the flux but barely moves the cytoplasmic pool, and the pool is what drives templating."
+ ],
+ "status": "Negative. Recorded because a model that will not reproduce a target without being bent is more informative than one that has been bent.",
+ "date": "2026-10-26"
+}

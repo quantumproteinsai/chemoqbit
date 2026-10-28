@@ -1,0 +1,42 @@
+{
+ "question": "The conformational-work calculation asks whether Cys6 can reach the Cys57-Cys146 disulfide in folded SOD1. Deposited cryo-EM structures of SOD1 amyloid fibrils can say whether that reaction is on the aggregation pathway at all.",
+ "structures": [
+  {
+   "pdb": "7VZF",
+   "what": "wild-type SOD1 fibril (Wang et al., Nat Commun 2022)",
+   "modelled": "3-55 and 86-153",
+   "cys_ordered": [
+    6,
+    111,
+    146
+   ]
+  },
+  {
+   "pdb": "8IHV",
+   "what": "H46R fibril (Wang et al., Sci Adv 2024)",
+   "modelled": "85-153",
+   "cys_ordered": [
+    111,
+    146
+   ]
+  },
+  {
+   "pdb": "8IHU",
+   "what": "G85R fibril (Wang et al., Sci Adv 2024)",
+   "modelled": "82-153",
+   "cys_ordered": [
+    111,
+    146
+   ]
+  }
+ ],
+ "result": {
+  "cys57_is_disordered_in_all_three": "Cys57, the partner of Cys146 in the native disulfide, is not modelled in any of them. 7VZF leaves 56-85 unmodelled; the two mutant fibrils model only the C-terminal segment from 82 or 85. Cys146 is ordered in every one.",
+  "no_disulfide_of_any_kind": "Within a layer the cysteine separations are Cys6-Cys146 39.46 A, Cys111-Cys146 24.69 A (7VZF), 31.72 A (8IHV), 31.48 A (8IHU). Across adjacent layers every cysteine stacks with its own counterpart at 4.55 to 4.99 A, which is the amyloid rise and is fixed by the backbone. The closest sulfur-sulfur approach anywhere is 4.55 A, more than twice a formed disulfide at 2.05 A.",
+  "the_amyloid_state_moves_them_apart": "Cys6 and Cys146 are 8.37 A apart in the folded protein (2C9U chain F conformer B) and 39.46 A apart in the wild-type fibril -- almost five times further. The fibril does not bring them together; it separates them."
+ },
+ "one_observation_worth_keeping": "Cys111, the free solvent-exposed cysteine (SASA 4.02 A2 in the folded protein by our own Shrake-Rupley), forms a stacked column along the fibril axis at 4.55 to 4.87 A spacing in all three structures. That spacing is set by the beta-sheet rise and is too long for a disulfide, so it is an ordered sulfur array rather than a bonded one. Cys111 oxidation is documented in ALS, and a regular column of it in the fibril is a structural feature of the aggregated state that the folded-protein analysis could not have seen.",
+ "honest_consequence": "The ALS geometric work is a well-tested negative that agrees with an existing structural consensus. Worth recording; not worth a paper on its own.",
+ "date": "2026-10-26",
+ "status_of_the_conformational_work_scan": "Correct and confirmatory. The scan establishes by energetics that Cys6 cannot reach the disulfide in folded SOD1: the work crosses the 31.23 kcal/mol fifty-year ceiling at about 6.5 A with 3.3 A still to travel. The cryo-EM establishes by structure that the fibril contains no disulfide at all, forming only under reducing conditions. Two methods, one conclusion, independently reached. The structural literature reached it first, and the reaction the scan prices is not on the aggregation pathway."
+}

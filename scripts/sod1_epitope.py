@@ -19,11 +19,20 @@ artefact of the model rather than of the protein:
 
 Shrake-Rupley, summed per residue, over the residues present in both.
 
-The result that was not sought: Thr116, Val118 and His120 are the three residues
-that occlude the Cys146 backside attack trajectory in the folded protein, and
-all three are buried natively and exposed on the fibril. The surface that blocks
-the chemistry in the native state is the surface that appears on aggregation.
-Those are the same measurement made twice for unrelated reasons, and they agree.
+The result that was not sought: Thr116 and Val118, which occupy the Cys146
+backside attack site in the 2C9U conformer used for that measurement, are both
+buried natively and exposed on the fibril. Part of the surface that blocks the
+chemistry in the native state is surface that appears on aggregation. Those are
+the same measurement made twice for unrelated reasons.
+
+CORRECTED 27 Oct 2026. This previously read "Thr116, Val118 and His120 are the
+three residues that occlude". His120 occludes nothing: it appears in no occupancy
+list of the attack site, at either radius tested on 2C9U and in none of the 37
+chain-and-conformer combinations of scripts/sod1_attack_site_crossval.py. It IS
+buried natively and exposed on the fibril (6.1 -> 57.7 A^2), which is how it came
+to be grouped with the other two. The overlap is two residues, not three, and the
+occluder identity is itself conformer-specific -- Thr116 occupies the site in
+12/37 chains and Val118 in 1/37.
 
 The second: His46 and His120 are both copper ligands and both become exposed, so
 the surface reports the apo state. An antibody raised against it selects for
@@ -204,11 +213,14 @@ def main():
                  len(buried_in_gap)))
 
     res['two_convergences'] = [
-        'Thr116, Val118 and His120 are the three residues that occlude the Cys146 backside '
-        'attack trajectory in the folded protein. All three are buried natively and exposed '
-        'on the fibril. The surface that blocks the chemistry in the native state is the '
-        'surface that appears when the protein aggregates, and those are the same '
-        'measurement made twice for unrelated reasons.',
+        'Thr116 and Val118, which occupy the Cys146 backside attack site in the 2C9U '
+        'conformer used for that measurement, are both buried natively and exposed on the '
+        'fibril. Part of the surface that blocks the chemistry natively is surface that '
+        'appears on aggregation. CORRECTED 27 Oct 2026: this previously named His120 as a '
+        'third occluder. It is not one -- it appears in no occupancy list of the attack '
+        'site, on 2C9U or across the 37 chains of sod1_attack_site_crossval.py -- although '
+        'it is buried natively and exposed on the fibril. The occluder identity is also '
+        'conformer-specific: Thr116 occupies the site in 12/37 chains, Val118 in 1/37.',
         'His46 and His120 are both copper ligands and both become exposed, so the aggregate '
         'surface reports the apo state. An antibody raised against it selects for metal-free '
         'protein, which is the species the maturation argument identifies as vulnerable.']

@@ -1,0 +1,27 @@
+{
+ "model": "An INDEPENDENT model of the Choi et al. charge series: Kramers barrier crossing within a finite susceptible subpopulation. Shares nothing with the three-ODE compartment model -- no nuclear or cytoplasmic pools, no autoregulation, no transport, no clearance term.",
+ "form": "f(t) = p . (1 - exp(-nu(q).t)),  nu(q) = nu0 . exp(-b.q)",
+ "rationale": "A rare barrier crossing gives an exponential waiting time and therefore a constant hazard, which the earlier reanalysis found. A barrier height linear in charge gives a rate EXPONENTIAL in charge, by Kramers. A finite susceptible fraction p is what the compartment model means by cells differing in margin.",
+ "fit": {
+  "data": "18 constructs, percent of fibril-bearing cells at 48 h, read from the preprint's prose",
+  "susceptible_fraction_p": "0.228 +- 0.012",
+  "nu0_at_q0_per_hour": "0.00593 +- 0.00074",
+  "barrier_per_unit_charge_kT": "0.475 +- 0.061",
+  "R2": 0.957,
+  "comparison": "their straight line in percent gives R2 = 0.871 on the same 18 points with 2 parameters; this gives 0.957 with 3, and each parameter is a physical quantity rather than a slope"
+ },
+ "what_it_explains": "The apparent SATURATION of rate beyond q = -4, which the first reanalysis flagged as anomalous, is not saturation of the rate. It is f approaching its ceiling p = 22.8 %: the fastest construct's 24.6 % is 108 % of that ceiling. The underlying nucleation rate keeps rising by a constant factor of 2.58 per two charge units, from 0.0023 /h at q = +2 to 0.102 /h at q = -6. Their linear relationship in PERCENT is a property of the readout saturating, not of the mechanism.",
+ "held_out_test": {
+  "method": "fitted on the 48 h column alone, then asked to predict the 72 h column",
+  "results": [["S266D/S273D", 12.1, 7.9], ["S266E/S273E", 11.1, 7.9], ["3R-A", 13.6, 11.3]],
+  "mean_absolute_error_points": 3.2,
+  "honest_caveat": "All three residuals are POSITIVE: the model systematically UNDERPREDICTS at 72 h. Either p is larger than 22.8 %, or the susceptible pool is not fixed and cells become susceptible over time. The fit is not vindicated by this test so much as bounded by it."
+ },
+ "independent_corroboration": {
+  "framework": "Stochastic nucleation per cell, with cells as independent reaction vesicles and only the nucleation step controlling aggregate appearance, is established for other aggregating proteins -- polyglutamine in C. elegans muscle (PNAS 2021, 'independent nucleation events determine the progression of polyglutamine aggregation') and huntingtin exon 1 in cells (Nat. Chem. Biol., unimolecular nucleation). Both give the probability of aggregation by time t as 1 - exp(-t/<T>), the same functional form used here.",
+  "rate_constant": "The C. elegans work reports a nucleation rate of about 0.01 per hour per cell at 1 mM intracellular protein. The TDP-43 rate fitted here spans 0.0023 /h at wild-type charge to 0.102 /h at the most negative, with 0.0059 /h at neutral charge. The published figure sits inside that range. Different protein, different organism, different laboratory, different method -- and the same order of magnitude.",
+  "what_is_NOT_corroborated": "The finite susceptible subpopulation. The searched literature describes outcomes as mostly non-aggregated or fully aggregated cells, which is close to bimodal, but no model with an explicit susceptible fraction was found. That extension is the part the 72 h residuals question, and it is the part that is mine.",
+  "a_caution_taken_from_the_same_literature": "A review warns that the lag time of a bulk in-vitro aggregation assay must not be read as a waiting time for nucleation. The earlier note cited the TDP-43 LCD lag phase of 31 h at 24 uM as a measured input; by this caution that figure is not a nucleation waiting time and should not be used as one."
+ },
+ "date": "2026-10-26"
+}
