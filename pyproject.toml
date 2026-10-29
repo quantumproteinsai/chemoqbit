@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "chemoqbit"
-version = "1.4.1"
+version = "1.4.2"
 description = "Reaction energetics on qubits, from molecular integrals to the instruction stream of an FPGA state-vector simulator"
 readme = "README.md"
 requires-python = ">=3.11"

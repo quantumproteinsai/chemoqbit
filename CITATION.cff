@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 title: "chemoqbit: reaction energetics on qubits, from molecular integrals to the instruction stream of an FPGA state-vector simulator"
-version: 1.4.1
+version: 1.4.2
 date-released: 2026-10-28
 license: MIT
 doi: "10.5281/zenodo.23665343"
