@@ -15,5 +15,22 @@
   "if_they_share_the_source_data": "The threshold manuscript's section 3.4 becomes a fit to real numbers with error bars rather than a reanalysis of prose-read percentages. The rising-hazard observation in the two slow constructs, which none of three models explains, could then be resolved as a lag, a subpopulation or heterogeneity -- the question the held-out test could not settle on five points.",
   "if_they_disagree": "Their objection goes into the manuscript's limitations and to them in reply, and the numbers are rechecked against whatever they point at.",
   "if_no_reply": "Nothing changes. The manuscript already states that the reanalysis rests on a single unreplicated experiment read from text, and that stands on its own."
+ },
+ "corrections": {
+  "status": "Drafted 2026-10-28 in paper_private/email_song_draft.txt as a second email. NOT YET SENT.",
+  "found_by": "Checking the claims in this file against results/tdp43_charge_steps.json, which was written after the email went out and reports three measures of the scatter rather than one.",
+  "items": [
+   {
+    "claimed": "The 3R-E hazards are \"constant to 4 %\" across a four-fold range.",
+    "correct": "The three rate constants were right. 4 % is their coefficient of variation, the smallest available description of the scatter. No single estimate is more than 6 % from the mean; the full range is 10 % of the mean.",
+    "effect_on_the_argument": "None. The hazard is flat on all three measures, which is what the ageing argument needs."
+   },
+   {
+    "claimed": "The charge-neutral S266A/S273A control is \"flat\".",
+    "correct": "Flat as a percentage, and so scored by the authors, but about 1.5-fold above wild type once converted to a rate. The comparison is therefore S266D/S273D at 9.4-fold wild type and 6.3-fold the alanine control.",
+    "effect_on_the_argument": "Weakens it slightly and leaves it standing: the phosphomimetic effect survives the controlled comparison at the same two positions."
+   }
+  ],
+  "both_are_the_same_error": "A word accurate in the percentage domain carried unchanged into an argument conducted in rates, which is what the email itself was about."
  }
 }
