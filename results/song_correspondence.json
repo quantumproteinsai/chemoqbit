@@ -17,7 +17,7 @@
   "if_no_reply": "Nothing changes. The manuscript already states that the reanalysis rests on a single unreplicated experiment read from text, and that stands on its own."
  },
  "corrections": {
-  "status": "Drafted 2026-10-28 in paper_private/email_song_draft.txt as a second email. NOT YET SENT.",
+  "status": "Drafted 2026-10-28 in paper_private/email_song_draft.txt as a second email. DECIDED 2026-10-29 NOT TO SEND. The draft is kept as the record of what was found and what would have been written.",
   "found_by": "Checking the claims in this file against results/tdp43_charge_steps.json, which was written after the email went out and reports three measures of the scatter rather than one.",
   "items": [
    {
@@ -31,6 +31,15 @@
     "effect_on_the_argument": "Weakens it slightly and leaves it standing: the phosphomimetic effect survives the controlled comparison at the same two positions."
    }
   ],
-  "both_are_the_same_error": "A word accurate in the percentage domain carried unchanged into an argument conducted in rates, which is what the email itself was about."
+  "both_are_the_same_error": "A word accurate in the percentage domain carried unchanged into an argument conducted in rates, which is what the email itself was about.",
+  "decision_not_to_send": {
+   "date": "2026-10-29",
+   "decided_by": "Bertrand Mercier des Rochettes",
+   "what_stands": "Song holds the two figures as first sent: the 3R-E hazards as 'constant to 4 %' and the alanine control as 'flat'.",
+   "what_was_corrected_anyway": "Both are corrected in the manuscript. Section 3.4 now reads 'no estimate more than 6 % from the mean' and reports the alanine control at 1.5-fold wild type as a rate, giving 9.4-fold wild type and 6.3-fold the control.",
+   "why_the_cost_is_limited": "Neither correction touches Song's own measurements. Both concern how this reanalysis of his published percentages was described to him, and the published version of the reanalysis carries the corrected figures.",
+   "noted_against_it": "This file was created on the principle that claims asserted to a third party have to be corrected to them as well as in the file. That principle is not satisfied by this decision, and the record says so rather than leaving it to be inferred."
+  },
+  "also_not_sent": "The draft had gained a proposal that Song test N259D or N265D, the deamidation route his 15 charge constructs leave untouched. That proposal is unsent too. It survives as experiment 4 of the manuscript and in paper_private/sod1_cross_disease.md."
  }
 }
