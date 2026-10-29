@@ -1,0 +1,448 @@
+{
+ "human_only_liabilities": [
+  {
+   "residue": "N19",
+   "liability": "deamidation (Asn)",
+   "mouse": "H19",
+   "detail": "motif N19-F20, slow"
+  },
+  {
+   "residue": "N26",
+   "liability": "deamidation (Asn)",
+   "mouse": "G26",
+   "detail": "motif N26-G27, very fast"
+  },
+  {
+   "residue": "K30",
+   "liability": "glycation / acetylation / ubiquitination",
+   "mouse": "V30",
+   "detail": ""
+  },
+  {
+   "residue": "W32",
+   "liability": "oxidation (Trp)",
+   "mouse": "S32",
+   "detail": ""
+  },
+  {
+   "residue": "K36",
+   "liability": "glycation / acetylation / ubiquitination",
+   "mouse": "T36",
+   "detail": ""
+  },
+  {
+   "residue": "K75",
+   "liability": "glycation / acetylation / ubiquitination",
+   "mouse": "A75",
+   "detail": ""
+  },
+  {
+   "residue": "C111",
+   "liability": "oxidation / glutathionylation / non-native disulfide",
+   "mouse": "S111",
+   "detail": ""
+  }
+ ],
+ "liable_counts": {
+  "K": 11,
+  "C": 4,
+  "Q": 3,
+  "N": 7,
+  "W": 1
+ },
+ "conserved": 19,
+ "assay_targets": [
+  {
+   "target": "Cys6 free thiol",
+   "residue": "C6",
+   "peptide": "ATKAVCVLKGDGPVQGIINFE",
+   "span": "1-21",
+   "length": 21,
+   "mod": "unmodified",
+   "mass": 2158.1456,
+   "mz2": 1080.0801,
+   "mz3": 720.3891
+  },
+  {
+   "target": "Cys6 free thiol",
+   "residue": "C6",
+   "peptide": "ATKAVCVLKGDGPVQGIINFE",
+   "span": "1-21",
+   "length": 21,
+   "mod": "oxidation",
+   "mass": 2174.1405,
+   "mz2": 1088.0775,
+   "mz3": 725.7208
+  },
+  {
+   "target": "Cys6 free thiol",
+   "residue": "C6",
+   "peptide": "ATKAVCVLKGDGPVQGIINFE",
+   "span": "1-21",
+   "length": 21,
+   "mod": "glutathionylation",
+   "mass": 2463.2137,
+   "mz2": 1232.6141,
+   "mz3": 822.0785
+  },
+  {
+   "target": "Ser25 phosphorylation (reported)",
+   "residue": "S25",
+   "peptide": "SNGPVKVWGSIKGLTE",
+   "span": "25-40",
+   "length": 16,
+   "mod": "unmodified",
+   "mass": 1670.8991,
+   "mz2": 836.4568,
+   "mz3": 557.9737
+  },
+  {
+   "target": "Ser25 phosphorylation (reported)",
+   "residue": "S25",
+   "peptide": "SNGPVKVWGSIKGLTE",
+   "span": "25-40",
+   "length": 16,
+   "mod": "phospho",
+   "mass": 1750.8655,
+   "mz2": 876.44,
+   "mz3": 584.6291
+  },
+  {
+   "target": "Asn26 fastest deamidation motif (absent in mouse)",
+   "residue": "N26",
+   "peptide": "SNGPVKVWGSIKGLTE",
+   "span": "25-40",
+   "length": 16,
+   "mod": "unmodified",
+   "mass": 1670.8991,
+   "mz2": 836.4568,
+   "mz3": 557.9737
+  },
+  {
+   "target": "Asn26 fastest deamidation motif (absent in mouse)",
+   "residue": "N26",
+   "peptide": "SNGPVKVWGSIKGLTE",
+   "span": "25-40",
+   "length": 16,
+   "mod": "deamidation",
+   "mass": 1671.8832,
+   "mz2": 836.9489,
+   "mz3": 558.3017
+  },
+  {
+   "target": "Lys30 glycation (reported)",
+   "residue": "K30",
+   "peptide": "SNGPVKVWGSIKGLTE",
+   "span": "25-40",
+   "length": 16,
+   "mod": "unmodified",
+   "mass": 1670.8991,
+   "mz2": 836.4568,
+   "mz3": 557.9737
+  },
+  {
+   "target": "Lys30 glycation (reported)",
+   "residue": "K30",
+   "peptide": "SNGPVKVWGSIKGLTE",
+   "span": "25-40",
+   "length": 16,
+   "mod": "glycation (Amadori)",
+   "mass": 1832.952,
+   "mz2": 917.4833,
+   "mz3": 611.9913
+  },
+  {
+   "target": "Cu ligand His46",
+   "residue": "H46",
+   "peptide": "GLHGFHVHE",
+   "span": "41-49",
+   "length": 9,
+   "mod": "unmodified",
+   "mass": 1031.4937,
+   "mz2": 516.7541,
+   "mz3": 344.8385
+  },
+  {
+   "target": "Cu ligand His46",
+   "residue": "H46",
+   "peptide": "GLHGFHVHE",
+   "span": "41-49",
+   "length": 9,
+   "mod": "oxidation",
+   "mass": 1047.4886,
+   "mz2": 524.7516,
+   "mz3": 350.1701
+  },
+  {
+   "target": "Cu ligand His48",
+   "residue": "H48",
+   "peptide": "GLHGFHVHE",
+   "span": "41-49",
+   "length": 9,
+   "mod": "unmodified",
+   "mass": 1031.4937,
+   "mz2": 516.7541,
+   "mz3": 344.8385
+  },
+  {
+   "target": "Cu ligand His48",
+   "residue": "H48",
+   "peptide": "GLHGFHVHE",
+   "span": "41-49",
+   "length": 9,
+   "mod": "oxidation",
+   "mass": 1047.4886,
+   "mz2": 524.7516,
+   "mz3": 350.1701
+  },
+  {
+   "target": "Asn53 interface, 3.5A from Cys146",
+   "residue": "N53",
+   "peptide": "FGDNTAGCTSAGPHFNPLSRKHGGPKDE",
+   "span": "50-77",
+   "length": 28,
+   "mod": "unmodified",
+   "mass": 2896.331,
+   "mz2": 1449.1728,
+   "mz3": 966.451
+  },
+  {
+   "target": "Asn53 interface, 3.5A from Cys146",
+   "residue": "N53",
+   "peptide": "FGDNTAGCTSAGPHFNPLSRKHGGPKDE",
+   "span": "50-77",
+   "length": 28,
+   "mod": "deamidation",
+   "mass": 2897.3151,
+   "mz2": 1449.6648,
+   "mz3": 966.779
+  },
+  {
+   "target": "Cys57 disulfide",
+   "residue": "C57",
+   "peptide": "FGDNTAGCTSAGPHFNPLSRKHGGPKDE",
+   "span": "50-77",
+   "length": 28,
+   "mod": "unmodified",
+   "mass": 2896.331,
+   "mz2": 1449.1728,
+   "mz3": 966.451
+  },
+  {
+   "target": "Cys57 disulfide",
+   "residue": "C57",
+   "peptide": "FGDNTAGCTSAGPHFNPLSRKHGGPKDE",
+   "span": "50-77",
+   "length": 28,
+   "mod": "oxidation",
+   "mass": 2912.3259,
+   "mz2": 1457.1702,
+   "mz3": 971.7826
+  },
+  {
+   "target": "Cys57 disulfide",
+   "residue": "C57",
+   "peptide": "FGDNTAGCTSAGPHFNPLSRKHGGPKDE",
+   "span": "50-77",
+   "length": 28,
+   "mod": "glutathionylation",
+   "mass": 3201.3992,
+   "mz2": 1601.7069,
+   "mz3": 1068.1403
+  },
+  {
+   "target": "Cu/Zn bridge His63",
+   "residue": "H63",
+   "peptide": "FGDNTAGCTSAGPHFNPLSRKHGGPKDE",
+   "span": "50-77",
+   "length": 28,
+   "mod": "unmodified",
+   "mass": 2896.331,
+   "mz2": 1449.1728,
+   "mz3": 966.451
+  },
+  {
+   "target": "Cu/Zn bridge His63",
+   "residue": "H63",
+   "peptide": "FGDNTAGCTSAGPHFNPLSRKHGGPKDE",
+   "span": "50-77",
+   "length": 28,
+   "mod": "oxidation",
+   "mass": 2912.3259,
+   "mz2": 1457.1702,
+   "mz3": 971.7826
+  },
+  {
+   "target": "Zn ligand His71 (INVISIBLE to trypsin)",
+   "residue": "H71",
+   "peptide": "FGDNTAGCTSAGPHFNPLSRKHGGPKDE",
+   "span": "50-77",
+   "length": 28,
+   "mod": "unmodified",
+   "mass": 2896.331,
+   "mz2": 1449.1728,
+   "mz3": 966.451
+  },
+  {
+   "target": "Zn ligand His71 (INVISIBLE to trypsin)",
+   "residue": "H71",
+   "peptide": "FGDNTAGCTSAGPHFNPLSRKHGGPKDE",
+   "span": "50-77",
+   "length": 28,
+   "mod": "oxidation",
+   "mass": 2912.3259,
+   "mz2": 1457.1702,
+   "mz3": 971.7826
+  },
+  {
+   "target": "Zn ligand His80",
+   "residue": "H80",
+   "peptide": "RHVGDLGNVTADKDGVADVSIE",
+   "span": "79-100",
+   "length": 22,
+   "mod": "unmodified",
+   "mass": 2266.1189,
+   "mz2": 1134.0667,
+   "mz3": 756.3802
+  },
+  {
+   "target": "Zn ligand His80",
+   "residue": "H80",
+   "peptide": "RHVGDLGNVTADKDGVADVSIE",
+   "span": "79-100",
+   "length": 22,
+   "mod": "oxidation",
+   "mass": 2282.1138,
+   "mz2": 1142.0642,
+   "mz3": 761.7119
+  },
+  {
+   "target": "Zn ligand Asp83",
+   "residue": "D83",
+   "peptide": "RHVGDLGNVTADKDGVADVSIE",
+   "span": "79-100",
+   "length": 22,
+   "mod": "unmodified",
+   "mass": 2266.1189,
+   "mz2": 1134.0667,
+   "mz3": 756.3802
+  },
+  {
+   "target": "Cys111 free thiol (absent in mouse)",
+   "residue": "C111",
+   "peptide": "DSVISLSGDHCIIGRTLVVHE",
+   "span": "101-121",
+   "length": 21,
+   "mod": "unmodified",
+   "mass": 2249.1474,
+   "mz2": 1125.581,
+   "mz3": 750.7231
+  },
+  {
+   "target": "Cys111 free thiol (absent in mouse)",
+   "residue": "C111",
+   "peptide": "DSVISLSGDHCIIGRTLVVHE",
+   "span": "101-121",
+   "length": 21,
+   "mod": "oxidation",
+   "mass": 2265.1423,
+   "mz2": 1133.5784,
+   "mz3": 756.0547
+  },
+  {
+   "target": "Cys111 free thiol (absent in mouse)",
+   "residue": "C111",
+   "peptide": "DSVISLSGDHCIIGRTLVVHE",
+   "span": "101-121",
+   "length": 21,
+   "mod": "glutathionylation",
+   "mass": 2554.2155,
+   "mz2": 1278.115,
+   "mz3": 852.4125
+  },
+  {
+   "target": "Cu ligand His120",
+   "residue": "H120",
+   "peptide": "DSVISLSGDHCIIGRTLVVHE",
+   "span": "101-121",
+   "length": 21,
+   "mod": "unmodified",
+   "mass": 2249.1474,
+   "mz2": 1125.581,
+   "mz3": 750.7231
+  },
+  {
+   "target": "Cu ligand His120",
+   "residue": "H120",
+   "peptide": "DSVISLSGDHCIIGRTLVVHE",
+   "span": "101-121",
+   "length": 21,
+   "mod": "oxidation",
+   "mass": 2265.1423,
+   "mz2": 1133.5784,
+   "mz3": 756.0547
+  },
+  {
+   "target": "Asn139 electrostatic loop (measured deamidated)",
+   "residue": "N139",
+   "peptide": "STKTGNAGSRLACGVIGIAQ",
+   "span": "134-153",
+   "length": 20,
+   "mod": "unmodified",
+   "mass": 1902.9945,
+   "mz2": 952.5045,
+   "mz3": 635.3388
+  },
+  {
+   "target": "Asn139 electrostatic loop (measured deamidated)",
+   "residue": "N139",
+   "peptide": "STKTGNAGSRLACGVIGIAQ",
+   "span": "134-153",
+   "length": 20,
+   "mod": "deamidation",
+   "mass": 1903.9785,
+   "mz2": 952.9965,
+   "mz3": 635.6668
+  },
+  {
+   "target": "Cys146 disulfide",
+   "residue": "C146",
+   "peptide": "STKTGNAGSRLACGVIGIAQ",
+   "span": "134-153",
+   "length": 20,
+   "mod": "unmodified",
+   "mass": 1902.9945,
+   "mz2": 952.5045,
+   "mz3": 635.3388
+  },
+  {
+   "target": "Cys146 disulfide",
+   "residue": "C146",
+   "peptide": "STKTGNAGSRLACGVIGIAQ",
+   "span": "134-153",
+   "length": 20,
+   "mod": "oxidation",
+   "mass": 1918.9894,
+   "mz2": 960.502,
+   "mz3": 640.6704
+  },
+  {
+   "target": "Cys146 disulfide",
+   "residue": "C146",
+   "peptide": "STKTGNAGSRLACGVIGIAQ",
+   "span": "134-153",
+   "length": 20,
+   "mod": "glutathionylation",
+   "mass": 2208.0627,
+   "mz2": 1105.0386,
+   "mz3": 737.0282
+  }
+ ],
+ "protocol": [
+  "Block free thiols with NEM at pH 6.5 before lysis.",
+  "NO reduction and NO iodoacetamide: carbamidomethyl as a fixed modification is what destroys disulfide connectivity in every published SOD1 dataset.",
+  "Digest with Glu-C at pH 6.5-7.0, not the usual pH 8 ammonium bicarbonate, which generates deamidation and promotes thiol-disulfide exchange in the tube.",
+  "Run a matched pH 8 aliquot as the artefact control.",
+  "Post-mortem interval is a covariate for every deamidation readout."
+ ]
+}
