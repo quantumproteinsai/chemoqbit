@@ -20,6 +20,11 @@ mail carries, so an ordinary inbox is never swept. --any turns the filter off an
 to be asked for: that address receives personal mail which is none of this script's
 business.
 
+This account mails itself, so an outgoing note and an incoming reply share one
+address and one subject. Mail that send_note.py sent carries X-Chemoqbit-Origin and
+is skipped here; without that a polling loop reads its own status mail back as though
+it were an instruction, which is exactly what happened the first time it ran.
+
 Two things Gmail does that are easy to trip over. A filter routes this traffic into
 the 'chemoqbit' mailbox rather than leaving it in INBOX, which is why that is the
 default here. And Gmail's SEARCH ignores punctuation, so the [chemoqbit] tag matches
@@ -37,6 +42,7 @@ CRED = Path.home() / '.config' / 'chemoqbit' / 'smtp.ini'
 TAG = '[chemoqbit]'          # outgoing subjects carry it, so replies keep it under "Re:"
 BOX = 'chemoqbit'            # a Gmail filter routes this traffic out of INBOX into here
 SEEN = Path(__file__).resolve().parents[1] / 'results' / 'replies_seen.json'
+ORIGIN = 'X-Chemoqbit-Origin'   # send_note.py stamps its own mail with this
 QUOTED = ('>', 'On ', '-----Original', '________')
 
 
@@ -112,6 +118,8 @@ def main():
             typ, raw = m.fetch(i, '(BODY.PEEK[])')   # PEEK: does not set \Seen
             msg = email.message_from_bytes(raw[0][1])
             subj = str(make_header(decode_header(msg.get('Subject', '(no subject)'))))
+            if msg.get(ORIGIN):
+                continue              # our own outgoing mail, not a reply to it
             if a.replies_only and not subj.lower().startswith('re:'):
                 continue
             mid = msg.get('Message-ID') or f'{msg.get("Date")}|{subj}'
