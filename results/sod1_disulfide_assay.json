@@ -1,0 +1,285 @@
+{
+ "what": "SOD1 disulfide assay design and deamidation clock",
+ "cysteines": [
+  6,
+  57,
+  111,
+  146
+ ],
+ "assay": {
+  "trypsin": {
+   "rows": [
+    {
+     "pair": "C6-C57",
+     "kind": "cross-link",
+     "m": 4090.953,
+     "lo": 6,
+     "note": "6+33 aa"
+    },
+    {
+     "pair": "C6-C111",
+     "kind": "cross-link",
+     "m": 3085.5423,
+     "lo": 6,
+     "note": "6+24 aa"
+    },
+    {
+     "pair": "C6-C146",
+     "kind": "cross-link",
+     "m": 1572.8731,
+     "lo": 6,
+     "note": "6+10 aa"
+    },
+    {
+     "pair": "C57-C111",
+     "kind": "cross-link",
+     "m": 5915.7655,
+     "lo": 24,
+     "note": "33+24 aa"
+    },
+    {
+     "pair": "C57-C146",
+     "kind": "cross-link",
+     "m": 4403.0963,
+     "lo": 10,
+     "note": "33+10 aa"
+    },
+    {
+     "pair": "C111-C146",
+     "kind": "cross-link",
+     "m": 3397.6857,
+     "lo": 10,
+     "note": "24+10 aa"
+    }
+   ],
+   "collisions": [],
+   "shortest_partner": 6
+  },
+  "Glu-C": {
+   "rows": [
+    {
+     "pair": "C6-C57",
+     "kind": "cross-link",
+     "m": 5052.461,
+     "lo": 21,
+     "note": "21+28 aa"
+    },
+    {
+     "pair": "C6-C111",
+     "kind": "cross-link",
+     "m": 4405.2773,
+     "lo": 21,
+     "note": "21+21 aa"
+    },
+    {
+     "pair": "C6-C146",
+     "kind": "cross-link",
+     "m": 4059.1244,
+     "lo": 20,
+     "note": "21+20 aa"
+    },
+    {
+     "pair": "C57-C111",
+     "kind": "cross-link",
+     "m": 5143.4628,
+     "lo": 21,
+     "note": "28+21 aa"
+    },
+    {
+     "pair": "C57-C146",
+     "kind": "cross-link",
+     "m": 4797.3099,
+     "lo": 20,
+     "note": "28+20 aa"
+    },
+    {
+     "pair": "C111-C146",
+     "kind": "cross-link",
+     "m": 4150.1262,
+     "lo": 20,
+     "note": "21+20 aa"
+    }
+   ],
+   "collisions": [],
+   "shortest_partner": 20
+  },
+  "Asp-N": {
+   "rows": [
+    {
+     "pair": "C6-C57",
+     "kind": "cross-link",
+     "m": 3434.7299,
+     "lo": 10,
+     "note": "10+24 aa"
+    },
+    {
+     "pair": "C6-C111",
+     "kind": "cross-link",
+     "m": 2676.4567,
+     "lo": 10,
+     "note": "10+15 aa"
+    },
+    {
+     "pair": "C6-C146",
+     "kind": "cross-link",
+     "m": 3788.9512,
+     "lo": 10,
+     "note": "10+29 aa"
+    },
+    {
+     "pair": "C57-C111",
+     "kind": "cross-link",
+     "m": 4136.0544,
+     "lo": 15,
+     "note": "24+15 aa"
+    },
+    {
+     "pair": "C57-C146",
+     "kind": "cross-link",
+     "m": 5248.5489,
+     "lo": 24,
+     "note": "24+29 aa"
+    },
+    {
+     "pair": "C111-C146",
+     "kind": "cross-link",
+     "m": 4490.2757,
+     "lo": 15,
+     "note": "15+29 aa"
+    }
+   ],
+   "collisions": [],
+   "shortest_partner": 10
+  },
+  "chymotrypsin": {
+   "rows": [
+    {
+     "pair": "C6-C57",
+     "kind": "cross-link",
+     "m": 2134.9775,
+     "lo": 8,
+     "note": "8+14 aa"
+    },
+    {
+     "pair": "C6-C111",
+     "kind": "cross-link",
+     "m": 1972.0234,
+     "lo": 8,
+     "note": "8+11 aa"
+    },
+    {
+     "pair": "C6-C146",
+     "kind": "cross-link",
+     "m": 1631.8738,
+     "lo": 8,
+     "note": "8+9 aa"
+    },
+    {
+     "pair": "C57-C111",
+     "kind": "cross-link",
+     "m": 2502.1016,
+     "lo": 11,
+     "note": "14+11 aa"
+    },
+    {
+     "pair": "C57-C146",
+     "kind": "cross-link",
+     "m": 2161.9521,
+     "lo": 9,
+     "note": "14+9 aa"
+    },
+    {
+     "pair": "C111-C146",
+     "kind": "cross-link",
+     "m": 1998.9979,
+     "lo": 9,
+     "note": "11+9 aa"
+    }
+   ],
+   "collisions": [],
+   "shortest_partner": 8
+  }
+ },
+ "deamidation": {
+  "interface_residues": [
+   5,
+   7,
+   17,
+   50,
+   51,
+   52,
+   53,
+   54,
+   113,
+   114,
+   115,
+   148,
+   149,
+   150,
+   151,
+   152,
+   153
+  ],
+  "sites": [
+   {
+    "residue": 26,
+    "motif": "N26-G27",
+    "next": "G",
+    "tier": "very fast",
+    "rank": 1,
+    "roles": []
+   },
+   {
+    "residue": 139,
+    "motif": "N139-A140",
+    "next": "A",
+    "tier": "moderate",
+    "rank": 3,
+    "roles": []
+   },
+   {
+    "residue": 19,
+    "motif": "N19-F20",
+    "next": "F",
+    "tier": "slow",
+    "rank": 4,
+    "roles": []
+   },
+   {
+    "residue": 53,
+    "motif": "N53-T54",
+    "next": "T",
+    "tier": "slow",
+    "rank": 4,
+    "roles": [
+     "dimer interface"
+    ]
+   },
+   {
+    "residue": 65,
+    "motif": "N65-P66",
+    "next": "P",
+    "tier": "slow",
+    "rank": 4,
+    "roles": []
+   },
+   {
+    "residue": 86,
+    "motif": "N86-V87",
+    "next": "V",
+    "tier": "slow",
+    "rank": 4,
+    "roles": []
+   },
+   {
+    "residue": 131,
+    "motif": "N131-E132",
+    "next": "E",
+    "tier": "slow",
+    "rank": 4,
+    "roles": []
+   }
+  ]
+ },
+ "caveat": "Tiers are sequence context only (the n+1 residue). In a folded protein local flexibility dominates the sequence term, so these rank candidates, they do not predict rates. Alkaline digestion generates deamidation chemically, so any measurement needs low-pH digestion and a matched unmodified control."
+}

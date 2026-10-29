@@ -1,0 +1,49 @@
+{
+ "species": {
+  "identity_pct": 83.7,
+  "asparagines": [
+   {
+    "human": "N19-F20",
+    "tier": "slow",
+    "mouse": "H19",
+    "mouse_tier": "--"
+   },
+   {
+    "human": "N26-G27",
+    "tier": "very fast",
+    "mouse": "G26",
+    "mouse_tier": "--"
+   },
+   {
+    "human": "N53-T54",
+    "tier": "slow",
+    "mouse": "Asn53-T54",
+    "mouse_tier": "slow"
+   },
+   {
+    "human": "N65-P66",
+    "tier": "blocked (Pro)",
+    "mouse": "Asn65-P66",
+    "mouse_tier": "blocked (Pro)"
+   },
+   {
+    "human": "N86-V87",
+    "tier": "slow",
+    "mouse": "Asn86-V87",
+    "mouse_tier": "slow"
+   },
+   {
+    "human": "N131-E132",
+    "tier": "slow",
+    "mouse": "Asn131-E132",
+    "mouse_tier": "slow"
+   },
+   {
+    "human": "N139-A140",
+    "tier": "moderate",
+    "mouse": "Asn139-A140",
+    "mouse_tier": "moderate"
+   }
+  ]
+ }
+}
