@@ -44,7 +44,7 @@ TITLE_GENRE = [(r":\s*an?\s+(?:\w+\s+){0,2}"
                 r"(model|hypothesis|perspective|commentary|review|proposal|note|framework)\b",
                 "the subtitle names a genre rather than a finding")]
 PLACEHOLDER = [r"XXXX+", r"\bTODO\b", r"\bTBD\b", r"\[citation needed\]", r"\bFIXME\b",
-               r"\bplaceholder\b"]
+               r"\bplaceholder\b", r"\b[A-Z][A-Z_]*_PENDING\b", r"\bFILL[_ ]?IN\b"]
 
 
 def sections(md):
@@ -126,9 +126,15 @@ def check_availability(md, repo, tarball, add):
         for f in sorted(named):
             if Path(f).name not in inside:
                 add("FATAL", f"availability names `{f}` but it is not in {Path(tarball).name}")
-    for doi in set(re.findall(r"zenodo\.(\d+|X+)", avail)):
-        if set(doi) == {"X"}:
-            add("FATAL", "availability still contains a placeholder DOI")
+    # Match any suffix, not just digits or X's, and reject whatever is not a bare
+    # number. The old pattern only recognised zenodo.NNNN and zenodo.XXXX, so a
+    # placeholder of any other shape -- zenodo.ZENODO_DOI_PENDING, left in while
+    # waiting for an upload -- did not match the pattern at all and was reported
+    # clean. A DOI is digits; anything else is unfinished.
+    for doi in set(re.findall(r"zenodo\.([A-Za-z0-9_.-]+)", avail)):
+        if not doi.isdigit():
+            add("FATAL", f"availability DOI is not a number, so it is unfinished: "
+                         f"zenodo.{doi}")
 
 
 def check_wording(md, add):

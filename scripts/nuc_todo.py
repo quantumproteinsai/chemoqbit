@@ -76,8 +76,20 @@ def prolyl():
     p = RES / 'prolyl.json'
     if not p.exists():
         return True
-    done = json.loads(p.read_text()).get('_stages_done', [])
-    return not all(x in done for x in ('scan', 'points', 'dft'))
+    d = json.loads(p.read_text())
+    done = d.get('_stages_done', [])
+    if not all(x in done for x in ('scan', 'points', 'dft')):
+        return True
+    # A stage name in _stages_done says the stage RAN, not that every point in it
+    # succeeded. On 27 October four of the five saddle searches raised and were stored
+    # as {'failed': ...}; the unit was skipped at every firing afterwards because
+    # 'points' was in the list. A stationary point recorded only as a failure is work
+    # still to do, so say so -- the models written off in diagnoses.json excepted,
+    # since those are meant to be absent.
+    pts = d.get('points') or {}
+    return any('failed' in v.get(tag, {})
+               for v in pts.values() if isinstance(v, dict) and 'skipped' not in v
+               for tag in ('trans', 'cis', 'saddle'))
 
 
 def pocket(system, stages=('wt', 'scan', 'dft')):

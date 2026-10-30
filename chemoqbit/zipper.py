@@ -183,6 +183,12 @@ def build(pdb, chain='A', mate=None, neighbours=0, to_alanine=(), substitutions=
     else:
         R, t = mate
         sheets = [(np.eye(3), np.zeros(3), chain), (R, t, chain)]
+    # A symmetry image carries the same atoms of the same chain in a rotated frame,
+    # so the two sheets are the same fragment and every per-sheet quantity must
+    # match. A second deposited chain carries no such promise: 5WMJ chain B has two
+    # more ordered waters than chain A, so there the sheets legitimately differ.
+    equivalent = not isinstance(mate, str)
+    mate_transform = (sheets[1][0], sheets[1][1])
 
     sym, X, label, sheet = [], [], [], []
     n_lys = 0
@@ -212,10 +218,11 @@ def build(pdb, chain='A', mate=None, neighbours=0, to_alanine=(), substitutions=
              else not any(l.rsplit(':', 1)[1] == 'OXT' for l in label))
     return dict(symbols=sym, X=np.array(X), labels=label, charge=charge,
                 sheet=np.array(sheet), n_residues=len(res), n_strands=n_strands,
-                cut_c_terminus=cut_c)
+                cut_c_terminus=cut_c, sheets_equivalent=equivalent,
+                mate_transform=mate_transform)
 
 
-def protonate(c):
+def protonate(c, seed=None):
     """Hydrogens and the termini/lysine formal charges."""
     from rdkit import Chem
     from rdkit.Chem import rdDetermineBonds
@@ -259,9 +266,89 @@ def protonate(c):
     # extend the sheet mask over the added hydrogens
     sh = np.full(len(symH), -1)
     sh[:len(sym)] = c['sheet']
+    parent = {}
     for at in molH.GetAtoms():
         if at.GetSymbol() == 'H':
             nb = at.GetNeighbors()
             if nb:
                 sh[at.GetIdx()] = sh[nb[0].GetIdx()]
-    return symH, XH, lab, Chem.GetFormalCharge(molH), sh
+                parent[at.GetIdx()] = nb[0].GetIdx()
+    hmap = {}
+    for h, q_ in sorted(parent.items()):
+        hmap.setdefault(lab[q_], []).append(h)
+    if seed:
+        XH = _seed_hydrogens(XH, hmap, seed)
+    if c.get('sheets_equivalent'):
+        XH = _image_hydrogens(XH, sh, parent, c)
+    return symH, XH, lab, Chem.GetFormalCharge(molH), sh, hmap
+
+
+def _seed_hydrogens(XH, hmap, seed):
+    """Start each hydrogen from a relaxed position carried in from another model.
+
+    An alanine ddE is a difference of two interaction energies, so it only means
+    "what that side chain contributes" if everything else about the two models is
+    the same. It was not: every mutant got its own AddHs guess and its own local
+    optimise_frozen, so the wild type and each mutant settled into a DIFFERENT
+    local minimum of the same hydrogen-bond network -- three waters, two of them
+    interfacial, plus the backbone and the Gln7 amide. The interaction energy is a
+    difference of numbers two hundred times its own size, so a basin change at the
+    interface passes into ddE whole, and two of 4NIP's four came out at -31 and
+    -28 kcal/mol for the loss of a valine and a glutamine side chain.
+
+    Seeding every surviving hydrogen from the wild type's relaxed geometry puts all
+    the models in one basin, leaving the mutation as the only difference. A parent
+    whose hydrogen count the mutation changed -- CB goes from one hydrogen to three
+    when a side chain is truncated to alanine -- keeps its own guess, since there is
+    no wild-type position for the two new ones.
+    """
+    for l, idx in hmap.items():
+        x = seed.get(l)
+        if x is None or len(x) != len(idx):
+            continue
+        for i, xi in zip(idx, x):
+            XH[i] = xi
+    return XH
+
+
+def _image_hydrogens(XH, sh, parent, c):
+    """Replace sheet 1's hydrogens with the rigid image of sheet 0's.
+
+    rdkit's AddHs places a hydrogen from its parent's own local frame. That fixes
+    it at a tetrahedral or planar centre, but a free rotor -- a water, a hydroxyl,
+    NH3+, an amide -- is left on whichever rotamer that frame happens to pick, and
+    the mating sheet's frame is rotated. The two sheets of 4NIP came out 0.499 A
+    apart in their hydrogens while their heavy atoms agreed to 0.000000 A, and
+    E_sheet0 - E_sheet1, which symmetry fixes at zero, was 36 kcal/mol for the wild
+    type and up to 95 for a mutant. Waters are the worst case because an isolated
+    oxygen has no heavy-atom frame to orient against at all.
+
+    That asymmetry is the detector rather than the error itself: interaction()
+    slices one coordinate set for the complex and for both fragments, so a static
+    misplacement cancels in E(both) - E(sheet0) - E(sheet1). What does not cancel
+    is WHICH local minimum of the hydrogen-bond network each structure fell into,
+    because optimise_frozen relaxes locally and the wild type and every mutant get
+    an independent guess. Placing the hydrogens symmetrically removes one arbitrary
+    degree of freedom and makes the model match its own symmetry; it does not on
+    its own put the wild type and its mutants in a COMMON basin, which is what an
+    alanine ddE needs. sheet_equivalence records the residual either way.
+    """
+    R, t = c['mate_transform']
+    n = len(c['symbols']) // 2
+    image = lambda x: x @ R.T + t
+    off = np.abs(image(XH[:n]) - XH[n:2 * n]).max()
+    if off > 1e-4:
+        raise ValueError(f'sheet 1 is not the image of sheet 0 under the mate '
+                         f'transform ({off:.2e} A); the index correspondence this '
+                         f'relies on no longer holds')
+    by_parent = ({}, {})
+    for h, p in sorted(parent.items()):
+        by_parent[p >= n][p % n] = by_parent[p >= n].get(p % n, []) + [h]
+    for p, hs0 in by_parent[0].items():
+        hs1 = by_parent[1].get(p, [])
+        if len(hs0) != len(hs1):
+            raise ValueError(f'heavy atom {p} carries {len(hs0)} hydrogens in sheet 0 '
+                             f'but {len(hs1)} in its symmetry image')
+        for a, b in zip(hs0, hs1):
+            XH[b] = image(XH[a])
+    return XH

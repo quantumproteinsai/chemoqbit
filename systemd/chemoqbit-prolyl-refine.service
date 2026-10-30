@@ -1,0 +1,27 @@
+[Unit]
+Description=chemoqbit: refine the prolyl saddle guesses on a 3-degree grid (resumable)
+StartLimitIntervalSec=6h
+StartLimitBurst=3
+
+[Service]
+Type=simple
+WorkingDirectory=/home/deploy/dev/chemoqbit
+Environment=OMP_NUM_THREADS=1 PYSCF_MAX_MEMORY=8000
+MemoryMax=10G
+TimeoutStartSec=infinity
+# Queue behind anything already running. Launched with nohup instead, this job sat at
+# 0% CPU for eighteen minutes while zipper_scan held all four cores at 372%.
+# zip-sod1ct is deliberately NOT in this list. The refinement is about twenty
+# single-core points at 24 s each; waiting for a seven-CPU-hour zipper scan to
+# finish first would cost eight hours to save one core of contention for thirty
+# minutes. The multi-core jobs still gate it.
+ExecStartPre=/home/deploy/dev/chemoqbit/scripts/wait_units.sh chemoqbit-zip-sod1 chemoqbit-zip-tau chemoqbit-zip-asyn47 chemoqbit-zip-nacore chemoqbit-prolyl
+ExecStartPre=/bin/sh -c 'echo "=== $(date "+%%F %%T")  start: prolyl saddle refinement"'
+ExecStart=/home/deploy/dev/chemoqbit/.venv/bin/python -u /home/deploy/dev/chemoqbit/scripts/prolyl_refine.py ala ser pser1 pthr1
+StandardOutput=append:/home/deploy/dev/chemoqbit/results/service_prolyl_refine.log
+StandardError=append:/home/deploy/dev/chemoqbit/results/service_prolyl_refine.log
+Restart=on-failure
+RestartSec=120
+
+[Install]
+WantedBy=default.target

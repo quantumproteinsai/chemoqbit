@@ -315,6 +315,17 @@ record('an alanine truncation worth 120 kcal/mol', 'alanine_ddE',
        'one side chain cannot be worth that')
 record('a plausible alanine ddE', 'alanine_ddE',
        not sanity.check('alanine_ddE', 3.4, log=lambda m: None), False, '+3.4 kcal/mol')
+# 4NIP's two sheets are a proper 2-fold image of one another, so their energies are
+# equal by construction. They came out 36 kcal/mol apart because rdkit placed the
+# hydrogens of each sheet in that sheet's own rotated frame, which put every alanine
+# ddE in the file tens of kcal/mol out. The labelled positive is the wild-type value
+# that was actually recorded.
+record('the 4NIP sheet pair 36 kcal/mol apart', 'sheet_equivalence',
+       not sanity.check('sheet_equivalence', 35.985, log=lambda m: None), True,
+       'a symmetry image cannot differ from its original')
+record('two sheets agreeing to a tenth of a kcal', 'sheet_equivalence',
+       not sanity.check('sheet_equivalence', 0.1, log=lambda m: None), False,
+       'what the symmetrised hydrogens give')
 
 o_ = load('ts_oniom_opt.json') or {}
 an_ = (o_.get('analysis') or {}).get('kie', {})

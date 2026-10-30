@@ -65,6 +65,22 @@ def kies(r):
 
 STALL_MIN = 150       # a surface point has legitimately taken 52 minutes, so 90 was
                       # a near miss; this still catches a genuine hang within 2.5 h
+CPU_BUSY = 0.5        # core-seconds per wall second over the sample below. A silent
+                      # unit that is still burning CPU is working, not hung: the
+                      # zipper core stage runs one density-fitted SCF on 262 atoms
+                      # with 10720 auxiliary functions and prints nothing for hours,
+                      # which tripped the silence test at 151 minutes while the job
+                      # held 372% CPU and 559 minutes of CPU time. Raising STALL_MIN
+                      # to cover that would have blinded the check for every fast
+                      # job, so the test is silence AND no progress, not silence.
+
+
+def cpu_seconds(unit):
+    """Core-seconds the unit's whole cgroup has used, or None if it cannot be read."""
+    import subprocess
+    v = subprocess.run(['systemctl', '--user', 'show', '-p', 'CPUUsageNSec', '--value', unit],
+                       capture_output=True, text=True).stdout.strip()
+    return int(v) / 1e9 if v.isdigit() else None
 
 
 def stalls():
@@ -72,7 +88,7 @@ def stalls():
     no new line for the notifier and no exit for systemd, so nothing else would
     notice it. The threshold is well beyond the slowest legitimate step."""
     import subprocess, time as _t
-    out = []
+    out, out_busy = [], []
 
     # Units and their logs come from systemd, not from a list written out here. The
     # list that used to be here had gone stale in both directions: it was missing
@@ -104,9 +120,20 @@ def stalls():
         if not p_.exists():
             continue
         quiet = (_t.time() - p_.stat().st_mtime) / 60.0
-        if quiet > STALL_MIN:
-            out.append(f'SANITY {u} has been running but silent for {quiet:.0f} minutes '
-                       f'(threshold {STALL_MIN}); its log is {lg}')
+        if quiet <= STALL_MIN:
+            continue
+        c0 = cpu_seconds(u)
+        if c0 is not None:
+            _t.sleep(4.0)
+            c1 = cpu_seconds(u)
+            if c1 is not None and (c1 - c0) / 4.0 > CPU_BUSY:
+                out_busy.append(f'{u} silent for {quiet:.0f} min but using '
+                                f'{(c1 - c0) / 4.0:.1f} cores; working, not hung')
+                continue
+        out.append(f'SANITY {u} has been running but silent for {quiet:.0f} minutes '
+                   f'(threshold {STALL_MIN}) and is not using CPU; its log is {lg}')
+    for m in out_busy:
+        print('  note: ' + m)
     return out
 
 

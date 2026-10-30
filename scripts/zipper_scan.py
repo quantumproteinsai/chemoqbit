@@ -105,18 +105,22 @@ def load():
     return json.loads(OUT.read_text()) if OUT.exists() else {}
 
 
-def pieces(to_alanine=(), keep_residues=None):
+def pieces(to_alanine=(), keep_residues=None, seed=None):
     c = build(str(PDB), mate=S['mate'], neighbours=NEIGHBOURS, to_alanine=to_alanine,
               keep_residues=keep_residues)
     if c.get('cut_c_terminus'):
         raise ValueError('the window does not reach the deposited C-terminus, so there '
                          'is no OXT: the carboxylate charge and the cap would both be '
                          'invented. Extend the window to the last residue.')
-    sym, X, lab, q, sheet = protonate(c)
+    sym, X, lab, q, sheet, hmap = protonate(c, seed=seed)
     heavy = [i for i, s in enumerate(sym) if s != 'H']
     X, _ = optimise_frozen(sym, X, charge=q, frozen=heavy, solvent=SOLVENT,
                            maxiter=300, gtol=5e-4)
-    return sym, np.array(X), q, sheet, lab
+    X = np.array(X)
+    # the relaxed hydrogen network, by the heavy atom that carries it, so the
+    # mutants can start from the wild type's basin instead of their own
+    hyd = {l: [X[i].tolist() for i in idx] for l, idx in hmap.items()}
+    return sym, X, q, sheet, lab, hyd
 
 
 def interaction(sym, X, q, sheet):
@@ -129,7 +133,22 @@ def interaction(sym, X, q, sheet):
     for s_ in (0, 1):
         i = np.flatnonzero(sheet == s_)
         out[s_] = E([sym[k] for k in i], X[i], half)
-    return (e_all - out[0] - out[1]) * K, dict(E_both=e_all, E_sheet0=out[0], E_sheet1=out[1])
+    return (e_all - out[0] - out[1]) * K, dict(E_both=e_all, E_sheet0=out[0], E_sheet1=out[1],
+                                               E_sheet_asymmetry=(out[0] - out[1]) * K)
+
+
+def check_sheets(res, parts, label):
+    """A symmetry-generated mate must give the two fragments the same energy.
+
+    Not a diagnostic nicety: the interaction energy is a difference of numbers two
+    hundred times its own size, so a per-sheet difference passes into it whole. In
+    4NIP it was 36 kcal/mol against an interaction energy of -3.4, which is how two
+    alanine ddE values reached -31 and -28 kcal/mol.
+    """
+    if isinstance(S['mate'], str):
+        return True            # a second deposited chain is a different fragment
+    return sanity.record(res, 'sheet_equivalence', abs(parts['E_sheet_asymmetry']),
+                         label=label)
 
 
 def residues(lab):
@@ -161,12 +180,13 @@ def stage_wt(res):
         print(f"  interface: symmetry op {desc['op']} cell {desc['cell']}, buries "
               f"{desc['buried']:.1f} A^2, side-chain fraction {desc['side_fraction']:.2f}, "
               f"interfacial waters {desc['interfacial_waters']}", flush=True)
-    sym, X, q, sheet, lab = pieces()
+    sym, X, q, sheet, lab, hyd = pieces()
     ei, parts = interaction(sym, X, q, sheet)
+    check_sheets(res, parts, f'{NAME} wild type sheet pair')
     res['wt'] = dict(atoms=len(sym), charge=q, neighbours=NEIGHBOURS, E_int=ei,
                      residues=[f'{r}{n}' for n, r in residues(lab)],
                      seconds=time.time() - t0, **parts)
-    res['geometry'] = dict(labels=lab)
+    res['geometry'] = dict(labels=lab, hydrogens=hyd)
     save(res)
     sanity.record(res, 'interaction_energy', ei, label='zipper wild type', fatal=True)
     print(f'wild type: {len(sym)} atoms, charge {q:+d}, E_int {ei:+.2f} kcal/mol '
@@ -191,8 +211,10 @@ def stage_scan(res):
             continue
         t0 = time.time()
         try:
-            sym, X, q, sheet, lab = pieces(to_alanine=[n])
+            sym, X, q, sheet, lab, _hyd = pieces(
+                to_alanine=[n], seed=(res['geometry'].get('hydrogens') or None))
             ei, parts = interaction(sym, X, q, sheet)
+            check_sheets(res, parts, f'{key} -> Ala sheet pair')
             res['alanine'][key] = dict(E_int=ei, ddE=ei - res['wt']['E_int'], charge=q,
                                        atoms=len(sym), seconds=time.time() - t0, **parts)
             sanity.record(res, 'alanine_ddE', ei - res['wt']['E_int'], label=f'{key} -> Ala')
@@ -267,11 +289,11 @@ def stage_dft(res):
     # size first, on composition alone: relaxing for two hours and only then
     # discovering the integral file does not fit is how this stage wasted about
     # forty CPU-hours
-    sym0, X0, _l, q0, _sh = core_model(None)
+    sym0, X0, _l, q0, _sh, _hm = core_model(None)
     probe = gto.M(atom=[(sym0[i], X0[i]) for i in range(len(sym0))], basis=BASIS,
                   charge=int(q0), unit='Angstrom', verbose=0)
     print('  ' + check_fits(probe, 'both (before relaxing)'), flush=True)
-    sym, X, q, sheet, lab = pieces()
+    sym, X, q, sheet, lab, _hyd = pieces(seed=(res.get('geometry') or {}).get('hydrogens'))
     out = {}
     half = q // 2
     for tag, idx, qq in (('both', np.arange(len(sym)), q),
@@ -288,7 +310,17 @@ def stage_dft(res):
         res['dft'] = out; save(res)
         print(f"  dft {tag}: {len(idx)} atoms, E {out[tag]['E']:.6f} ({time.time() - t0:.0f}s)",
               flush=True)
+    if not all(out[t]['converged'] for t in ('both', 'sheet0', 'sheet1')):
+        # stage_core has always refused here; this stage recorded the flag and used
+        # the energy anyway, which is the one case where a fragment energy is
+        # arbitrary rather than merely imprecise
+        out['note'] = 'at least one SCF did not converge; no interaction energy reported'
+        res['dft'] = out; save(res)
+        print('an SCF did not converge -- not reporting an interaction energy', flush=True)
+        return
     out['E_int'] = (out['both']['E'] - out['sheet0']['E'] - out['sheet1']['E']) * K
+    out['E_sheet_asymmetry'] = (out['sheet0']['E'] - out['sheet1']['E']) * K
+    check_sheets(res, out, f'{NAME} wild type sheet pair, DFT')
     res['dft'] = out; save(res)
     print(f"DFT E_int {out['E_int']:+.2f} kcal/mol (gas phase)", flush=True)
 
@@ -331,7 +363,7 @@ def stage_core(res):
         out = {}
 
     # size first, on composition alone, before anything expensive
-    sym0, X0, lab0, q0, sheet0 = core_model(keep)
+    sym0, X0, lab0, q0, sheet0, _hm = core_model(keep)
     probe = gto.M(atom=[(sym0[i], X0[i]) for i in range(len(sym0))], basis=BASIS,
                   charge=int(q0), unit='Angstrom', verbose=0)
     print('  ' + check_fits(probe, 'both (before relaxing)'), flush=True)
@@ -344,9 +376,11 @@ def stage_core(res):
               flush=True)
     else:
         t0 = time.time()
-        sym, X, q, sheet, lab = pieces(keep_residues=keep)
+        sym, X, q, sheet, lab, _hyd = pieces(
+            keep_residues=keep, seed=(res.get('geometry') or {}).get('hydrogens'))
         names = dict(residues(lab))
         ei_xtb, parts_xtb = interaction(sym, X, q, sheet)
+        check_sheets(res, parts_xtb, f'{NAME} core sheet pair')
         out = dict(window=keep, residues=[f'{names[n]}{n}' for n in sorted(names)],
                    atoms=len(sym), charge=int(q), symbols=list(sym),
                    coords=[list(map(float, r)) for r in X], sheet=[int(v) for v in sheet],
@@ -384,6 +418,9 @@ def stage_core(res):
         return
     ei_dft = (E['both']['E'] - E['sheet0']['E'] - E['sheet1']['E']) * K
     out['dft_E_int'] = ei_dft
+    out['dft_E_sheet_asymmetry'] = (E['sheet0']['E'] - E['sheet1']['E']) * K
+    check_sheets(res, dict(E_sheet_asymmetry=out['dft_E_sheet_asymmetry']),
+                 f'{NAME} core sheet pair, DFT')
     out['xtb_minus_dft'] = ei_xtb - ei_dft
     # the full sheet pair for contrast: the core is a neutral 4-residue dry model and
     # the full model is a dication with six waters, so these are not the same quantity

@@ -79,6 +79,18 @@ BOUNDS = {
                            'a bound complex must be downhill against its separated parts'),
     'alanine_ddE': (-20.0, 60.0, 'kcal/mol',
                     'removing one side chain cannot change a contact by more than this'),
+    'sheet_equivalence': (0.0, 0.5, 'kcal/mol',
+                          'when the mating sheet is a symmetry image of the reference sheet it '
+                          'is the SAME fragment in a rotated frame, so the two fragment energies '
+                          'are equal by construction and |E_sheet0 - E_sheet1| is zero. Anything '
+                          'larger is a per-sheet modelling difference -- an arbitrary hydrogen '
+                          'rotamer, a stalled SCF. A static one cancels in E(both) - E(sheet0) '
+                          '- E(sheet1), since the same coordinates are sliced for all three, so '
+                          'this is a detector and not the error: it says the per-structure '
+                          'modelling is arbitrary, and what then fails to cancel is which local '
+                          'minimum each structure relaxed into. The interaction energy is a '
+                          'difference of numbers two hundred times its own size, so that passes '
+                          'into it whole'),
     # the quantities the two manuscripts rest on
     'kie': (0.5, 30.0, '-', 'a primary H/T effect of a hydride transfer; outside this the '
                             'partition functions or the mass assignment are wrong'),
@@ -152,9 +164,13 @@ BOUNDS = {
                            'reactants and products of an IDENTITY exchange are the same two '
                            'species, so its reaction energy is exactly zero by symmetry. Any '
                            'departure is scan error and nothing else, which makes this the one '
-                           'check here with no physics in its tolerance: ss and sese give the '
-                           'true numerical noise floor, and a barrier difference smaller than '
-                           'it cannot be claimed for se_s or se_nuc'),
+                           'check here with no physics in its tolerance: the identity systems '
+                           'give the numerical noise floor, and a barrier difference smaller '
+                           'than it cannot be claimed for se_s or se_nuc. Read it from ss '
+                           '(0.021 kcal/mol on a smooth reversible scan), NOT from sese, whose '
+                           'scan leaves the exchange path: its 1.10 is the gap between two ends '
+                           'taken from different sweeps, and a failed scan is not a measurement '
+                           'of noise'),
     'exchange_well': (0.0, 2.0, 'kcal/mol',
                       'how far the symmetric arrangement of a displacement sits BELOW the '
                       'reactant complex. For an S_N2 it should be about zero, because that '

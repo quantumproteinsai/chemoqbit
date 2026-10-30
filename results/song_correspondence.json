@@ -1,5 +1,5 @@
 {
- "sent": "2026-10-26",
+ "sent": "2026-10-26, 18:18, from contact@quantum-proteins.ai",
  "to": "Prof. Kiwon Song, Yonsei University, corresponding author of Choi et al., bioRxiv 2026.10.15.759291",
  "why_recorded": "These claims are now asserted to a third party, and the threshold manuscript rests on the same reanalysis. If any of them is wrong it has to be corrected to them as well as in the file.",
  "claims_made": [
@@ -7,17 +7,17 @@
   "S266D/S273D against wild type is 5.5 % versus 0.6 %, which as a rate is 9.4-fold, with the charge-neutral S266A/S273A control flat. Two phosphomimetic substitutions sit on the steepest segment.",
   "Their 3R-E time course gives hazards of 0.00463, 0.00500 and 0.00452 per hour at 12, 24 and 48 h -- constant to 4 % across a four-fold range -- which supports from kinetics the conclusion they argue from FRAP.",
   "Their two q=0 constructs both show the hazard RISING about 2.5-fold between 48 and 72 h while q=-1 and q=-4 are flat or falling, which a lag appearing only where crossing is slow would produce.",
-  "Figure S5 panels E and F reassure on expression for the PAM and arginine series, but no serine construct appears in either, and those carry the phosphorylation argument and the largest rate effect.",
+  "NOT SENT, drafted only -- Figure S5 panels E and F reassure on expression for the PAM and arginine series, but no serine construct appears in either, and those carry the phosphorylation argument and the largest rate effect. This paragraph was cut before sending, so it was never asserted to him.",
   "Our reading reproduces their own mobile-fraction-against-charge statistic, R2 = 0.52 and P = 0.029 over nine constructs, which is offered as the check on the extraction."
  ],
- "what_was_disclaimed_in_the_email": "That everything is read from their text rather than their data; that they are better placed to check it; that the 24-construct time course is their single-experiment dataset while the U2OS proportions have n=4 and the FRAP has per-structure n of 14 to 23; and that it is held loosely for that reason.",
+ "what_was_disclaimed_in_the_email": "That everything is read from their text rather than their data, and that they are better placed to check it. THAT IS ALL. The qualification previously recorded here -- that the 24-construct time course is their single-experiment dataset while the U2OS proportions have n=4 and the FRAP has per-structure n of 14 to 23, and that it is therefore held loosely -- was drafted and then cut before sending. Song holds the claims with the lighter hedge only: 'I have no data of my own here' and 'equally happy to be wrong about it'.",
  "what_a_reply_would_change": {
   "if_they_share_the_source_data": "The threshold manuscript's section 3.4 becomes a fit to real numbers with error bars rather than a reanalysis of prose-read percentages. The rising-hazard observation in the two slow constructs, which none of three models explains, could then be resolved as a lag, a subpopulation or heterogeneity -- the question the held-out test could not settle on five points.",
   "if_they_disagree": "Their objection goes into the manuscript's limitations and to them in reply, and the numbers are rechecked against whatever they point at.",
   "if_no_reply": "Nothing changes. The manuscript already states that the reanalysis rests on a single unreplicated experiment read from text, and that stands on its own."
  },
  "corrections": {
-  "status": "Drafted 2026-10-28 in paper_private/email_song_draft.txt as a second email. DECIDED 2026-10-29 NOT TO SEND. The draft is kept as the record of what was found and what would have been written.",
+  "status": "Drafted 2026-10-28. Decided 2026-10-29 not to send; that decision was REVERSED and the correction was SENT on 2026-10-30, as paper_private/email_song_correction_SEND.txt. What went is the 28 October draft with three changes: the single-experiment caveat restored as a third item, the code citation moved to the concept DOI 10.5281/zenodo.23665343 so it cannot go stale, and the preprint disclosure made unconditional because the preprint went public the same day as 10.5281/zenodo.23774105.",
   "found_by": "Checking the claims in this file against results/tdp43_charge_steps.json, which was written after the email went out and reports three measures of the scatter rather than one.",
   "items": [
    {
@@ -38,8 +38,22 @@
    "what_stands": "Song holds the two figures as first sent: the 3R-E hazards as 'constant to 4 %' and the alanine control as 'flat'.",
    "what_was_corrected_anyway": "Both are corrected in the manuscript. Section 3.4 now reads 'no estimate more than 6 % from the mean' and reports the alanine control at 1.5-fold wild type as a rate, giving 9.4-fold wild type and 6.3-fold the control.",
    "why_the_cost_is_limited": "Neither correction touches Song's own measurements. Both concern how this reanalysis of his published percentages was described to him, and the published version of the reanalysis carries the corrected figures.",
-   "noted_against_it": "This file was created on the principle that claims asserted to a third party have to be corrected to them as well as in the file. That principle is not satisfied by this decision, and the record says so rather than leaving it to be inferred."
+   "noted_against_it": "This file was created on the principle that claims asserted to a third party have to be corrected to them as well as in the file. That principle is not satisfied by this decision, and the record says so rather than leaving it to be inferred.",
+   "rests_on_a_premise_since_corrected": "The decision was taken on 2026-10-29 against this file as it then read, which said the email had disclaimed the single-experiment dependence. It had not. That is a point in favour of sending, since a correction would naturally carry the n=1 caveat with it. Recorded, not acted on: the decision is Bertrand's and stands until he says otherwise.",
+   "reversed": "2026-10-30, by Bertrand. The principle this file was created on -- that a claim asserted to a third party is corrected to them as well as in the file -- is now satisfied, and the entry below that recorded it as unsatisfied is kept rather than deleted because the reasoning on both sides is the point of the record."
   },
-  "also_not_sent": "The draft had gained a proposal that Song test N259D or N265D, the deamidation route his 15 charge constructs leave untouched. That proposal is unsent too. It survives as experiment 4 of the manuscript and in paper_private/sod1_cross_disease.md."
- }
+  "also_not_sent": "The N259D/N265D deamidation proposal was NOT sent. Confirmed 2026-10-30 with Bertrand and against the file itself: paper_private/email_song_correction_SEND.txt is unchanged from commit 5b3e9dc, 596 words, with no occurrence of N259D, N265D, deamidation, citrullination or Kametani. It was deliberately split into paper_private/email_song_OPTIONAL_n259d.txt so the correction could go as an apology rather than as an apology carrying an ask, which is most of why the earlier combined draft was hard to send.\n\nSo the proposal was never put to Song. It is not secret -- it is experiment 4 of the preprint and this file is itself public -- but he has not been asked, and priority needs no defending because the preprint carries it. It survives as experiment 4 of the manuscript and in paper_private/sod1_cross_disease.md. If it is ever sent, the citrullination counter-argument goes with it -- Arg268/272/275 citrullination reported to SLOW low-complexity-domain aggregation in vitro (bioRxiv 2025.02.28.639952, not peer reviewed) where Song's Arg->Glu at the same three positions accelerates conversion eight- to fourteen-fold in cells -- which is the condition it was always to be sent under, and the optional file carries it.",
+  "what_song_now_holds": {
+   "corrected": [
+    "The 3R-E scatter: 4 % is the coefficient of variation; no single estimate is more than 6 % from the mean; the full range is 10 % of the mean. Flat on all three measures.",
+    "The S266A/S273A control is about 1.5-fold wild type as a rate, so the comparison is S266D/S273D at 9.4-fold wild type and 6.3-fold the control, not against an inert baseline."
+   ],
+   "newly_disclosed": [
+    "That the whole reading rests on the 24-construct single-experiment time course, against n=4 for the U2OS proportions and 14 to 23 structures for the FRAP, and is held loosely for that reason. This was cut from the first email; it has now been said.",
+    "That the reanalysis forms part of a preprint public since 2026-10-30, 10.5281/zenodo.23774105, carrying the corrected figures rather than the first ones."
+   ],
+   "still_never_said": "The Figure S5 point -- panels E and F reassure on expression for the PAM and arginine series, no serine construct in either -- was cut from the first email and not restored. Song has never seen it."
+  }
+ },
+ "verified_against_the_sent_copy": "2026-10-30. Checked against the sent message itself, not the draft. Confirmed sent to bc5012@yonsei.ac.kr with no bounce, which is also the only evidence that address is right -- nothing here records where it was read from. It went from the Quantum Proteins address, not the gmail one, which is why a search of the gmail sent folder finds nothing and why it was briefly thought unsent. Two paragraphs present in paper_private/email_song_draft.txt were NOT in the sent message; they are marked below. Everything else matches the draft word for word, including both errors under 'corrections'."
 }
