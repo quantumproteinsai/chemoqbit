@@ -1,0 +1,77 @@
+{
+ "question": "Are the residues Rowlands finds modified the ones copper loss exposes?",
+ "source": "Rowlands et al., Acta Neuropathol Commun 13:133 (2025), main text and Table 1",
+ "note": "Supplementary Table 4 carries the full 33-residue list and was not available; these are the residues named in the main text.",
+ "residues": {
+  "SER25": {
+   "reported": "phosphorylation, CuATSM-responsive",
+   "sasa": {
+    "Cu-Zn": 100.44,
+    "as-isolated": 90.96,
+    "Zn-Zn": 87.88,
+    "holo (1HL5)": 95.18,
+    "1HL4 (mixed)": 90.98
+   }
+  },
+  "LYS30": {
+   "reported": "glycation, CuATSM-responsive",
+   "sasa": {
+    "Cu-Zn": 97.25,
+    "as-isolated": 72.95,
+    "Zn-Zn": 84.81,
+    "holo (1HL5)": 91.12,
+    "1HL4 (mixed)": 61.42
+   }
+  },
+  "HIS46": {
+   "reported": "oxidation (Cu ligand)",
+   "sasa": {
+    "Cu-Zn": 0.0,
+    "as-isolated": 0.0,
+    "Zn-Zn": 0.94,
+    "holo (1HL5)": 0.0,
+    "1HL4 (mixed)": 3.43
+   }
+  },
+  "HIS48": {
+   "reported": "oxidation (Cu ligand)",
+   "sasa": {
+    "Cu-Zn": 1.89,
+    "as-isolated": 0.94,
+    "Zn-Zn": 2.36,
+    "holo (1HL5)": 2.52,
+    "1HL4 (mixed)": 1.65
+   }
+  },
+  "HIS63": {
+   "reported": "oxidation (Cu ligand), CuATSM-responsive",
+   "sasa": {
+    "Cu-Zn": 16.14,
+    "as-isolated": 14.01,
+    "Zn-Zn": 17.69,
+    "holo (1HL5)": 10.77,
+    "1HL4 (mixed)": 52.12
+   }
+  },
+  "HIS120": {
+   "reported": "oxidation (Cu ligand)",
+   "sasa": {
+    "Cu-Zn": 8.02,
+    "as-isolated": 7.55,
+    "Zn-Zn": 9.91,
+    "holo (1HL5)": 6.24,
+    "1HL4 (mixed)": 17.24
+   }
+  },
+  "ASN139": {
+   "reported": "deamidation, CuATSM-responsive",
+   "sasa": {
+    "Cu-Zn": 48.44,
+    "as-isolated": 39.08,
+    "Zn-Zn": 35.91,
+    "holo (1HL5)": 48.99,
+    "1HL4 (mixed)": 50.99
+   }
+  }
+ }
+}

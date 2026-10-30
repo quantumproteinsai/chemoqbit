@@ -1,0 +1,70 @@
+{
+ "question": "Does proximity to copper, or solvent exposure, predict which histidines oxidise?",
+ "source": "Rowlands et al. 2025, Supplementary Table 4; geometry from 2C9V and 1HL5",
+ "residues": [
+  {
+   "residue": "H48",
+   "ligand": "Cu",
+   "oxidised": 2.83,
+   "d_cu": 2.08,
+   "d_zn": 7.2,
+   "sasa": 2.5
+  },
+  {
+   "residue": "H46",
+   "ligand": "Cu",
+   "oxidised": 0.97,
+   "d_cu": 2.11,
+   "d_zn": 5.08,
+   "sasa": 0.0
+  },
+  {
+   "residue": "H120",
+   "ligand": "Cu",
+   "oxidised": 1.12,
+   "d_cu": 2.12,
+   "d_zn": 8.23,
+   "sasa": 6.4
+  },
+  {
+   "residue": "H63",
+   "ligand": "Cu+Zn",
+   "oxidised": 3.57,
+   "d_cu": 2.67,
+   "d_zn": 2.01,
+   "sasa": 11.3
+  },
+  {
+   "residue": "H71",
+   "ligand": "Zn",
+   "oxidised": null,
+   "d_cu": 6.53,
+   "d_zn": 2.04,
+   "sasa": 8.9
+  },
+  {
+   "residue": "H80",
+   "ligand": "Zn",
+   "oxidised": null,
+   "d_cu": 7.91,
+   "d_zn": 2.03,
+   "sasa": 11.1
+  },
+  {
+   "residue": "H43",
+   "ligand": "-",
+   "oxidised": 0.97,
+   "d_cu": 8.57,
+   "d_zn": 11.86,
+   "sasa": 1.9
+  },
+  {
+   "residue": "H110",
+   "ligand": "-",
+   "oxidised": 1.0,
+   "d_cu": 15.29,
+   "d_zn": 13.07,
+   "sasa": 50.1
+  }
+ ]
+}

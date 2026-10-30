@@ -1,0 +1,913 @@
+{
+ "question": "Does copper loss expose the copper-binding histidines of SOD1?",
+ "method": "Shrake-Rupley side-chain SASA, heavy atoms, 1.4 A probe, 256 points, first altloc only. Bound metals are kept in the occlusion set, since a ligand coordinated to a metal is shielded by it. Chains are accepted as SOD1 only if they carry Cys6/57/111/146 and all four copper ligands.",
+ "caveat": "Crystal structures of different constructs, resolutions and space groups. A difference between metallation groups here is a difference between crystals, not a measured response to removing copper from one molecule.",
+ "rows": [
+  {
+   "pdb": "1HL4",
+   "chain": "A",
+   "state": "Cu-vacant, Zn-bound",
+   "cu": 0,
+   "zn": 1,
+   "cu_site": 33.64,
+   "zn_site": 38.63,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.94,
+    "48": 2.83,
+    "63": 19.49,
+    "120": 10.38,
+    "71": 9.21,
+    "80": 9.93,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "1HL4",
+   "chain": "B",
+   "state": "Cu-vacant, Zn-bound",
+   "cu": 0,
+   "zn": 1,
+   "cu_site": 33.43,
+   "zn_site": 35.83,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 3.77,
+    "63": 18.43,
+    "120": 11.23,
+    "71": 6.7,
+    "80": 10.7,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "1HL4",
+   "chain": "C",
+   "state": "apo",
+   "cu": 0,
+   "zn": 0,
+   "cu_site": 102.04,
+   "zn_site": 146.13,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 3.6,
+    "48": 0.0,
+    "63": 82.67,
+    "120": 15.77,
+    "71": 0.0,
+    "80": 22.96,
+    "83": 40.5
+   }
+  },
+  {
+   "pdb": "1HL4",
+   "chain": "D",
+   "state": "apo",
+   "cu": 0,
+   "zn": 0,
+   "cu_site": 128.66,
+   "zn_site": 143.96,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 9.17,
+    "48": 0.0,
+    "63": 87.89,
+    "120": 31.6,
+    "71": 0.0,
+    "80": 30.38,
+    "83": 25.69
+   }
+  },
+  {
+   "pdb": "1HL5",
+   "chain": "A",
+   "state": "holo",
+   "cu": 1,
+   "zn": 1,
+   "cu_site": 18.92,
+   "zn_site": 26.89,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 3.77,
+    "63": 9.49,
+    "120": 5.66,
+    "71": 6.7,
+    "80": 10.7,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "1HL5",
+   "chain": "B",
+   "state": "holo",
+   "cu": 1,
+   "zn": 1,
+   "cu_site": 17.14,
+   "zn_site": 31.08,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 2.83,
+    "63": 8.65,
+    "120": 5.66,
+    "71": 10.88,
+    "80": 11.55,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "1HL5",
+   "chain": "C",
+   "state": "holo",
+   "cu": 1,
+   "zn": 1,
+   "cu_site": 21.56,
+   "zn_site": 35.57,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 1.89,
+    "63": 12.12,
+    "120": 7.55,
+    "71": 11.72,
+    "80": 11.73,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "1HL5",
+   "chain": "D",
+   "state": "holo",
+   "cu": 1,
+   "zn": 1,
+   "cu_site": 20.59,
+   "zn_site": 34.33,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 2.83,
+    "63": 11.16,
+    "120": 6.6,
+    "71": 12.56,
+    "80": 10.61,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "1HL5",
+   "chain": "E",
+   "state": "holo",
+   "cu": 1,
+   "zn": 1,
+   "cu_site": 20.53,
+   "zn_site": 33.63,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 2.83,
+    "63": 12.04,
+    "120": 5.66,
+    "71": 10.04,
+    "80": 11.55,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "1HL5",
+   "chain": "F",
+   "state": "holo",
+   "cu": 1,
+   "zn": 1,
+   "cu_site": 18.69,
+   "zn_site": 27.47,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 2.83,
+    "63": 10.2,
+    "120": 5.66,
+    "71": 8.37,
+    "80": 8.9,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "1HL5",
+   "chain": "G",
+   "state": "holo",
+   "cu": 1,
+   "zn": 1,
+   "cu_site": 21.74,
+   "zn_site": 30.29,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 2.83,
+    "63": 10.42,
+    "120": 8.49,
+    "71": 6.7,
+    "80": 13.17,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "1HL5",
+   "chain": "H",
+   "state": "holo",
+   "cu": 1,
+   "zn": 1,
+   "cu_site": 19.11,
+   "zn_site": 30.24,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 3.77,
+    "63": 8.74,
+    "120": 6.6,
+    "71": 10.04,
+    "80": 11.46,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "1HL5",
+   "chain": "I",
+   "state": "holo",
+   "cu": 1,
+   "zn": 1,
+   "cu_site": 22.2,
+   "zn_site": 36.42,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 2.83,
+    "63": 14.65,
+    "120": 4.72,
+    "71": 10.04,
+    "80": 11.73,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "1HL5",
+   "chain": "J",
+   "state": "holo",
+   "cu": 1,
+   "zn": 1,
+   "cu_site": 18.8,
+   "zn_site": 31.9,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 2.83,
+    "63": 10.31,
+    "120": 5.66,
+    "71": 10.04,
+    "80": 11.55,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "1HL5",
+   "chain": "K",
+   "state": "holo",
+   "cu": 1,
+   "zn": 1,
+   "cu_site": 17.04,
+   "zn_site": 30.43,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 1.89,
+    "63": 9.49,
+    "120": 5.66,
+    "71": 9.21,
+    "80": 11.73,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "1HL5",
+   "chain": "L",
+   "state": "holo",
+   "cu": 1,
+   "zn": 1,
+   "cu_site": 20.68,
+   "zn_site": 33.06,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 0.94,
+    "63": 11.25,
+    "120": 8.49,
+    "71": 8.37,
+    "80": 13.44,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "1HL5",
+   "chain": "M",
+   "state": "holo",
+   "cu": 1,
+   "zn": 1,
+   "cu_site": 18.71,
+   "zn_site": 31.26,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 1.89,
+    "63": 11.16,
+    "120": 5.66,
+    "71": 8.37,
+    "80": 11.73,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "1HL5",
+   "chain": "N",
+   "state": "holo",
+   "cu": 1,
+   "zn": 1,
+   "cu_site": 16.93,
+   "zn_site": 31.12,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 1.89,
+    "63": 9.38,
+    "120": 5.66,
+    "71": 11.72,
+    "80": 10.02,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "1HL5",
+   "chain": "O",
+   "state": "holo",
+   "cu": 1,
+   "zn": 1,
+   "cu_site": 18.71,
+   "zn_site": 26.92,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 1.89,
+    "63": 10.22,
+    "120": 6.6,
+    "71": 7.53,
+    "80": 9.17,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "1HL5",
+   "chain": "P",
+   "state": "holo",
+   "cu": 1,
+   "zn": 1,
+   "cu_site": 22.42,
+   "zn_site": 33.37,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 1.89,
+    "63": 14.87,
+    "120": 5.66,
+    "71": 7.53,
+    "80": 10.97,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "1HL5",
+   "chain": "Q",
+   "state": "holo",
+   "cu": 1,
+   "zn": 1,
+   "cu_site": 15.13,
+   "zn_site": 27.76,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 2.83,
+    "63": 8.53,
+    "120": 3.77,
+    "71": 9.21,
+    "80": 10.02,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "1HL5",
+   "chain": "S",
+   "state": "holo",
+   "cu": 1,
+   "zn": 1,
+   "cu_site": 22.5,
+   "zn_site": 28.64,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 2.83,
+    "63": 11.18,
+    "120": 8.49,
+    "71": 7.53,
+    "80": 9.93,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "1L3N",
+   "chain": "A",
+   "state": "Cu-vacant, Zn-bound",
+   "cu": 0,
+   "zn": 1,
+   "cu_site": 20.01,
+   "zn_site": 15.58,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 7.85,
+    "63": 10.49,
+    "120": 1.67,
+    "71": 0.0,
+    "80": 4.25,
+    "83": 0.84
+   }
+  },
+  {
+   "pdb": "1L3N",
+   "chain": "B",
+   "state": "Cu-vacant, Zn-bound",
+   "cu": 0,
+   "zn": 1,
+   "cu_site": 12.29,
+   "zn_site": 35.41,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 1.71,
+    "63": 10.58,
+    "120": 0.0,
+    "71": 1.67,
+    "80": 15.63,
+    "83": 7.53
+   }
+  },
+  {
+   "pdb": "2AF2",
+   "chain": "A",
+   "state": "Cu-vacant, Zn-bound",
+   "cu": 0,
+   "zn": 1,
+   "cu_site": 11.0,
+   "zn_site": 11.44,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 0.0,
+    "63": 3.45,
+    "120": 7.55,
+    "71": 0.94,
+    "80": 5.38,
+    "83": 1.67
+   }
+  },
+  {
+   "pdb": "2AF2",
+   "chain": "B",
+   "state": "Cu-vacant, Zn-bound",
+   "cu": 0,
+   "zn": 1,
+   "cu_site": 47.76,
+   "zn_site": 11.34,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.94,
+    "48": 16.36,
+    "63": 5.25,
+    "120": 25.21,
+    "71": 0.0,
+    "80": 6.09,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "2C9S",
+   "chain": "A",
+   "state": "Zn-Zn (Strange)",
+   "cu": 0,
+   "zn": 3,
+   "cu_site": 31.85,
+   "zn_site": 40.13,
+   "oxidised_residues": [
+    111
+   ],
+   "per_residue": {
+    "46": 0.94,
+    "48": 2.83,
+    "63": 17.7,
+    "120": 10.38,
+    "71": 10.88,
+    "80": 11.55,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "2C9S",
+   "chain": "F",
+   "state": "Zn-Zn (Strange)",
+   "cu": 0,
+   "zn": 3,
+   "cu_site": 29.94,
+   "zn_site": 42.84,
+   "oxidised_residues": [
+    111
+   ],
+   "per_residue": {
+    "46": 0.94,
+    "48": 1.89,
+    "63": 17.68,
+    "120": 9.43,
+    "71": 11.72,
+    "80": 13.44,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "2C9U",
+   "chain": "A",
+   "state": "as-isolated (Strange)",
+   "cu": 1,
+   "zn": 2,
+   "cu_site": 25.24,
+   "zn_site": 30.66,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 0.94,
+    "63": 15.81,
+    "120": 8.49,
+    "71": 5.86,
+    "80": 8.99,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "2C9U",
+   "chain": "F",
+   "state": "as-isolated (Strange)",
+   "cu": 1,
+   "zn": 2,
+   "cu_site": 19.75,
+   "zn_site": 32.32,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 0.94,
+    "63": 12.21,
+    "120": 6.6,
+    "71": 7.53,
+    "80": 12.58,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "2C9V",
+   "chain": "A",
+   "state": "Cu-Zn (Strange)",
+   "cu": 1,
+   "zn": 1,
+   "cu_site": 26.96,
+   "zn_site": 33.42,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 1.89,
+    "63": 17.52,
+    "120": 7.55,
+    "71": 5.02,
+    "80": 10.88,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "2C9V",
+   "chain": "F",
+   "state": "Cu-Zn (Strange)",
+   "cu": 1,
+   "zn": 1,
+   "cu_site": 25.14,
+   "zn_site": 33.19,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 1.89,
+    "63": 14.76,
+    "120": 8.49,
+    "71": 6.7,
+    "80": 11.73,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "7FB9",
+   "chain": "A",
+   "state": "holo",
+   "cu": 1,
+   "zn": 1,
+   "cu_site": 27.81,
+   "zn_site": 38.48,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 3.77,
+    "63": 18.38,
+    "120": 5.66,
+    "71": 8.37,
+    "80": 11.73,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "7FB9",
+   "chain": "B",
+   "state": "Cu-vacant, Zn-bound",
+   "cu": 0,
+   "zn": 1,
+   "cu_site": 19.88,
+   "zn_site": 24.84,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 2.83,
+    "63": 10.45,
+    "120": 6.6,
+    "71": 5.13,
+    "80": 9.26,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "7FB9",
+   "chain": "C",
+   "state": "Cu-vacant, Zn-bound",
+   "cu": 0,
+   "zn": 1,
+   "cu_site": 15.33,
+   "zn_site": 20.6,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 2.83,
+    "63": 6.84,
+    "120": 5.66,
+    "71": 8.37,
+    "80": 5.39,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "7FB9",
+   "chain": "D",
+   "state": "holo",
+   "cu": 1,
+   "zn": 1,
+   "cu_site": 15.12,
+   "zn_site": 26.29,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 0.94,
+    "63": 9.46,
+    "120": 4.72,
+    "71": 5.86,
+    "80": 10.97,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "7FB9",
+   "chain": "E",
+   "state": "Cu-vacant, Zn-bound",
+   "cu": 0,
+   "zn": 1,
+   "cu_site": 20.41,
+   "zn_site": 34.34,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 1.89,
+    "63": 13.8,
+    "120": 4.72,
+    "71": 7.53,
+    "80": 13.01,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "7FB9",
+   "chain": "F",
+   "state": "Cu-vacant, Zn-bound",
+   "cu": 0,
+   "zn": 1,
+   "cu_site": 14.86,
+   "zn_site": 22.71,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 0.94,
+    "63": 9.47,
+    "120": 4.45,
+    "71": 5.02,
+    "80": 8.22,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "7FB9",
+   "chain": "G",
+   "state": "Cu-vacant, Zn-bound",
+   "cu": 0,
+   "zn": 1,
+   "cu_site": 17.42,
+   "zn_site": 34.12,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 1.89,
+    "63": 10.31,
+    "120": 5.22,
+    "71": 11.72,
+    "80": 12.09,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "7FB9",
+   "chain": "H",
+   "state": "holo",
+   "cu": 1,
+   "zn": 1,
+   "cu_site": 21.45,
+   "zn_site": 35.32,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 2.83,
+    "63": 12.96,
+    "120": 5.66,
+    "71": 7.53,
+    "80": 14.83,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "7FB9",
+   "chain": "I",
+   "state": "holo",
+   "cu": 1,
+   "zn": 1,
+   "cu_site": 20.42,
+   "zn_site": 30.5,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 0.94,
+    "63": 11.93,
+    "120": 7.55,
+    "71": 8.37,
+    "80": 10.2,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "7FB9",
+   "chain": "J",
+   "state": "holo",
+   "cu": 1,
+   "zn": 1,
+   "cu_site": 16.09,
+   "zn_site": 32.4,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 2.83,
+    "63": 10.43,
+    "120": 2.83,
+    "71": 9.21,
+    "80": 12.76,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "7FB9",
+   "chain": "K",
+   "state": "holo",
+   "cu": 1,
+   "zn": 1,
+   "cu_site": 23.96,
+   "zn_site": 38.47,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 1.89,
+    "63": 15.47,
+    "120": 6.6,
+    "71": 5.02,
+    "80": 17.98,
+    "83": 0.0
+   }
+  },
+  {
+   "pdb": "7FB9",
+   "chain": "L",
+   "state": "Cu-vacant, Zn-bound",
+   "cu": 0,
+   "zn": 1,
+   "cu_site": 13.83,
+   "zn_site": 26.17,
+   "oxidised_residues": [],
+   "per_residue": {
+    "46": 0.0,
+    "48": 0.94,
+    "63": 8.62,
+    "120": 4.27,
+    "71": 7.53,
+    "80": 10.02,
+    "83": 0.0
+   }
+  }
+ ],
+ "summary": {
+  "Cu-Zn (Strange)": {
+   "n": 2,
+   "cu_mean": 26.05,
+   "cu_sd": 0.91,
+   "zn_mean": 33.3,
+   "zn_sd": 0.12,
+   "pdbs": [
+    "2C9V"
+   ]
+  },
+  "as-isolated (Strange)": {
+   "n": 2,
+   "cu_mean": 22.49,
+   "cu_sd": 2.74,
+   "zn_mean": 31.49,
+   "zn_sd": 0.83,
+   "pdbs": [
+    "2C9U"
+   ]
+  },
+  "Zn-Zn (Strange)": {
+   "n": 2,
+   "cu_mean": 30.9,
+   "cu_sd": 0.96,
+   "zn_mean": 41.48,
+   "zn_sd": 1.36,
+   "pdbs": [
+    "2C9S"
+   ]
+  },
+  "holo": {
+   "n": 24,
+   "cu_mean": 19.84,
+   "cu_sd": 2.88,
+   "zn_mean": 31.74,
+   "zn_sd": 3.44,
+   "pdbs": [
+    "1HL5",
+    "7FB9"
+   ]
+  },
+  "Cu-vacant, Zn-bound": {
+   "n": 12,
+   "cu_mean": 21.65,
+   "cu_sd": 10.56,
+   "zn_mean": 25.92,
+   "zn_sd": 9.39,
+   "pdbs": [
+    "1HL4",
+    "1L3N",
+    "2AF2",
+    "7FB9"
+   ]
+  },
+  "apo": {
+   "n": 2,
+   "cu_mean": 115.35,
+   "cu_sd": 13.31,
+   "zn_mean": 145.05,
+   "zn_sd": 1.08,
+   "pdbs": [
+    "1HL4"
+   ]
+  }
+ }
+}
