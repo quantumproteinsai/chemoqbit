@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 title: "chemoqbit: reaction energetics on qubits, from molecular integrals to the instruction stream of an FPGA state-vector simulator, and the protein-misfolding studies built on it"
-version: 1.4.2
+version: 1.4.4
 date-released: 2026-10-28
 license: MIT
 doi: "10.5281/zenodo.23665343"
@@ -50,3 +50,15 @@ keywords:
   - protein clearance
   - aggregation threshold
   - stochastic nucleation
+  - redox proteomics
+  - targeted proteomics
+  - parallel reaction monitoring
+  - mass spectrometry
+  - protease selection
+  - Glu-C
+  - post-translational modification
+  - asparagine deamidation
+  - cysteine oxidation
+  - wild-type SOD1
+  - comparative sequence analysis
+  - animal models
