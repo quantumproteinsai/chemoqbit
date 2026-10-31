@@ -41,3 +41,6 @@ paper/figures/
 
 # the auditor remembers which violations it has already shown; local state, not a result
 results/.audit_seen.json
+
+# SCF restart densities: tens of MB of binary per fragment, regenerable.
+results/*.chk

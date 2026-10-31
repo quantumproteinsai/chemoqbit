@@ -281,6 +281,84 @@ def check_fits(mol, tag, headroom=0.70, xc=None):
     return msg
 
 
+
+SCF_MAX_CYCLE = 60        # the default 50 was reached by the sod1 core SCF after about
+                          # 43 iterations and 21 hours. More cycles alone is not the fix,
+                          # which is why the ladder below exists, but stopping one cycle
+                          # short of a convergence that was nearly there is pure waste.
+SCF_VERBOSE = 4           # print every SCF cycle. At verbose=0 a run that is converging
+                          # and a run going nowhere look identical from outside: both are
+                          # a live process reading the integral file at 200 MB/s. That is
+                          # exactly what the stall check could not distinguish, and why a
+                          # job was reported as "working" for 21 hours while it drifted
+                          # towards max_cycle.
+
+
+def run_scf(mol, tag, chkdir=None):
+    """One SCF, with somewhere to go when it does not converge.
+
+    stage_core and stage_dft set conv_tol and nothing else, so a hard case -- the
+    sod1 core model is a dication with six waters and a charged interface -- had
+    no help at all: plain DIIS, and a refusal after fifty cycles. Three attempts
+    now, each starting from the density the last one reached:
+
+      1. DIIS as before.
+      2. A level shift with damping, which separates the frontier orbitals and
+         stops the oscillation that keeps a charged, water-rich system cycling.
+         The shift is released for a final stretch so the answer is the true
+         stationary point and not the shifted one.
+      3. Second-order (Newton) SCF, which converges where DIIS will not, at a
+         higher cost per step.
+
+    Returns (energy, converged, how). The chkfile means a killed job resumes from
+    the last density rather than from the atomic guess.
+    """
+    from pyscf import dft          # pyscf is imported lazily by the stages that use it
+    mol.verbose = SCF_VERBOSE
+    mol.stdout = sys.stdout
+
+    def base():
+        m = dft.RKS(mol, xc=XC).density_fit()
+        m.conv_tol = 1e-8
+        m.max_cycle = SCF_MAX_CYCLE
+        if chkdir:
+            m.chkfile = str(Path(chkdir) / f'scf_{tag}.chk')
+        return m
+
+    mf = base()
+    dm = None
+    if chkdir and Path(str(mf.chkfile)).exists():
+        try:
+            dm = mf.from_chk(str(mf.chkfile))
+            print(f'  scf {tag}: resuming from {mf.chkfile}', flush=True)
+        except Exception as e:
+            print(f'  scf {tag}: stored density unusable ({e}); starting fresh', flush=True)
+            dm = None
+    e = float(mf.kernel(dm0=dm))
+    if mf.converged:
+        return e, True, 'diis'
+
+    print(f'  scf {tag}: DIIS did not converge in {SCF_MAX_CYCLE}; '
+          f'retrying with a level shift', flush=True)
+    dm = mf.make_rdm1()
+    mf = base()
+    mf.level_shift, mf.damp = 0.4, 0.3
+    e = float(mf.kernel(dm0=dm))
+    # release the shift: a shifted SCF converges to the shifted problem
+    dm = mf.make_rdm1()
+    mf = base()
+    e = float(mf.kernel(dm0=dm))
+    if mf.converged:
+        return e, True, 'level-shift then released'
+
+    print(f'  scf {tag}: still not converged; going second-order', flush=True)
+    dm = mf.make_rdm1()
+    mf = base().newton()
+    mf.max_cycle = 100
+    e = float(mf.kernel(dm0=dm))
+    return e, bool(mf.converged), 'newton' if mf.converged else 'failed'
+
+
 def stage_dft(res):
     """A DFT check of the wild-type interface energy."""
     if 'dft' in res:
@@ -303,9 +381,8 @@ def stage_dft(res):
         mol = gto.M(atom=[(sym[i], X[i]) for i in idx], basis=BASIS, charge=int(qq),
                     unit='Angstrom', verbose=0)
         print('  ' + check_fits(mol, tag), flush=True)
-        mf = dft.RKS(mol, xc=XC).density_fit()
-        mf.conv_tol = 1e-8
-        out[tag] = dict(E=float(mf.kernel()), converged=bool(mf.converged), atoms=len(idx),
+        e, ok, how = run_scf(mol, tag, chkdir=OUT.parent)
+        out[tag] = dict(E=e, converged=ok, how=how, atoms=len(idx),
                         seconds=time.time() - t0)
         res['dft'] = out; save(res)
         print(f"  dft {tag}: {len(idx)} atoms, E {out[tag]['E']:.6f} ({time.time() - t0:.0f}s)",
@@ -402,9 +479,8 @@ def stage_core(res):
         mol = gto.M(atom=[(sym[i], X[i]) for i in idx], basis=BASIS, charge=int(qq),
                     unit='Angstrom', verbose=0)
         print('  ' + check_fits(mol, tag), flush=True)
-        mf = dft.RKS(mol, xc=XC).density_fit()
-        mf.conv_tol = 1e-8
-        E[tag] = dict(E=float(mf.kernel()), converged=bool(mf.converged),
+        e, ok, how = run_scf(mol, tag, chkdir=OUT.parent)
+        E[tag] = dict(E=e, converged=ok, how=how,
                       atoms=len(idx), seconds=time.time() - t1)
         out['dft'] = E; res['core'] = out; save(res)
         print('  dft %-6s %d atoms  E %.6f  converged %s  (%.0fs)'
